@@ -104,12 +104,12 @@ include_directories(include ${catkin_INCLUDE_DIRS} )
 
 
 
-set(PROJECT_NAME_TRACKING_INTERFACE "pose_tracking_interface")
+set(PROJECT_NAME_TRACKING_INTERFACE "dbot_ros_pkg")
 
 file(GLOB_RECURSE tracking_interface_headers include/${PROJECT_NAME_TRACKING_INTERFACE}/*.hpp include/${PROJECT_NAME_TRACKING_INTERFACE}/*.h)
 
 set(tracking_interface_sources
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/object_tracker.cpp
+    src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/tracker.cpp
 
     src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/image_visualizer.cpp
     src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/cloud_visualizer.cpp
@@ -130,9 +130,9 @@ add_library(${PROJECT_NAME_TRACKING_INTERFACE} ${dbot_headers}
 
 
 
-    add_executable(object_tracker
-        src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/object_tracker_node.cpp)
-    target_link_libraries(object_tracker
+    add_executable(tracker
+        src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/tracker_node.cpp)
+    target_link_libraries(tracker
         ${PROJECT_NAME_TRACKING_INTERFACE}
         ${catkin_LIBRARIES}
         ${OpenCV_LIBS}
