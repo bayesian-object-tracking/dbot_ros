@@ -33,16 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <dbot_ros_pkg/utils/object_file_reader.hpp>
 
 
-
-//#include <fast_filtering/distributions/uniform_distribution.hpp>
-//#include <dbot/models/observation_models/continuous_kinect_pixel_observation_model.hpp>
-//#include <dbot/models/observation_models/approximate_kinect_pixel_observation_model.hpp>
-
-//#include <dbot/models/process_models/continuous_occlusion_process_model.hpp>
-
-//#include <dbot/utils/distribution_test.hpp>
-
-#include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
+//#include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
 
 
 #include <boost/filesystem.hpp>

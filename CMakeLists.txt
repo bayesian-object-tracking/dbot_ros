@@ -110,14 +110,9 @@ file(GLOB_RECURSE tracking_interface_headers include/${PROJECT_NAME_TRACKING_INT
 
 set(tracking_interface_sources
     src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/tracker.cpp
-
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/image_visualizer.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/cloud_visualizer.cpp
     src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/object_file_reader.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/tracking_dataset.cpp
     src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/pcl_interface.cpp
     src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/ros_interface.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/image_publisher.cpp
 )
 
 
