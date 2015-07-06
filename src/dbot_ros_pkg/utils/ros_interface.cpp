@@ -45,7 +45,7 @@
  * University of Southern California
  */
 
-#include <pose_tracking_interface/utils/ros_interface.hpp>
+#include <dbot_ros_pkg/utils/ros_interface.hpp>
 
 template void ri::ReadParameter(const std::string& path,
                                 double& parameter,
