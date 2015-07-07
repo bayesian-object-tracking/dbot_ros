@@ -80,7 +80,7 @@ void PointsOnPlane(
 		pcl::PointCloud<PointT>& output_cloud,
 		Eigen::Matrix<MatrixT, 4, 1>& table_plane,
 		const bool& keep_organized = false,
-		const float& z_min = 0.3,  const float& z_max = 2.0,
+        const float& z_min = 0.3,  const float& z_max = 2.,
 		const float& y_min = -1.0, const float& y_max = 1.0,
 		const float& x_min = -1.0, const float& x_max = 1.0,
 		const float& min_table_dist = 0.01, const float& max_table_dist = 0.4,
@@ -94,10 +94,10 @@ void PointsOnPlane(
 		size_t& output_rows, size_t& output_cols,
 		Eigen::Matrix<MatrixT, 4, 1>& table_plane,
 		const bool& keep_organized = false,
-		const float& z_min = 0.3,  const float& z_max = 1.5,
-		const float& y_min = -0.4, const float& y_max = 0.4,
-		const float& x_min = -0.3, const float& x_max = 0.3,
-		const float& min_table_dist = 0.01, const float& max_table_dist = 0.3,
+        const float& z_min = 0.3,  const float& z_max = 2.,
+        const float& y_min = -1., const float& y_max = 1.,
+        const float& x_min = -1., const float& x_max = 1.,
+        const float& min_table_dist = 0.01, const float& max_table_dist = 0.4,
         const float& grid_size = 0.02);
 
 
