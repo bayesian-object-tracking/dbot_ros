@@ -92,8 +92,8 @@ void MultiObjectTracker::Initialize(
     std::vector<std::vector<std::vector<int> > > object_triangle_indices(object_names_.size());
     for(size_t i = 0; i < object_names_.size(); i++)
     {
-        std::string object_model_path = ros::package::getPath("arm_object_models") +
-                "/objects/" + object_names_[i] + "/" + object_names_[i] + "_downsampled" + ".obj";
+        std::string object_model_path = ros::package::getPath("dbot_ros_pkg") +
+                "/object_models/"  + object_names_[i] + ".obj";
         ObjectFileReader file_reader;
         file_reader.set_filename(object_model_path);
         file_reader.Read();
@@ -111,96 +111,26 @@ void MultiObjectTracker::Initialize(
                                                                       object_triangle_indices,
                                                                       rigid_bodies_state));
 
-
-
-
-
-
-
-
-
-
-
-
-
     // initialize observation model ========================================================================================================================================================================================================================================================================================================================================================================================================================
     boost::shared_ptr<ObservationModel> observation_model;
-#ifndef BUILD_GPU
-    use_gpu = false;
-#endif
 
-    if(!use_gpu)
-    {
-        // cpu obseration model
-        boost::shared_ptr<ff::KinectPixelObservationModel> kinect_pixel_observation_model(
-                    new ff::KinectPixelObservationModel(tail_weight, model_sigma, sigma_factor));
-        boost::shared_ptr<ff::OcclusionProcessModel> occlusion_process(
-                    new ff::OcclusionProcessModel(p_occluded_visible, p_occluded_occluded));
-        observation_model = boost::shared_ptr<ObservationModelCPUType>(
-                    new ObservationModelCPUType(camera_matrix,
-                                        image.rows(),
-                                        image.cols(),
-                                        initial_states.size(),
-                                        object_renderer,
-                                        kinect_pixel_observation_model,
-                                        occlusion_process,
-                                        initial_occlusion_prob,
-                                        delta_time));
-    }
-    else
-    {
-#ifdef BUILD_GPU
-        // gpu obseration model
-        boost::shared_ptr<ObservationModelGPUType>
-                gpu_observation_model(new ObservationModelGPUType(
-                                                 camera_matrix,
-                                                 image.rows(),
-                                                 image.cols(),
-                                                 max_sample_count,
-                                                 initial_occlusion_prob,
-                                                 delta_time));
+    // cpu obseration model
+    boost::shared_ptr<ff::KinectPixelObservationModel> kinect_pixel_observation_model(
+                new ff::KinectPixelObservationModel(tail_weight, model_sigma, sigma_factor));
+    boost::shared_ptr<ff::OcclusionProcessModel> occlusion_process(
+                new ff::OcclusionProcessModel(p_occluded_visible, p_occluded_occluded));
+    observation_model = boost::shared_ptr<ObservationModelCPUType>(
+                new ObservationModelCPUType(camera_matrix,
+                                            image.rows(),
+                                            image.cols(),
+                                            initial_states.size(),
+                                            object_renderer,
+                                            kinect_pixel_observation_model,
+                                            occlusion_process,
+                                            initial_occlusion_prob,
+                                            delta_time));
 
-        std::string vertex_shader_path =
-                ros::package::getPath("state_filtering")
-                + "/src/dbot/models/observation_models/"
-                + "kinect_image_observation_model_gpu/shaders/"
-                + "VertexShader.vertexshader";
 
-        std::string fragment_shader_path =
-                ros::package::getPath("state_filtering")
-                + "/src/dbot/models/observation_models/"
-                + "kinect_image_observation_model_gpu/shaders/"
-                + "FragmentShader.fragmentshader";
-
-        if(!boost::filesystem::exists(fragment_shader_path))
-        {
-            std::cout << "vertex shader does not exist at: "
-                 << vertex_shader_path << std::endl;
-            exit(-1);
-        }
-        if(!boost::filesystem::exists(vertex_shader_path))
-        {
-            std::cout << "fragment_shader does not exist at: "
-                 << fragment_shader_path << std::endl;
-            exit(-1);
-        }
-
-        gpu_observation_model->Constants(object_vertices,
-                                         object_triangle_indices,
-                                         p_occluded_visible,
-                                         p_occluded_occluded,
-                                         tail_weight,
-                                         model_sigma,
-                                         sigma_factor,
-                                         6.0f,         // max_depth
-                                         -log(0.5),
-                                         vertex_shader_path,
-                                         fragment_shader_path);   // exponential_rate
-
-        gpu_observation_model->Initialize();
-        observation_model = gpu_observation_model;
-#endif
-    }
 
     std::cout << "initialized observation omodel " << std::endl;
 
@@ -281,7 +211,7 @@ Eigen::VectorXd MultiObjectTracker::Filter(const sensor_msgs::Image& ros_image)
 
     std::cout << "actual delta time " << delta_time << std::endl;
     // convert image
-    Observation image = ri::Ros2Eigen<Scalar>(ros_image, downsampling_factor_); // convert to m
+    Observation image = ri::Ros2Eigen<Scalar>(ros_image, downsampling_factor_);
 
     // filter
     INIT_PROFILING;
@@ -293,7 +223,8 @@ Eigen::VectorXd MultiObjectTracker::Filter(const sensor_msgs::Image& ros_image)
     ff::FreeFloatingRigidBodiesState<> mean = filter_->StateDistribution().mean();
     for(size_t i = 0; i < object_names_.size(); i++)
     {
-        std::string object_model_path = "package://arm_object_models/objects/" + object_names_[i] + "/" + object_names_[i] + ".obj";
+        std::string object_model_path =
+                "package://dbot_ros_pkg/object_models/" + object_names_[i] + ".obj";
         ri::PublishMarker(mean.homogeneous_matrix(i).cast<float>(),
                           ros_image.header, object_model_path, object_publisher_,
                           i, 1, 0, 0);
