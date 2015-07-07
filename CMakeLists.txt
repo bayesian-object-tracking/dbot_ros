@@ -31,14 +31,6 @@ find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED)
 
-
-
-find_package(OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
 set(ccache_DIR ${PROJECT_MODULE_PATH})
 find_package(ccache REQUIRED)
 
@@ -54,13 +46,6 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
-
-
-
-# enable cuda debug information with -g -G -O0, to use with cuda-dbg
-# use --ptxas-options=-v to see number of registers, local, shared and constant memory used in kernels
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -O2 -arch=sm_20)
-
 
 
 ###################################
@@ -95,50 +80,36 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS} )
 
+set(PROJECT_NAME "dbot_ros_pkg")
 
+file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
+                          include/${PROJECT_NAME}/*.h)
 
-
-
-
-
-
-
-
-set(PROJECT_NAME_TRACKING_INTERFACE "dbot_ros_pkg")
-
-file(GLOB_RECURSE tracking_interface_headers include/${PROJECT_NAME_TRACKING_INTERFACE}/*.hpp include/${PROJECT_NAME_TRACKING_INTERFACE}/*.h)
-
-set(tracking_interface_sources
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/tracker.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/object_file_reader.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/pcl_interface.cpp
-    src/${PROJECT_NAME_TRACKING_INTERFACE}/utils/ros_interface.cpp
+set(sources
+    src/${PROJECT_NAME}/trackers/tracker.cpp
+    src/${PROJECT_NAME}/utils/object_file_reader.cpp
+    src/${PROJECT_NAME}/utils/pcl_interface.cpp
+    src/${PROJECT_NAME}/utils/ros_interface.cpp
 )
 
 
-add_library(${PROJECT_NAME_TRACKING_INTERFACE} ${dbot_headers}
-                                               ${tracking_interface_headers}
-                                               ${tracking_interface_sources})
+add_library(${PROJECT_NAME} ${dbot_headers}
+                            ${headers}
+                            ${sources})
 
 
+add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
+target_link_libraries(tracker
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${PCL_LIBRARIES}
+    yaml-cpp)
 
 
-
-
-    add_executable(tracker
-        src/${PROJECT_NAME_TRACKING_INTERFACE}/trackers/tracker_node.cpp)
-    target_link_libraries(tracker
-        ${PROJECT_NAME_TRACKING_INTERFACE}
-        ${catkin_LIBRARIES}
-        ${OpenCV_LIBS}
-        ${PCL_LIBRARIES}
-        yaml-cpp)
-
-
-    target_link_libraries(${PROJECT_NAME_TRACKING_INTERFACE} ${PCL_LIBRARIES}
-                                                             ${catkin_LIBRARIES}
-                                                             ${OpenCV_LIBRARIES}
-                                                             assimp)
+target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES}
+                                      ${catkin_LIBRARIES}
+                                      ${OpenCV_LIBRARIES})
 
 
 
