@@ -28,7 +28,6 @@
   <build_depend>orocos_kdl</build_depend>
   <build_depend>kdl_parser</build_depend>
   <build_depend>message_filters</build_depend>
-  <build_depend>robot_state_pub</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>fl</build_depend>
   <build_depend>dbot</build_depend>
@@ -45,7 +44,6 @@
   <run_depend>orocos_kdl</run_depend>
   <run_depend>kdl_parser</run_depend>
   <run_depend>message_filters</run_depend>
-  <run_depend>robot_state_pub</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>fl</run_depend>
   <run_depend>dbot</run_depend>

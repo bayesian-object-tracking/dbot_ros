@@ -16,7 +16,6 @@ find_package(catkin REQUIRED
     kdl_parser
     rosbag
     message_filters
-    robot_state_pub
     image_transport
     fl
     dbot
@@ -64,7 +63,6 @@ catkin_package(
         orocos_kdl
         kdl_parser
         message_filters
-        robot_state_pub
         image_transport
         fl
         dbot
