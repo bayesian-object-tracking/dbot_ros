@@ -5,8 +5,11 @@ source: camera
 evaluation_count: 100 #the number of evaluations
 
 object_names: [
- impact_battery
+ mugbox
 ]
+
+# value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
+update_rate: 0.05
 
 
 

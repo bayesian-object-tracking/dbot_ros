@@ -74,6 +74,8 @@ public:
     Eigen::VectorXd Filter(const sensor_msgs::Image& ros_image);
 
 private:  
+    double update_rate_;
+
     Scalar last_measurement_time_;
 
     boost::mutex mutex_;
@@ -85,6 +87,9 @@ private:
     // parameters
     std::vector<std::string> object_names_;
     int downsampling_factor_;
+
+
+    ff::FreeFloatingRigidBodiesState<> shifting_average;
 };
 
 

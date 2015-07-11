@@ -102,6 +102,9 @@ void MultiObjectTracker::Initialize(
         object_triangle_indices[i] = *file_reader.get_indices();
     }
 
+   ri::ReadParameter("update_rate", update_rate_, node_handle_);
+
+
 
 
 
@@ -198,6 +201,8 @@ void MultiObjectTracker::Initialize(
    }
     filter_->Resample(evaluation_count/sampling_blocks.size());
     filter_->SamplingBlocks(sampling_blocks);
+
+    shifting_average = filter_->StateDistribution().max();
 }
 
 Eigen::VectorXd MultiObjectTracker::Filter(const sensor_msgs::Image& ros_image)
@@ -219,17 +224,38 @@ Eigen::VectorXd MultiObjectTracker::Filter(const sensor_msgs::Image& ros_image)
     MEASURE("-----------------> total time for filtering");
 
 
+
     // visualize the mean state
-    ff::FreeFloatingRigidBodiesState<> mean = filter_->StateDistribution().mean();
+    ff::FreeFloatingRigidBodiesState<> max = filter_->StateDistribution().max();
+
+
+    // doing orientation average properly
+    Eigen::Vector4d average_q = shifting_average.quaternion().coeffs();
+
+    Eigen::Vector4d max_q = max.quaternion().coeffs();
+
+    if(average_q.dot(max_q) < 0)
+        max_q = -max_q;
+
+    Eigen::Quaterniond q;
+    q.coeffs() = (1.0-update_rate_) * average_q + update_rate_ * max_q;
+    q.normalize();
+
+    // taking weighted average
+    shifting_average = (1.0-update_rate_) * shifting_average + update_rate_ * max;
+
+    shifting_average.quaternion(q);
+
+
     for(size_t i = 0; i < object_names_.size(); i++)
     {
         std::string object_model_path =
                 "package://dbot_ros_pkg/object_models/" + object_names_[i] + ".obj";
-        ri::PublishMarker(mean.homogeneous_matrix(i).cast<float>(),
+        ri::PublishMarker(shifting_average.homogeneous_matrix(i).cast<float>(),
                           ros_image.header, object_model_path, object_publisher_,
                           i, 1, 0, 0);
     }
 
     last_measurement_time_ = ros_image.header.stamp.toSec();
-    return filter_->StateDistribution().mean();
+    return shifting_average;
 }
