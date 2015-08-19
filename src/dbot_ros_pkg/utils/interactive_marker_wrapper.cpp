@@ -20,7 +20,7 @@ namespace im {
 	visualization_msgs::InteractiveMarker int_marker;
 	std::string name = std::to_string(i);
 	// TODO add frame id either to config or as a parameters of the constructor
-	createInteractiveMarker("/XTION", name, "Object Control", int_marker);
+	createInteractiveMarker("/XTION", name, "Click on object when satisfied with initialisation", int_marker);
         
 	addObjectControl(object_names_[i], int_marker);
 	add6DoFControl(int_marker);
@@ -65,6 +65,12 @@ namespace im {
     int_marker.header.stamp=ros::Time::now();
     int_marker.name = name;
     int_marker.description = description;
+    int_marker.scale = 0.3;
+    // position interactive marker by default 1 m in front
+    // of camera in viewing condition
+    int_marker.pose.position.x = 0.0;
+    int_marker.pose.position.y = 0.0;
+    int_marker.pose.position.z = 1.0;
   }
   
   void InteractiveMarkerWrapper::addObjectControl(const std::string object_name,
