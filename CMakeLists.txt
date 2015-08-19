@@ -19,6 +19,7 @@ find_package(catkin REQUIRED
     image_transport
     fl
     dbot
+    interactive_markers
 )
 
 
@@ -66,6 +67,7 @@ catkin_package(
         image_transport
         fl
         dbot
+	interactive_markers
     DEPENDS
         OpenCV
         eigen
@@ -88,6 +90,8 @@ set(sources
     src/${PROJECT_NAME}/utils/object_file_reader.cpp
     src/${PROJECT_NAME}/utils/pcl_interface.cpp
     src/${PROJECT_NAME}/utils/ros_interface.cpp
+    src/${PROJECT_NAME}/utils/interactive_marker_wrapper.cpp
+       
 )
 
 
@@ -98,6 +102,15 @@ add_library(${PROJECT_NAME} ${dbot_headers}
 
 add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
 target_link_libraries(tracker
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${PCL_LIBRARIES}
+    yaml-cpp)
+
+
+add_executable(interactive_tracker  src/${PROJECT_NAME}/trackers/tracker_interactive_node.cpp)
+target_link_libraries(interactive_tracker
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}

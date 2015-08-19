@@ -1,0 +1,11 @@
+<launch>
+  <arg name="config_file" default="$(find dbot_ros_pkg)/config/config.yaml"/>
+
+  <!-- Pose Estimation Node-->
+  <node name="interactive_tracker" type="interactive_tracker"
+        pkg="dbot_ros_pkg" output="screen" respawn="false"> <!-- launch-prefix="valgrind" -->      
+        <rosparam command="load" file="$(arg config_file)" />
+        <param name="config_file"  type="string"  value="$(arg config_file)" />              
+  </node>
+
+</launch>
