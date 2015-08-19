@@ -42,7 +42,7 @@ namespace im
     ~InteractiveMarkerWrapper() {};
 
     std::vector<Eigen::VectorXd> getMarkerPose();
-    bool finalPose();
+    bool initializeObjects();
     
   private:
 

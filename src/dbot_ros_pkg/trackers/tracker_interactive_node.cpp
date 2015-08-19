@@ -122,29 +122,19 @@ int main (int argc, char **argv)
 
     int initial_sample_count; ri::ReadParameter("initial_sample_count", initial_sample_count, node_handle);
 
-
-
-
-
     std::cout << "reading data from camera " << std::endl;
     Eigen::Matrix3d camera_matrix = ri::GetCameraMatrix<double>(camera_info_topic, node_handle, 2.0);
 
     // get observations from camera
     sensor_msgs::Image::ConstPtr ros_image =
             ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
-    Image image = ri::Ros2Eigen<double>(*ros_image);
 
-
-
-    /// THIS IS WHERE WE COULD INITIALIZE FROM AN INTERACTIVE MARKER
+    /// publish an interactive marker and wait until initialization is finalized
     im::InteractiveMarkerWrapper im_server;
-    while(!im_server.finalPose())
+    while(!im_server.initializeObjects())
       ros::spinOnce();
-
+    
     std::vector<Eigen::VectorXd> initial_states =im_server.getMarkerPose();
-
-    ROS_INFO("initial_state size %d", initial_states.size());
-    std::cout << initial_states[0] << std::endl;
       
     // intialize the filter
     boost::shared_ptr<MultiObjectTracker> tracker(new MultiObjectTracker);
@@ -153,7 +143,20 @@ int main (int argc, char **argv)
     Tracker interface(tracker);
 
     ros::Subscriber subscriber = node_handle.subscribe(depth_image_topic, 1, &Tracker::Filter, &interface);
-    ros::spin();
+
+    while (ros::ok())
+      {
+	// in case interactive marker gets clicked again, re-initialize the filter
+	if(im_server.initializeObjects())
+	  {
+	    // get current observations from camera
+	    ros_image = ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
+	    // get desired initialization pose
+	    initial_states =im_server.getMarkerPose();
+	    tracker->Initialize(initial_states, *ros_image, camera_matrix);
+	  }
+	ros::spinOnce();
+      }
 
     return 0;
 }

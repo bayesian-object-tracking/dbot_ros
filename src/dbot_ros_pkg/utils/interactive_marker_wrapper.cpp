@@ -34,9 +34,15 @@ namespace im {
     server_.applyChanges();
   }
 
-  bool InteractiveMarkerWrapper::finalPose()
+  bool InteractiveMarkerWrapper::initializeObjects()
   {
-    return button_clicked_;
+    if(button_clicked_)
+      {
+	button_clicked_ = false;
+	return true;
+      }
+    
+    return false;
   }
   
   std::vector<Eigen::VectorXd> InteractiveMarkerWrapper::getMarkerPose()
