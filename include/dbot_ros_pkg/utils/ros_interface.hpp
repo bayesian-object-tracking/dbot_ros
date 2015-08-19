@@ -127,8 +127,27 @@ GetCameraMatrix(const std::string& camera_info_topic,
 
     return camera_matrix;
 }
+  
+  template<typename Scalar> std::string
+  GetCameraFrame(const std::string& camera_info_topic,
+		 ros::NodeHandle& node_handle,
+		 const Scalar& seconds)
+  {
+    // TODO: Check if const pointer is valid before accessing memory
+    sensor_msgs::CameraInfo::ConstPtr camera_info =
+      ros::topic::waitForMessage<sensor_msgs::CameraInfo> (camera_info_topic,
+							   node_handle,
+							   ros::Duration(seconds));
+    if(!camera_info) {
+      // if not topic was received within <seconds>
+      ROS_WARN("CameraInfo wasn't received within %f seconds. Returning default Zero message.", seconds);
+      return "";
+    }
+    
+    return camera_info->header.frame_id;
+  }
 
-
+  
 void PublishMarker(const Eigen::Matrix3f R, const Eigen::Vector3f t,
 		std_msgs::Header header,
 		std::string object_model_path,

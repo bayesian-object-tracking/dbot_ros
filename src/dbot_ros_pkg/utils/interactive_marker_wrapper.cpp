@@ -4,10 +4,11 @@
 
 namespace im {
 
-  InteractiveMarkerWrapper::InteractiveMarkerWrapper()
+  InteractiveMarkerWrapper::InteractiveMarkerWrapper(const std::string frame_id)
     : nh_("~")
     , server_("object_marker")
     , button_clicked_(false)
+    , frame_id_(frame_id)
   {
     ri::ReadParameter("object_names", object_names_, nh_);
     n_objects_ = object_names_.size();
@@ -19,8 +20,7 @@ namespace im {
 	// create an interactive marker for our server
 	visualization_msgs::InteractiveMarker int_marker;
 	std::string name = std::to_string(i);
-	// TODO add frame id either to config or as a parameters of the constructor
-	createInteractiveMarker("/XTION", name, "Click on object when satisfied with initialisation", int_marker);
+	createInteractiveMarker(frame_id_, name, "Click on object when aligned", int_marker);
         
 	addObjectControl(object_names_[i], int_marker);
 	add6DoFControl(int_marker);
@@ -57,8 +57,6 @@ namespace im {
 	state.position(i) = marker_positions_[i];
       }
     
-    //std::vector<Eigen::VectorXd> initial_states(1,state);
-    //return initial_states;
     return std::vector<Eigen::VectorXd>(1,state);
   }
 

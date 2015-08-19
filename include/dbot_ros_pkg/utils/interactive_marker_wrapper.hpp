@@ -38,7 +38,7 @@ namespace im
   class InteractiveMarkerWrapper
   {
   public:
-    InteractiveMarkerWrapper();
+    InteractiveMarkerWrapper(const std::string frame_id);
     ~InteractiveMarkerWrapper() {};
 
     std::vector<Eigen::VectorXd> getMarkerPose();
@@ -69,6 +69,8 @@ namespace im
     int n_objects_;
 
     bool button_clicked_;
+
+    std::string frame_id_;
     
   };
 

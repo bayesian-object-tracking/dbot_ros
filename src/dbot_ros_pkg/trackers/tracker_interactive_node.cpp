@@ -124,13 +124,15 @@ int main (int argc, char **argv)
 
     std::cout << "reading data from camera " << std::endl;
     Eigen::Matrix3d camera_matrix = ri::GetCameraMatrix<double>(camera_info_topic, node_handle, 2.0);
+    std::string frame_id = ri::GetCameraFrame<double>(camera_info_topic, node_handle, 2.0);
 
+    
     // get observations from camera
     sensor_msgs::Image::ConstPtr ros_image =
             ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
 
     /// publish an interactive marker and wait until initialization is finalized
-    im::InteractiveMarkerWrapper im_server;
+    im::InteractiveMarkerWrapper im_server(frame_id);
     while(!im_server.initializeObjects())
       ros::spinOnce();
     
