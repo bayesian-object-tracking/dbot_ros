@@ -10,18 +10,32 @@ find_package(catkin REQUIRED
     roscpp
     roslib
     sensor_msgs
+    std_msgs
+    geometry_msgs
     cv_bridge
     urdf
     orocos_kdl
     kdl_parser
     rosbag
-    message_filters
+    message_generation
     image_transport
     fl
     dbot
     interactive_markers
 )
 
+#Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  ObjectState.msg
+)
+
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  )
 
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
@@ -60,9 +74,12 @@ catkin_package(
         roscpp
         roslib
         sensor_msgs
+	std_msgs
+	geometry_msgs
         urdf
         orocos_kdl
         kdl_parser
+	message_runtime
         message_filters
         image_transport
         fl

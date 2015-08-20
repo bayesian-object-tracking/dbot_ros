@@ -161,6 +161,16 @@ void PublishMarker(const Eigen::Matrix4f H,
         int marker_id = 0, float r = 0, float g = 1, float b = 0, float a = 1.0);
 
 
+void PublishObjectState(const Eigen::Matrix4f H,
+			std_msgs::Header header,
+			std::string object_name,
+			const ros::Publisher &pub);
+  
+void PublishObjectState(const Eigen::Matrix3f R,
+			const Eigen::Vector3f t,
+			std_msgs::Header header,
+			std::string object_name,
+			const ros::Publisher &pub);
 
 void PublishPoints(const std_msgs::Header header,
 		const ros::Publisher &pub,

@@ -80,7 +80,8 @@ private:
 
     boost::mutex mutex_;
     ros::NodeHandle node_handle_;
-    ros::Publisher object_publisher_;
+    ros::Publisher object_state_publisher_;
+    ros::Publisher object_marker_publisher_;
 
     boost::shared_ptr<FilterType> filter_;
 

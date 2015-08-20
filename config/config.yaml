@@ -1,25 +1,27 @@
 depth_image_topic: /XTION/depth/image 
 camera_info_topic: /XTION/depth/camera_info 
 
-#depth_image_topic: /rgbd_capture/depth/image 
-#camera_info_topic: /rgbd_capture/depth/camera_info 
-#source: /home/mwuethri_local/data/projects/coordinate_particle_filter/evaluation/moving_boxes/sim/dataset
 source: camera
 evaluation_count: 100 #the number of evaluations
 
+# list of name of the object instances in the scene
+# they have to match the names of the CAD models in
+# the directory object_models
 object_names: [
  impact_battery
  #, mugbox
 ]
 
-# value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
-update_rate: 0.05
-
-
+# groups of dimensions that are jointly sampled
+# for each object instance there should be a block
 sampling_blocks: [
  [ 0,  1,  2,  3,  4,  5]
  #,[ 6,  7,  8,  9,  10,  11]
 ]
+
+# value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
+update_rate: 0.05
+
 
 max_kl_divergence: 2.0
 use_gpu: false

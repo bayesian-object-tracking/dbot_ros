@@ -32,9 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/object_file_reader.hpp>
 
-
 //#include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
-
+#include <dbot_ros_pkg/ObjectState.h>
 
 #include <boost/filesystem.hpp>
 
@@ -45,7 +44,8 @@ MultiObjectTracker::MultiObjectTracker():
 {
     ri::ReadParameter("object_names", object_names_, node_handle_);
     ri::ReadParameter("downsampling_factor", downsampling_factor_, node_handle_);
-    object_publisher_ = node_handle_.advertise<visualization_msgs::Marker>("object_model", 0);
+    object_marker_publisher_ = node_handle_.advertise<visualization_msgs::Marker>("object_model", 0);
+    object_state_publisher_ = node_handle_.advertise<dbot_ros_pkg::ObjectState>("object_state", 0);
 }
 
 void MultiObjectTracker::Initialize(
@@ -90,6 +90,7 @@ void MultiObjectTracker::Initialize(
     // load object mesh
     std::vector<std::vector<Eigen::Vector3d> > object_vertices(object_names_.size());
     std::vector<std::vector<std::vector<int> > > object_triangle_indices(object_names_.size());
+    std::vector<dbot_ros_pkg::ObjectState> object_states(object_names_.size());
     for(size_t i = 0; i < object_names_.size(); i++)
     {
         std::string object_model_path = ros::package::getPath("dbot_ros_pkg") +
@@ -103,9 +104,6 @@ void MultiObjectTracker::Initialize(
     }
 
    ri::ReadParameter("update_rate", update_rate_, node_handle_);
-
-
-
 
 
     boost::shared_ptr<State> rigid_bodies_state(new ff::FreeFloatingRigidBodiesState<>(object_names_.size()));
@@ -252,8 +250,11 @@ Eigen::VectorXd MultiObjectTracker::Filter(const sensor_msgs::Image& ros_image)
         std::string object_model_path =
                 "package://dbot_ros_pkg/object_models/" + object_names_[i] + ".obj";
         ri::PublishMarker(shifting_average.homogeneous_matrix(i).cast<float>(),
-                          ros_image.header, object_model_path, object_publisher_,
+                          ros_image.header, object_model_path, object_marker_publisher_,
                           i, 1, 0, 0);
+
+	ri::PublishObjectState(shifting_average.homogeneous_matrix(i).cast<float>(),
+			       ros_image.header, object_names_[i], object_state_publisher_);
     }
 
     last_measurement_time_ = ros_image.header.stamp.toSec();

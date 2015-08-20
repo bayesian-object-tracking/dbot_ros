@@ -46,6 +46,7 @@
  */
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
+#include <dbot_ros_pkg/ObjectState.h>
 
 template void ri::ReadParameter(const std::string& path,
                                 double& parameter,
@@ -154,6 +155,44 @@ void ri::PublishMarker(const Eigen::Matrix4f H,
                   header,
                   object_model_path, pub,
                   marker_id, r, g, b, a);
+}
+
+void ri::PublishObjectState(const Eigen::Matrix4f H,
+			    std_msgs::Header header,
+			    std::string object_name,
+			    const ros::Publisher &pub)
+{
+  PublishObjectState(H.topLeftCorner(3,3),
+		     H.topRightCorner(3,1),
+		     header,
+		     object_name,
+		     pub);
+}
+
+void ri::PublishObjectState(const Eigen::Matrix3f R, const Eigen::Vector3f t,
+			    std_msgs::Header header,
+			    std::string object_name,
+			    const ros::Publisher &pub)
+{
+  Eigen::Quaternion<float> q(R);
+  
+  geometry_msgs::PoseStamped pose;
+  pose.header =  header;
+  pose.pose.position.x = t(0);
+  pose.pose.position.y = t(1);
+  pose.pose.position.z = t(2);
+  
+  pose.pose.orientation.x = q.x();
+  pose.pose.orientation.y = q.y();
+  pose.pose.orientation.z = q.z();
+  pose.pose.orientation.w = q.w();
+
+  dbot_ros_pkg::ObjectState object_state;
+  object_state.name = object_name;
+  object_state.pose = pose;
+
+  pub.publish(object_state);
+  
 }
 
 void ri::PublishPoints(const std_msgs::Header header,
