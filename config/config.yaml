@@ -20,7 +20,8 @@ sampling_blocks: [
 ]
 
 # value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
-update_rate: 0.05
+#update_rate: 0.05
+update_rate: 1.
 
 
 max_kl_divergence: 2.0

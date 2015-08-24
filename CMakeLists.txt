@@ -68,8 +68,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 catkin_package(
     INCLUDE_DIRS
         include
-    LIBRARIES
-        pose_tracking_interface
+    #LIBRARIES
+    #    pose_tracking_interface
     CATKIN_DEPENDS
         roscpp
         roslib
