@@ -1,0 +1,53 @@
+depth_image_topic: /XTION/depth/image 
+camera_info_topic: /XTION/depth/camera_info 
+
+source: camera
+evaluation_count: 100 #the number of evaluations
+
+# list of name of the object instances in the scene
+# they have to match the names of the CAD models in
+# the directory object_models
+object_names: [
+ impact_battery
+ #, mugbox
+]
+
+# groups of dimensions that are jointly sampled
+# for each object instance there should be a block
+sampling_blocks: [
+ [ 0,  1,  2,  3,  4,  5]
+ #,[ 6,  7,  8,  9,  10,  11]
+]
+
+# value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
+#update_rate: 0.05
+update_rate: 1.
+
+
+max_kl_divergence: 2.0
+use_gpu: false
+
+# filtering parameters ----------------------------------------------------------------------
+downsampling_factor: 8 #8
+initial_sample_count: 1000 #10000 this is the number of samples for the initialization
+max_sample_count: 10000 #10000 this is for the gpu to allocate memory
+
+linear_acceleration_sigma:   0.2 #0.1  0.2  1.0 2.0
+angular_acceleration_sigma: 3.0 #1.5  3.0  15.0 30.0
+damping: 5.0 #5.0  20.0  1000.0 1000.0
+
+# observation model parameters --------------------------------------------------------------
+tail_weight: 0.01 #0.01, 0.998
+model_sigma: 0.003 #0.003, 0.005
+sigma_factor: 0.0014247 #0.0014247
+
+# occlusion process model 
+initial_occlusion_prob: 0.1 #0.1
+p_occluded_visible: 0.1 #0.1
+p_occluded_occluded: 0.7 #0.7
+
+min_delta_time: 0.
+
+
+
+

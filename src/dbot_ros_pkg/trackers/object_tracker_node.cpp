@@ -36,13 +36,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <fl/util/profiling.hpp>
 
-#include <dbot_ros_pkg/trackers/object_tracker.hpp>
-#include <dbot_ros_pkg/utils/tracking_dataset.hpp>
-#include <dbot_ros_pkg/utils/pcl_interface.hpp>
-#include <dbot_ros_pkg/utils/ros_interface.hpp>
 
-#include <dbot/utils/helper_functions.hpp>
-#include <dbot/utils/distribution_test.hpp>
+#include <state_filtering/trackers/object_tracker.hpp>
+#include <state_filtering/utils/tracking_dataset.hpp>
+#include <state_filtering/utils/pcl_interface.hpp>
+#include <state_filtering/utils/ros_interface.hpp>
+
+//#include <dbot/utils/distribution_test.hpp>
 
 typedef sensor_msgs::CameraInfo::ConstPtr CameraInfoPtr;
 typedef Eigen::Matrix<double, -1, -1> Image;
@@ -76,14 +76,14 @@ public:
     void Filter(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        fl::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        dbot::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
     }
 
     void FilterAndStore(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        fl::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        dbot::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
 
         std::ofstream file;
@@ -125,6 +125,7 @@ int main (int argc, char **argv)
     // read from camera
     if(source == "camera")
     {
+        /// \todo this will only work for one object
         std::cout << "reading data from camera " << std::endl;
         Eigen::Matrix3d camera_matrix = ri::GetCameraMatrix<double>(camera_info_topic, node_handle, 2.0);
 
@@ -135,7 +136,7 @@ int main (int argc, char **argv)
 
         std::vector<Eigen::VectorXd>
                 initial_states = pi::SampleTableClusters(
-                    fl::hf::Image2Points(image, camera_matrix),
+                    dbot::hf::Image2Points(image, camera_matrix),
                     initial_sample_count);
 
         // intialize the filter
@@ -158,14 +159,14 @@ int main (int argc, char **argv)
         std::cout << "setting initial state " << std::endl;
         std::cout << TrackingDataset.GetGroundTruth(0).transpose() << std::endl;
         std::cout << "done printing vector " << std::endl;
-        fl::FreeFloatingRigidBodiesState<-1> initial_state(object_names.size());
+        dbot::FreeFloatingRigidBodiesState<-1> initial_state(object_names.size());
         initial_state.poses(TrackingDataset.GetGroundTruth(0).topRows(object_names.size()*6)); // we read only the part of the state we need
         std::vector<Eigen::VectorXd> initial_states(1, initial_state);
 
         std::cout << "initializing filter " << std::endl;
         // intialize the filter
         boost::shared_ptr<MultiObjectTracker> tracker(new MultiObjectTracker);
-        tracker->Initialize(initial_states, *TrackingDataset.GetImage(0), TrackingDataset.GetCameraMatrix(0), false);
+        tracker->Initialize(initial_states, *TrackingDataset.GetImage(0), TrackingDataset.GetCameraMatrix(0));
         Tracker interface(tracker);
 
         ros::Publisher image_publisher = node_handle.advertise<sensor_msgs::Image>("/bagfile/depth/image", 0);
