@@ -101,22 +101,41 @@ Ros2Eigen(const sensor_msgs::Image& ros_image,
     return eigen_image;
 }
 
+template<typename Scalar> Eigen::Matrix<Scalar, -1, 1>
+Ros2EigenVector(const sensor_msgs::Image& ros_image,
+          const size_t& n_downsampling = 1)
+{
+
+    cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
+
+    size_t n_rows = cv_image.rows/n_downsampling;
+    size_t n_cols = cv_image.cols/n_downsampling;
+
+    Eigen::Matrix<Scalar, -1, 1> eigen_image(n_rows * n_cols, 1);
+    for(size_t row = 0; row < n_rows; row++)
+        for(size_t col = 0; col < n_cols; col++)
+            eigen_image(row * n_cols + col) = cv_image.at<float>(row * n_downsampling, col * n_downsampling);
+
+    return eigen_image;
+}
+
+
 template<typename Scalar> Eigen::Matrix<Scalar, 3, 3>
 GetCameraMatrix(const std::string& camera_info_topic,
                 ros::NodeHandle& node_handle,
-                const Scalar& timeout_seconds)
+                const Scalar& seconds)
 {
   // TODO: Check if const pointer is valid before accessing memory
     sensor_msgs::CameraInfo::ConstPtr camera_info =
             ros::topic::waitForMessage<sensor_msgs::CameraInfo> (camera_info_topic,
                                                                  node_handle,
-                                                                 ros::Duration(timeout_seconds));
+                                                                 ros::Duration(seconds));
 
     Eigen::Matrix<Scalar, 3, 3> camera_matrix = Eigen::Matrix<Scalar, 3, 3>::Zero();
 
     if(!camera_info) {
       // if not topic was received within <seconds>
-      ROS_WARN("CameraInfo wasn't received within %f seconds. Returning default Zero message.", timeout_seconds);
+      ROS_WARN("CameraInfo wasn't received within %f seconds. Returning default Zero message.", seconds);
       return camera_matrix;
     }
     ROS_INFO("Valid CameraInfo was received");
@@ -127,50 +146,23 @@ GetCameraMatrix(const std::string& camera_info_topic,
 
     return camera_matrix;
 }
-  
-  template<typename Scalar> std::string
-  GetCameraFrame(const std::string& camera_info_topic,
-		 ros::NodeHandle& node_handle,
-		 const Scalar& seconds)
-  {
-    // TODO: Check if const pointer is valid before accessing memory
-    sensor_msgs::CameraInfo::ConstPtr camera_info =
-      ros::topic::waitForMessage<sensor_msgs::CameraInfo> (camera_info_topic,
-							   node_handle,
-							   ros::Duration(seconds));
-    if(!camera_info) {
-      // if not topic was received within <seconds>
-      ROS_WARN("CameraInfo wasn't received within %f seconds. Returning default Zero message.", seconds);
-      return "";
-    }
-    
-    return camera_info->header.frame_id;
-  }
 
-  
+
 void PublishMarker(const Eigen::Matrix3f R, const Eigen::Vector3f t,
         std_msgs::Header header,
         std::string object_model_path,
         const ros::Publisher &pub,
-        int marker_id = 0, float r = 0, float g = 1, float b = 0, float a = 1.0);
+        int marker_id = 0, float r = 0, float g = 1, float b = 0, float a = 1.0,
+        std::string ns= "object");
 
 void PublishMarker(const Eigen::Matrix4f H,
         std_msgs::Header header,
         std::string object_model_path,
         const ros::Publisher &pub,
-        int marker_id = 0, float r = 0, float g = 1, float b = 0, float a = 1.0);
+        int marker_id = 0, float r = 0, float g = 1, float b = 0, float a = 1.0,
+        std::string ns = "object");
 
 
-void PublishObjectState(const Eigen::Matrix4f H,
-			std_msgs::Header header,
-			std::string object_name,
-			const ros::Publisher &pub);
-  
-void PublishObjectState(const Eigen::Matrix3f R,
-			const Eigen::Vector3f t,
-			std_msgs::Header header,
-			std::string object_name,
-			const ros::Publisher &pub);
 
 void PublishPoints(const std_msgs::Header header,
         const ros::Publisher &pub,

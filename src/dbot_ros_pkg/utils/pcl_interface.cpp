@@ -69,7 +69,7 @@
 #include <fl/distribution/gaussian.hpp>
 
 #include <dbot_ros_pkg/utils/pcl_interface.hpp>
-//#include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
+#include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
 
 namespace pi
 {
@@ -605,7 +605,7 @@ template <typename PointT> void FindCylinder(
 // this function creates some samples around clusters on a plane. it assumes
 // that when the object is standing on the table, the origin coincides with the
 // table plane and z points upwards
-template<typename Scalar> std::vector<ff::FreeFloatingRigidBodiesState<-1>::State>
+template<typename Scalar> std::vector<osr::FreeFloatingRigidBodiesState<-1>::State>
 SampleTableClusters(const std::vector<Eigen::Matrix<Scalar,3,1> >& points,
                     const size_t& n_rows, const size_t& n_cols,
                     const size_t& sample_count)
@@ -614,7 +614,7 @@ SampleTableClusters(const std::vector<Eigen::Matrix<Scalar,3,1> >& points,
     typedef Eigen::Matrix<Scalar,3,3> Matrix;
     typedef Eigen::Matrix<Scalar,4,1> Plane;
 
-    typedef ff::FreeFloatingRigidBodiesState<-1> BodySystem;
+    typedef osr::FreeFloatingRigidBodiesState<-1> BodySystem;
 
     std::vector<BodySystem::State> states;
 
@@ -655,11 +655,11 @@ SampleTableClusters(const std::vector<Eigen::Matrix<Scalar,3,1> >& points,
         for(size_t i = 0; i < size_t(sample_count)/clusters.size(); i++)
         {
             BodySystem body_system(1);
-            body_system.position() =
+            body_system.component(0).pose().position() =
                     t_mean +
                     standard_deviation_translation * unit_gaussian.sample()(0) * table_vector_a +
                     standard_deviation_translation * unit_gaussian.sample()(0) * table_vector_b;
-            body_system.quaternion(Eigen::Quaterniond(
+            body_system.component(0).orientation().quaternion(Eigen::Quaterniond(
                                      Eigen::AngleAxisd(standard_deviation_rotation * unit_gaussian.sample()(0), table_normal) * R_mean));
 
             states.push_back(body_system);
@@ -670,7 +670,7 @@ SampleTableClusters(const std::vector<Eigen::Matrix<Scalar,3,1> >& points,
 }
 
 
-template<typename Scalar> std::vector<ff::FreeFloatingRigidBodiesState<-1>::State>
+template<typename Scalar> std::vector<osr::FreeFloatingRigidBodiesState<-1>::State>
 SampleTableClusters(const Eigen::Matrix<Eigen::Matrix<Scalar,3,1>, -1, -1>& points,
                     const size_t& sample_count)
 {
@@ -685,7 +685,7 @@ SampleTableClusters(const Eigen::Matrix<Eigen::Matrix<Scalar,3,1>, -1, -1>& poin
 
 }
 
-template std::vector<ff::FreeFloatingRigidBodiesState<-1>::State>
+template std::vector<osr::FreeFloatingRigidBodiesState<-1>::State>
 pi::SampleTableClusters(const Eigen::Matrix<Eigen::Matrix<double,3,1>, -1, -1>&,
                         const size_t&);
 template void pi::Cluster(const pcl::PointCloud<pcl::PointXYZ>&,

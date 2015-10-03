@@ -37,10 +37,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fl/util/profiling.hpp>
 
 
-#include <state_filtering/trackers/object_tracker.hpp>
-#include <state_filtering/utils/tracking_dataset.hpp>
-#include <state_filtering/utils/pcl_interface.hpp>
-#include <state_filtering/utils/ros_interface.hpp>
+#include <dbot_ros_pkg/trackers/object_tracker.hpp>
+#include <dbot_ros_pkg/utils/tracking_dataset.hpp>
+#include <dbot_ros_pkg/utils/pcl_interface.hpp>
+#include <dbot_ros_pkg/utils/ros_interface.hpp>
 
 //#include <dbot/utils/distribution_test.hpp>
 
@@ -76,14 +76,14 @@ public:
     void Filter(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        dbot::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+       osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
     }
 
     void FilterAndStore(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        dbot::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+       osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
 
         std::ofstream file;
@@ -159,7 +159,7 @@ int main (int argc, char **argv)
         std::cout << "setting initial state " << std::endl;
         std::cout << TrackingDataset.GetGroundTruth(0).transpose() << std::endl;
         std::cout << "done printing vector " << std::endl;
-        dbot::FreeFloatingRigidBodiesState<-1> initial_state(object_names.size());
+       osr::FreeFloatingRigidBodiesState<-1> initial_state(object_names.size());
         initial_state.poses(TrackingDataset.GetGroundTruth(0).topRows(object_names.size()*6)); // we read only the part of the state we need
         std::vector<Eigen::VectorXd> initial_states(1, initial_state);
 

@@ -45,17 +45,6 @@ find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED)
 
-set(ccache_DIR ${PROJECT_MODULE_PATH})
-find_package(ccache REQUIRED)
-
-if(CCACHE_FOUND)
-    message(" ccache found. GCC will be launched via ccache.")
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-else(CCACHE_FOUND)
-    message(" ccache not found. ")
-endif(CCACHE_FOUND)
-
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
@@ -68,27 +57,26 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 catkin_package(
     INCLUDE_DIRS
         include
-    #LIBRARIES
-    #    pose_tracking_interface
+    LIBRARIES
+        ${PROJECT_NAME}
     CATKIN_DEPENDS
         roscpp
         roslib
         sensor_msgs
-	std_msgs
-	geometry_msgs
+        std_msgs
+        geometry_msgs
         urdf
         orocos_kdl
         kdl_parser
-	message_runtime
+        message_runtime
         message_filters
         image_transport
         fl
         dbot
-	interactive_markers
+        interactive_markers
     DEPENDS
         OpenCV
         eigen
-        assimp
 )
 
 ###########
@@ -103,41 +91,52 @@ file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
                           include/${PROJECT_NAME}/*.h)
 
 set(sources
-    src/${PROJECT_NAME}/trackers/tracker.cpp
+#    src/${PROJECT_NAME}/trackers/tracker.cpp
+    src/${PROJECT_NAME}/trackers/object_tracker.cpp
     src/${PROJECT_NAME}/utils/object_file_reader.cpp
     src/${PROJECT_NAME}/utils/pcl_interface.cpp
     src/${PROJECT_NAME}/utils/ros_interface.cpp
-    src/${PROJECT_NAME}/utils/interactive_marker_wrapper.cpp
-       
+    src/${PROJECT_NAME}/utils/cloud_visualizer.cpp
+    src/${PROJECT_NAME}/utils/tracking_dataset.cpp
 )
-
 
 add_library(${PROJECT_NAME} ${dbot_headers}
                             ${headers}
                             ${sources})
 
-
-add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
-target_link_libraries(tracker
-    ${PROJECT_NAME}
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
-    ${PCL_LIBRARIES}
-    yaml-cpp)
-
-
-add_executable(interactive_tracker  src/${PROJECT_NAME}/trackers/tracker_interactive_node.cpp)
-target_link_libraries(interactive_tracker
-    ${PROJECT_NAME}
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
-    ${PCL_LIBRARIES}
-    yaml-cpp)
-
-
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES}
                                       ${catkin_LIBRARIES}
                                       ${OpenCV_LIBRARIES})
+
+
+# object_tracker
+add_executable(object_tracker
+    src/${PROJECT_NAME}/trackers/object_tracker_node.cpp)
+target_link_libraries(object_tracker
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${PCL_LIBRARIES}
+    yaml-cpp)
+
+#add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
+#target_link_libraries(tracker
+#    ${PROJECT_NAME}
+#    ${catkin_LIBRARIES}
+#    ${OpenCV_LIBS}
+#    ${PCL_LIBRARIES}
+#    yaml-cpp)
+
+
+#add_executable(interactive_tracker  src/${PROJECT_NAME}/trackers/tracker_interactive_node.cpp)
+#target_link_libraries(interactive_tracker
+#    ${PROJECT_NAME}
+#    ${catkin_LIBRARIES}
+#    ${OpenCV_LIBS}
+#    ${PCL_LIBRARIES}
+#    yaml-cpp)
+
+
 
 
 
