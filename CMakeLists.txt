@@ -13,9 +13,6 @@ find_package(catkin REQUIRED
     std_msgs
     geometry_msgs
     cv_bridge
-    urdf
-    orocos_kdl
-    kdl_parser
     rosbag
     message_generation
     image_transport
@@ -65,9 +62,6 @@ catkin_package(
         sensor_msgs
         std_msgs
         geometry_msgs
-        urdf
-        orocos_kdl
-        kdl_parser
         message_runtime
         message_filters
         image_transport
@@ -135,7 +129,6 @@ target_link_libraries(object_tracker
 #    ${OpenCV_LIBS}
 #    ${PCL_LIBRARIES}
 #    yaml-cpp)
-
 
 
 

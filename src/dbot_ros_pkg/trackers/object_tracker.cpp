@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dbot_ros_pkg/utils/cloud_visualizer.hpp>
 
-#include <osr/orientation_transition_function.hpp>
+#include <dbot/models/process_models/orientation_transition_function.hpp>
 
 
 
