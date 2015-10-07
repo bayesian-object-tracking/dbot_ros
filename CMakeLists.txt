@@ -17,8 +17,6 @@ find_package(catkin REQUIRED
     message_generation
     image_transport
     fl
-    dbot
-    interactive_markers
 )
 
 #Generate messages in the 'msg' folder
@@ -37,6 +35,10 @@ generate_messages(
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
 
+if(NOT dbot_FOUND)
+    find_package(dbot REQUIRED)
+endif(NOT dbot_FOUND)
+
 if(NOT osr_FOUND)
     find_package(osr REQUIRED)
 endif(NOT osr_FOUND)
@@ -46,12 +48,12 @@ find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(PCL 1.3 REQUIRED)
 
+include_directories(${dbot_INCLUDE_DIRS})
 include_directories(${osr_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
-
 
 ###################################
 ## catkin specific configuration ##
@@ -71,8 +73,6 @@ catkin_package(
         message_filters
         image_transport
         fl
-        dbot
-        interactive_markers
     DEPENDS
         OpenCV
         eigen
@@ -105,8 +105,8 @@ add_library(${PROJECT_NAME} ${dbot_headers}
 
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES}
                                       ${catkin_LIBRARIES}
-                                      ${OpenCV_LIBRARIES})
-
+                                      ${OpenCV_LIBRARIES}
+                                      ${dbot_LIBRARIES})
 
 # object_tracker
 add_executable(object_tracker
@@ -116,6 +116,7 @@ target_link_libraries(object_tracker
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     ${PCL_LIBRARIES}
+    ${dbot_LIBRARIES}
     yaml-cpp)
 
 #add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
