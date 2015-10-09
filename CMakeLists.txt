@@ -6,6 +6,20 @@ set(CMAKE_BUILD_TYPE Release)
 add_definitions(-std=c++0x )
 add_definitions(-DPROFILING_ON=1) #print profiling output
 
+############################
+# Library Version          #
+############################
+include(cmake/version.cmake)
+
+############################
+# Library info summary     #
+############################
+include(cmake/info.cmake)
+
+info_begin()
+  info_project("::bot::dbot_ros_pkg:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
+info_end()
+
 find_package(catkin REQUIRED
     roscpp
     roslib
