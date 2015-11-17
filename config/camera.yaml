@@ -1,0 +1,12 @@
+depth_image_topic: /XTION/depth/image 
+camera_info_topic: /XTION/depth/camera_info 
+camera_frame_id: /XTION_IR
+downsampling_factor: 8
+
+source: camera
+
+
+downsampling: 10     # wrt VGA resolution
+resX: 640
+resY: 480
+

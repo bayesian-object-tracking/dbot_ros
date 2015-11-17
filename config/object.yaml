@@ -1,0 +1,29 @@
+
+object_package: dbot_ros_pkg
+object_directory: object_models
+
+# list of name of the object instances in the scene
+# they have to match the names of the CAD models in
+# the directory object_models
+object_names: [
+ impact_battery_recenter
+ # canteen_recenter
+ #, mugbox
+]
+
+# groups of dimensions that are jointly sampled
+# for each object instance there should be a block
+sampling_blocks: [
+ [ 0,  1,  2,  3,  4,  5]
+# ,[ 6,  7,  8,  9,  10,  11]
+]
+
+object:
+  - package: dbot_ros_pkg
+  - directory: object_models
+  - meshes: [ impact_battery_recenter ]
+  - arguments:
+    - rbc_particle_filter: 
+      - sampling_blocks: [ [0, 1, 2, 3, 4, 5] ]
+    - rms_gaussian_filter: none
+
