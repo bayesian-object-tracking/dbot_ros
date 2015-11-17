@@ -4,7 +4,7 @@ project(dbot_ros_pkg)
 set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Debug)
 add_definitions(-std=c++0x )
-add_definitions(-DPROFILING_ON=1) #print profiling output
+add_definitions(-DPROFILING_ON=1 -DBUILD_GPU=1) #print profiling output
 
 ############################
 # Library Version          #
@@ -31,6 +31,8 @@ find_package(catkin REQUIRED
     message_generation
     image_transport
     fl
+    opi
+    dbot
 )
 
 #Generate messages in the 'msg' folder
@@ -87,6 +89,9 @@ catkin_package(
         message_filters
         image_transport
         fl
+        opi
+        osr
+        dbot
     DEPENDS
         OpenCV
         eigen
@@ -104,8 +109,10 @@ file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
                           include/${PROJECT_NAME}/*.h)
 
 set(sources
-#    src/${PROJECT_NAME}/trackers/tracker.cpp
-    src/${PROJECT_NAME}/trackers/object_tracker.cpp
+    ${headers}
+    src/${PROJECT_NAME}/trackers/rbc_particle_filter_object_tracker.cpp
+#    src/${PROJECT_NAME}/trackers/rms_gaussian_filter_object_tracker.cpp
+#    src/${PROJECT_NAME}/trackers/object_tracker.cpp
     src/${PROJECT_NAME}/utils/object_file_reader.cpp
     src/${PROJECT_NAME}/utils/pcl_interface.cpp
     src/${PROJECT_NAME}/utils/ros_interface.cpp
@@ -119,19 +126,26 @@ add_library(${PROJECT_NAME} ${dbot_headers}
 
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES}
                                       ${catkin_LIBRARIES}
-                                      ${OpenCV_LIBRARIES}
-                                      ${dbot_LIBRARIES})
+                                      ${OpenCV_LIBRARIES})
 
-# object_tracker
-add_executable(object_tracker
-    src/${PROJECT_NAME}/trackers/object_tracker_node.cpp)
-target_link_libraries(object_tracker
+
+
+add_executable(
+    rbc_particle_filter_object_tracker
+    src/${PROJECT_NAME}/trackers/rbc_particle_filter_object_tracker_node.cpp)
+
+target_link_libraries(rbc_particle_filter_object_tracker
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     ${PCL_LIBRARIES}
-    ${dbot_LIBRARIES}
     yaml-cpp)
+
+add_executable(rms_gaussian_filter_object_tracker
+    src/${PROJECT_NAME}/trackers/gaussian/rmsgf_object_tracker_node.cpp)
+target_link_libraries(rms_gaussian_filter_object_tracker
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES})
 
 #add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
 #target_link_libraries(tracker
@@ -139,6 +153,7 @@ target_link_libraries(object_tracker
 #    ${catkin_LIBRARIES}
 #    ${OpenCV_LIBS}
 #    ${PCL_LIBRARIES}
+#    ${dbot_LIBRARIES}
 #    yaml-cpp)
 
 
@@ -148,6 +163,7 @@ target_link_libraries(object_tracker
 #    ${catkin_LIBRARIES}
 #    ${OpenCV_LIBS}
 #    ${PCL_LIBRARIES}
+#    ${dbot_LIBRARIES}
 #    yaml-cpp)
 
 
