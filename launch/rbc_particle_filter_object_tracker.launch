@@ -1,0 +1,18 @@
+<launch>
+  <arg name="filter_config" default="$(find dbot_ros_pkg)/config/rbc_particle_filter_tracker.yaml"/>
+  <arg name="camera_config" default="$(find dbot_ros_pkg)/config/camera.yaml"/>
+  <arg name="object_config" default="$(find dbot_ros_pkg)/config/object.yaml"/>
+
+  <node 
+    name="rbc_particle_filter_object_tracker" 
+    type="rbc_particle_filter_object_tracker"
+    pkg="dbot_ros_pkg" 
+    output="screen" 
+    respawn="false"
+    launch-prefix="">
+        <rosparam command="load" file="$(arg filter_config)" />
+        <rosparam command="load" file="$(arg camera_config)" />
+        <rosparam command="load" file="$(arg object_config)" />
+        <!-- <param name="config_file"  type="string"  value="$(arg config_file)" /> -->
+  </node>
+</launch>

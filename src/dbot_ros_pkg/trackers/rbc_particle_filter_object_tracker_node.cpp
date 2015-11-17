@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
 
+#include <Eigen/Dense>
+
 #include <fstream>
 #include <ctime>
 
@@ -34,23 +36,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/filesystem.hpp>
 
-#include <dbot/utils/profiling.hpp>
+#include <fl/util/profiling.hpp>
 
-
-#include <dbot_ros_pkg/trackers/tracker.hpp>
+#include <dbot_ros_pkg/trackers/rbc_particle_filter_object_tracker.hpp>
 #include <dbot_ros_pkg/utils/pcl_interface.hpp>
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 
-#include <dbot_ros_pkg/utils/interactive_marker_wrapper.hpp>
+#include <opi/interactive_marker_initializer.hpp>
+#include <osr/free_floating_rigid_bodies_state.hpp>
 
+// #include <dbot_ros_pkg/utils/interactive_marker_wrapper.hpp>
 
 typedef sensor_msgs::CameraInfo::ConstPtr CameraInfoPtr;
 typedef Eigen::Matrix<double, -1, -1> Image;
 
+using namespace bot;
+
 class Tracker
 {
 public:
-    Tracker(boost::shared_ptr<MultiObjectTracker> tracker): tracker_(tracker), node_handle_("~")
+    Tracker(boost::shared_ptr<RbcParticleFilterObjectTracker> tracker): tracker_(tracker), node_handle_("~")
     {
         std::string config_file;
         ri::ReadParameter("config_file", config_file, node_handle_);
@@ -76,14 +81,14 @@ public:
     void Filter(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        ff::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
     }
 
     void FilterAndStore(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        ff::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
 
         std::ofstream file;
@@ -102,7 +107,7 @@ public:
     }
 
 private:
-    boost::shared_ptr<MultiObjectTracker> tracker_;
+    boost::shared_ptr<RbcParticleFilterObjectTracker> tracker_;
     ros::NodeHandle node_handle_;
     boost::filesystem::path path_;
 };
@@ -118,47 +123,91 @@ int main (int argc, char **argv)
     std::string camera_info_topic; ri::ReadParameter("camera_info_topic", camera_info_topic, node_handle);
     double min_delta_time; ri::ReadParameter("min_delta_time", min_delta_time, node_handle);
     std::string source; ri::ReadParameter("source", source, node_handle);
-    std::vector<std::string> object_names; ri::ReadParameter("object_names", object_names, node_handle);
+//    std::vector<std::string> object_names; ri::ReadParameter("object_names", object_names, node_handle);
 
     int initial_sample_count; ri::ReadParameter("initial_sample_count", initial_sample_count, node_handle);
 
     std::cout << "reading data from camera " << std::endl;
     Eigen::Matrix3d camera_matrix = ri::GetCameraMatrix<double>(camera_info_topic, node_handle, 2.0);
-    std::string frame_id = ri::GetCameraFrame<double>(camera_info_topic, node_handle, 2.0);
+//    std::string frame_id = ri::GetCameraFrame<double>(camera_info_topic, node_handle, 2.0);
 
+        
+
+    std::string camera_frame_id;
+    std::string object_package;
+    std::string object_directory;
+    std::vector<std::string> object_names;
+
+    node_handle.getParam("object_names", object_names);
+    node_handle.getParam("object_package", object_package);
+    node_handle.getParam("object_directory", object_directory);
+    node_handle.getParam("camera_frame_id", camera_frame_id);
+
+    opi::InteractiveMarkerInitializer im_server(
+        camera_frame_id, object_package, object_directory, object_names);
+
+    while(!im_server.all_object_poses_set() && ros::ok())
+    {
+        ros::Duration(1.e-3).sleep();
+        ros::spinOnce();
+    }
+
+    auto initial_poses = im_server.poses();
+    std::vector<Eigen::VectorXd> initial_states;
+
+//        std::vector<Eigen::VectorXd> initial_states = im_server.getMarkerPose();
+
+    for (int i = 0; i < initial_poses.size(); ++i)
+    {
+        std::cout << "tracking object: " << object_names[i] << std::endl;
+
+        Eigen::Vector3d p;
+        Eigen::Quaternion<double> q;
+        p[0] = initial_poses[0].position.x;
+        p[1] = initial_poses[0].position.y;
+        p[2] = initial_poses[0].position.z;
+        q.w() = initial_poses[0].orientation.w;
+        q.x() = initial_poses[0].orientation.x;
+        q.y() = initial_poses[0].orientation.y;
+        q.z() = initial_poses[0].orientation.z;
+        osr::PoseVelocityVector pose;
+        pose.position() = p;
+        pose.orientation().quaternion(q);
+        initial_states.push_back(pose);
+    }
+
+    std::cout << "Number of object poses: " << initial_states.size() << std::endl;
+    std::cout << initial_states[0] << std::endl;
     
+//    std::vector<Eigen::VectorXd> initial_states =im_server.getMarkerPose();
+      
     // get observations from camera
     sensor_msgs::Image::ConstPtr ros_image =
             ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
 
-    /// publish an interactive marker and wait until initialization is finalized
-    im::InteractiveMarkerWrapper im_server(frame_id);
-    while(!im_server.initializeObjects())
-      ros::spinOnce();
-    
-    std::vector<Eigen::VectorXd> initial_states =im_server.getMarkerPose();
-      
     // intialize the filter
-    boost::shared_ptr<MultiObjectTracker> tracker(new MultiObjectTracker);
+    boost::shared_ptr<RbcParticleFilterObjectTracker> tracker(new RbcParticleFilterObjectTracker);
     tracker->Initialize(initial_states, *ros_image, camera_matrix);
     std::cout << "done initializing" << std::endl;
     Tracker interface(tracker);
 
     ros::Subscriber subscriber = node_handle.subscribe(depth_image_topic, 1, &Tracker::Filter, &interface);
 
-    while (ros::ok())
-      {
-	// in case interactive marker gets clicked again, re-initialize the filter
-	if(im_server.initializeObjects())
-	  {
-	    // get current observations from camera
-	    ros_image = ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
-	    // get desired initialization pose
-	    initial_states =im_server.getMarkerPose();
-	    tracker->Initialize(initial_states, *ros_image, camera_matrix);
-	  }
-	ros::spinOnce();
-      }
+    ros::spin();
+
+//    while (ros::ok())
+//      {
+//	// in case interactive marker gets clicked again, re-initialize the filter
+////	if(im_server.initializeObjects())
+////	  {
+//	    // get current observations from camera
+////	    ros_image = ros::topic::waitForMessage<sensor_msgs::Image>(depth_image_topic, node_handle, ros::Duration(10.0));
+//	    // get desired initialization pose
+////	    initial_states =im_server.getMarkerPose();
+////	    tracker->Initialize(initial_states, *ros_image, camera_matrix);
+////	  }
+//        ros::spinOnce();
+//      }
 
     return 0;
 }
