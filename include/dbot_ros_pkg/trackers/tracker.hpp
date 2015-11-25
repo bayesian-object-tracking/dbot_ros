@@ -40,10 +40,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sensor_msgs/Image.h>
 
 #include <dbot/rao_blackwell_coordinate_particle_filter.hpp>
-#include <dbot/models/process_models/brownian_object_motion_model.hpp>
-#include <dbot/models/observation_models/kinect_image_observation_model_cpu.hpp>
+#include <dbot/model/state_transition/brownian_object_motion_model.hpp>
+#include <dbot/model/observation/kinect_image_observation_model_cpu.hpp>
 #ifdef BUILD_GPU
-#include <dbot/models/observation_models/kinect_image_observation_model_gpu/kinect_image_observation_model_gpu.hpp>
+#include <dbot/model/observation/gpu/kinect_image_observation_model_gpu.hpp>
 #endif
 
 class MultiObjectTracker

@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/foreach.hpp>
 
-#include <dbot/utils/helper_functions.hpp>
+#include <dbot/util/helper_functions.hpp>
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/pcl_interface.hpp>

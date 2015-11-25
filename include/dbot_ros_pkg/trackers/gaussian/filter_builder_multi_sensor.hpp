@@ -8,8 +8,8 @@
 
 #include "filter_builder_base.hpp"
 
-#include <dbot/utils/rigid_body_renderer.hpp>
-#include <dbot/models/observation_models/depth_pixel_observation_model.hpp>
+#include <dbot/util/rigid_body_renderer.hpp>
+#include <dbot/model/observation/depth_pixel_observation_model.hpp>
 
 #include <fl/model/observation/joint_observation_model_iid.hpp>
 #include <fl/filter/gaussian/multi_sensor_gaussian_filter.hpp>

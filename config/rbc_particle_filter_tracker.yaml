@@ -1,12 +1,12 @@
 
-evaluation_count: 100 #the number of evaluations
+evaluation_count: 1000 #the number of evaluations
 
 # value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
 #update_rate: 0.05
 update_rate: 1.
 
 max_kl_divergence: 2.0
-use_gpu: false 
+use_gpu: true 
 
 # filtering parameters ----------------------------------------------------------------------
 initial_sample_count: 1000 #10000 this is the number of samples for the initialization
@@ -27,4 +27,6 @@ p_occluded_visible: 0.1 #0.1
 p_occluded_occluded: 0.7 #0.7
 
 min_delta_time: 0.
+
+use_new_process: false
 

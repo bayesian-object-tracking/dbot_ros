@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <dbot/utils/rigid_body_renderer.hpp>
+#include <dbot/util/rigid_body_renderer.hpp>
 
-#include <dbot/models/observation_models/depth_pixel_observation_model.hpp>
+#include <dbot/model/observation/depth_pixel_observation_model.hpp>
 #include <fl/model/observation/linear_gaussian_observation_model.hpp>
 #include <fl/model/observation/body_tail_observation_model.hpp>
 #include <fl/filter/gaussian/robust_multi_sensor_gaussian_filter.hpp>
