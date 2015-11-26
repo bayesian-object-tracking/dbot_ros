@@ -76,7 +76,7 @@ public:
         double tail_weight;
         double model_sigma;
         double sigma_factor;
-        double downsampling_factor;
+        int downsampling_factor;
     };
 
 public:
