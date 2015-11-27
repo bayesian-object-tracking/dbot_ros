@@ -37,40 +37,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <dbot/model/state_transition/orientation_transition_function.hpp>
 
-#include <boost/filesystem.hpp>
-
 namespace bot
 {
 RbcParticleFilterObjectTracker::RbcParticleFilterObjectTracker(
-    const Parameters& param)
+        const Parameters& param)
     : param_(param)
 {
-    std::cout << "constructing rbc filter" << std::endl;
-
-    std::cout << "use_gpu" << param.use_gpu << std::endl;
-    std::cout << "angular_acceleration_sigma" << param.angular_acceleration_sigma << std::endl;
-    std::cout << "angular_sigma " << param.angular_sigma << std::endl;
-    std::cout << "damping " << param.damping << std::endl;
-    std::cout << "downsampling_factor " << param.downsampling_factor << std::endl;
-    std::cout << "evaluation_count " << param.evaluation_count << std::endl;
-    std::cout << "linear_acceleration_sigma " << param.linear_acceleration_sigma << std::endl;
-    std::cout << "initial_occlusion_prob " << param.initial_occlusion_prob << std::endl;
-    std::cout << "linear_sigma " << param.linear_sigma << std::endl;
-    std::cout << "max_kl_divergence " << param.max_kl_divergence << std::endl;
-    std::cout << "max_sample_count " << param.max_sample_count << std::endl;
-    std::cout << "model_sigma " << param.model_sigma << std::endl;
-    std::cout << "p_occluded_occluded " << param.p_occluded_occluded << std::endl;
-    std::cout << "p_occluded_visible " << param.p_occluded_visible << std::endl;
-    std::cout << "sigma_factor " << param.sigma_factor << std::endl;
-    std::cout << "tail_weight " << param.tail_weight << std::endl;
-    std::cout << "use_new_process " << param.use_new_process << std::endl;
-    std::cout << "velocity_factor " << param.velocity_factor << std::endl;
-
     object_publisher_ =
-        ros::NodeHandle("~")
-            .advertise<visualization_msgs::Marker>("object_model", 0);
-
-    std::cout << "finishing filter construction" << std::endl;
+        ros::NodeHandle("~").
+            advertise<visualization_msgs::Marker>("object_model", 0);
 }
 
 void RbcParticleFilterObjectTracker::Initialize(
@@ -78,27 +53,36 @@ void RbcParticleFilterObjectTracker::Initialize(
     const sensor_msgs::Image& ros_image,
     Eigen::Matrix3d camera_matrix)
 {
-    boost::mutex::scoped_lock lock(mutex_);
+    //    object_model_uri_ = object_model_uri;
+    //    object_model_path_ = object_model_path;
+    //    object_names_ = {object_model_uri};
 
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    //    std::cout << "received " << initial_states.size()
+    //                             << " intial states " << std::endl;
     // convert camera matrix and image to desired format
-    camera_matrix.topLeftCorner(2, 3) /= double(downsampling_factor_);
-    Observation image = ri::Ros2Eigen<Scalar>(ros_image, downsampling_factor_);
+    camera_matrix.topLeftCorner(2, 3) /= double(param_.downsampling_factor);
+    Observation image =
+        ri::Ros2Eigen<Scalar>(ros_image, param_.downsampling_factor);
 
     /// read parameters ********************************************************
+
     double delta_time = 0.033;
 
     std::cout << "sampling blocks: " << std::endl;
     dbot::hf::PrintVector(param_.sampling_blocks);
 
     /// load object mesh *******************************************************
-    std::vector<std::vector<Eigen::Vector3d>> vertices(param_.object_names.size());
+    std::vector<std::vector<Eigen::Vector3d>> vertices(
+        param_.object_names.size());
     std::vector<std::vector<std::vector<int>>> triangle_indices(
         param_.object_names.size());
     for (size_t i = 0; i < param_.object_names.size(); i++)
     {
         std::string object_model_path = ros::package::getPath("dbot_ros_pkg") +
-                                        "/object_models/" + param_.object_names[i] +
-                                        ".obj";
+                                        "/object_models/" +
+                                        param_.object_names[i] + ".obj";
         ObjectFileReader file_reader;
         file_reader.set_filename(object_model_path);
         file_reader.Read();
@@ -142,7 +126,7 @@ void RbcParticleFilterObjectTracker::Initialize(
     }
 
     /// initialize cpu observation model ***************************************
-    boost::shared_ptr<ObservationModel> observation_model;
+    std::shared_ptr<ObservationModel> observation_model;
 #ifndef BUILD_GPU
     param_.use_gpu = false;
 #endif
@@ -150,20 +134,20 @@ void RbcParticleFilterObjectTracker::Initialize(
     if (!param_.use_gpu)
     {
         // cpu obseration model
-        boost::shared_ptr<dbot::KinectPixelObservationModel>
+        std::shared_ptr<dbot::KinectPixelObservationModel>
             kinect_pixel_observation_model(
                 new dbot::KinectPixelObservationModel(param_.tail_weight,
                                                       param_.model_sigma,
                                                       param_.sigma_factor));
 
-        boost::shared_ptr<dbot::OcclusionProcessModel> occlusion_process(
+        std::shared_ptr<dbot::OcclusionProcessModel> occlusion_process(
             new dbot::OcclusionProcessModel(param_.p_occluded_visible,
                                             param_.p_occluded_occluded));
 
-        boost::shared_ptr<dbot::RigidBodyRenderer> renderer(
+        std::shared_ptr<dbot::RigidBodyRenderer> renderer(
             new dbot::RigidBodyRenderer(vertices, triangle_indices));
 
-        observation_model = boost::shared_ptr<ObservationModelCPUType>(
+        observation_model = std::shared_ptr<ObservationModelCPUType>(
             new ObservationModelCPUType(camera_matrix,
                                         image.rows(),
                                         image.cols(),
@@ -190,7 +174,7 @@ void RbcParticleFilterObjectTracker::Initialize(
             "gpu/shaders/" + "FragmentShader.fragmentshader";
 
         // gpu obseration model
-        boost::shared_ptr<ObservationModelGPUType> gpu_observation_model(
+        std::shared_ptr<ObservationModelGPUType> gpu_observation_model(
             new ObservationModelGPUType(camera_matrix,
                                         image.rows(),
                                         image.cols(),
@@ -265,11 +249,11 @@ void RbcParticleFilterObjectTracker::Initialize(
 
     // exit(-1);
 
-    boost::shared_ptr<StateTransition> process;
+    std::shared_ptr<StateTransition> process;
 
     if (param_.use_new_process)
     {
-        process = boost::shared_ptr<StateTransition>(
+        process = std::shared_ptr<StateTransition>(
             new NewStateTransition(new_process));
         param_.sampling_blocks.resize(1);
         param_.sampling_blocks[0].resize(12);
@@ -280,13 +264,13 @@ void RbcParticleFilterObjectTracker::Initialize(
     }
     else
     {
-        process = boost::shared_ptr<StateTransition>(
+        process = std::shared_ptr<StateTransition>(
             new OldStateTransition(old_process));
     }
 
     /// initialize filter ******************************************************
     filter_ =
-        boost::shared_ptr<FilterType>(new FilterType(process,
+        std::shared_ptr<FilterType>(new FilterType(process,
                                                      observation_model,
                                                      param_.sampling_blocks,
                                                      param_.max_kl_divergence));
@@ -299,8 +283,8 @@ void RbcParticleFilterObjectTracker::Initialize(
 
     filter_->set_particles(multi_body_samples);
 
-    filter_->filter(image,
-                    StateTransition::Input::Zero(param_.object_names.size() * 6));
+    filter_->filter(
+        image, StateTransition::Input::Zero(param_.object_names.size() * 6));
     filter_->resample(param_.evaluation_count / param_.sampling_blocks.size());
 
     /// convert to a differential reperesentation ******************************
@@ -339,21 +323,16 @@ void RbcParticleFilterObjectTracker::Initialize(
 Eigen::VectorXd RbcParticleFilterObjectTracker::Filter(
     const sensor_msgs::Image& ros_image)
 {
-    boost::mutex::scoped_lock lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
 
-    //    if (std::isnan(last_measurement_time_))
-    //        last_measurement_time_ = ros_image.header.stamp.toSec();
-    //    Scalar delta_time = ros_image.header.stamp.toSec() -
-    //    last_measurement_time_;
-    //    last_measurement_time_ = ros_image.header.stamp.toSec();
-    //    std::cout << "actual delta time " << delta_time << std::endl;
     // convert image
-    Observation image = ri::Ros2Eigen<Scalar>(ros_image, downsampling_factor_);
+    Observation image =
+        ri::Ros2Eigen<Scalar>(ros_image, param_.downsampling_factor);
 
     /// filter *****************************************************************
     //    INIT_PROFILING;
-    filter_->filter(image,
-                    StateTransition::Input::Zero(param_.object_names.size() * 6));
+    filter_->filter(
+        image, StateTransition::Input::Zero(param_.object_names.size() * 6));
     //    MEASURE("-----------------> total time for filtering");
 
     /// convert to a differential reperesentation ******************************
@@ -401,7 +380,8 @@ Eigen::VectorXd RbcParticleFilterObjectTracker::Filter(
     for (size_t i = 0; i < param_.object_names.size(); i++)
     {
         std::string object_model_path =
-            "package://dbot_ros_pkg/object_models/" + param_.object_names[i] + ".obj";
+            "package://dbot_ros_pkg/object_models/" + param_.object_names[i] +
+            ".obj";
 
         ri::PublishMarker(mean.component(i).homogeneous().cast<float>(),
                           ros_image.header,

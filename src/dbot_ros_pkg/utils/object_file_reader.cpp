@@ -30,13 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 #include <fstream>
-#include <boost/shared_ptr.hpp>
 #include <math.h>
 
 using namespace std;
 using namespace Eigen;
-using namespace boost;
-
 
 ObjectFileReader::ObjectFileReader()
 : vertices_(new vector<Vector3d>)
@@ -188,11 +185,11 @@ void ObjectFileReader::Process(float max_side_length) // todo: has to be tested 
 	}
 }
 
-boost::shared_ptr<std::vector<Eigen::Vector3d> > ObjectFileReader::get_vertices() {return vertices_;}
-boost::shared_ptr<std::vector<std::vector<int> > > ObjectFileReader::get_indices() {return indices_;}
+std::shared_ptr<std::vector<Eigen::Vector3d> > ObjectFileReader::get_vertices() {return vertices_;}
+std::shared_ptr<std::vector<std::vector<int> > > ObjectFileReader::get_indices() {return indices_;}
 
-boost::shared_ptr<std::vector<Eigen::Vector3d> > ObjectFileReader::get_centers() {return centers_;}
-boost::shared_ptr<std::vector<float> > ObjectFileReader::get_areas() {return areas_;}
+std::shared_ptr<std::vector<Eigen::Vector3d> > ObjectFileReader::get_centers() {return centers_;}
+std::shared_ptr<std::vector<float> > ObjectFileReader::get_areas() {return areas_;}
 
 
 

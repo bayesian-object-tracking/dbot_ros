@@ -25,18 +25,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *************************************************************************/
 
-
-#ifndef POSE_TRACKING_INTERFACE_UTILS_OBJECT_FILE_READER_HPP
-#define POSE_TRACKING_INTERFACE_UTILS_OBJECT_FILE_READER_HPP
-
-// #include <dbot/pose_tracking.hpp>
+#pragma once
 
 #include <string>
-#include <boost/shared_ptr.hpp>
-#include <Eigen/Core>
+#include <memory>
 #include <list>
 #include <vector>
 #include <list>
+
+#include <Eigen/Core>
 
 class ObjectFileReader
 {
@@ -48,20 +45,18 @@ public:
 	void Read();
 	void Process(float max_side_length);
 
-	boost::shared_ptr<std::vector<Eigen::Vector3d> > get_vertices();
-	boost::shared_ptr<std::vector<std::vector<int> > > get_indices();
+    std::shared_ptr<std::vector<Eigen::Vector3d> > get_vertices();
+    std::shared_ptr<std::vector<std::vector<int> > > get_indices();
 
 
-	boost::shared_ptr<std::vector<Eigen::Vector3d> > get_centers();
-	boost::shared_ptr<std::vector<float> > get_areas();
+    std::shared_ptr<std::vector<Eigen::Vector3d> > get_centers();
+    std::shared_ptr<std::vector<float> > get_areas();
 
 private:
 	std::string filename_;
-	boost::shared_ptr<std::vector<Eigen::Vector3d> > vertices_;
-	boost::shared_ptr<std::vector<std::vector<int> > > indices_;
+    std::shared_ptr<std::vector<Eigen::Vector3d> > vertices_;
+    std::shared_ptr<std::vector<std::vector<int> > > indices_;
 
-	boost::shared_ptr<std::vector<Eigen::Vector3d> > centers_;
-	boost::shared_ptr<std::vector<float> > areas_;
+    std::shared_ptr<std::vector<Eigen::Vector3d> > centers_;
+    std::shared_ptr<std::vector<float> > areas_;
 };
-
-#endif

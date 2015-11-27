@@ -1,13 +1,24 @@
-
+/*
+ * This is part of the fl library, a C++ Bayesian filtering library
+ * (https://github.com/filtering-library)
+ *
+ * Copyright (c) 2015 Max Planck Society,
+ * 				 Autonomous Motion Department,
+ * 			     Institute for Intelligent Systems
+ *
+ * This Source Code Form is subject to the terms of the GPL License (MIT).
+ * A copy of the license can be found in the LICENSE file distributed with this
+ * source code.
+ */
 
 #pragma once
-
-#include <boost/thread/mutex.hpp>
 
 #include <Eigen/Dense>
 
 #include <vector>
 #include <string>
+#include <memory>
+#include <mutex>
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
@@ -48,17 +59,10 @@ class RbcParticleFilterObjectTracker
 public:
     struct Parameters
     {
-        Parameters() = default;
-
-        Parameters(const Parameters& other)
-        {
-            *this = other;
-            sampling_blocks = other.sampling_blocks;
-        }
-
         std::vector<std::string> object_names;
-        std::vector<std::vector<size_t>> sampling_blocks;
+        int downsampling_factor;
 
+        std::vector<std::vector<size_t> > sampling_blocks;
         bool use_gpu;
         bool use_new_process;
         int evaluation_count;
@@ -76,7 +80,6 @@ public:
         double tail_weight;
         double model_sigma;
         double sigma_factor;
-        int downsampling_factor;
     };
 
 public:
@@ -109,7 +112,7 @@ public:
 
     typedef typename Eigen::Transform<fl::Real, 3, Eigen::Affine> Affine;
 
-    RbcParticleFilterObjectTracker(const Parameters &param);
+    RbcParticleFilterObjectTracker(const Parameters& param);
 
     void Reset(std::vector<Eigen::VectorXd> initial_states,
                const sensor_msgs::Image& ros_image);
@@ -121,19 +124,16 @@ public:
     Eigen::VectorXd Filter(const sensor_msgs::Image& ros_image);
 
 private:
-    boost::mutex mutex_;
+    std::mutex mutex_;
+    std::shared_ptr<FilterType> filter_;
     ros::Publisher object_publisher_;
-
-    boost::shared_ptr<FilterType> filter_;
 
     // parameters
     //    std::string object_model_uri_;
     //    std::string object_model_path_;
-    int downsampling_factor_;
 
     std::vector<Eigen::Vector3d> centers_;
     std::vector<Affine> default_poses_;
-
     Parameters param_;
 };
 }
