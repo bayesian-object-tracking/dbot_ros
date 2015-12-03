@@ -13,7 +13,7 @@ object_directory: object_models
 # they have to match the names of the CAD models in
 # the directory object_models
 object_names: [
- impact_battery_recenter
+ impact_battery_recenter.obj
  # canteen_recenter
  #, mugbox
 ]

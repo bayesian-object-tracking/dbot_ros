@@ -5,7 +5,6 @@ downsampling_factor: 8
 
 source: camera
 
-
 downsampling: 10     # wrt VGA resolution
 resX: 640
 resY: 480
