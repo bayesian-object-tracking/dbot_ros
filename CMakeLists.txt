@@ -108,6 +108,7 @@ file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
 
 set(sources
     ${headers}
+    src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
     src/${PROJECT_NAME}/trackers/rbc_particle_filter_object_tracker.cpp
 #    src/${PROJECT_NAME}/trackers/rms_gaussian_filter_object_tracker.cpp
 #    src/${PROJECT_NAME}/trackers/object_tracker.cpp
