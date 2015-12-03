@@ -8,6 +8,8 @@ AccessModifierOffset: -4
 AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AlignConsecutiveAssignments: true
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBraces: Allman
@@ -16,11 +18,9 @@ PointerAlignment: Left
 # BasedOnStyle: Chromium
 DerivePointerAlignment: false
 AlignAfterOpenBracket: true
-AlignConsecutiveAssignments: false
 AlignEscapedNewlinesLeft: true
 AlignOperands:   true
 AlignTrailingComments: true
-AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
