@@ -1,14 +1,14 @@
 /*
- * This is part of the fl library, a C++ Bayesian filtering library
- * (https://github.com/filtering-library)
+ * This is part of the Bayesian Object Tracking (bot),
+ * (https://github.com/bayesian-object-tracking)
  *
  * Copyright (c) 2015 Max Planck Society,
  * 				 Autonomous Motion Department,
  * 			     Institute for Intelligent Systems
  *
- * This Source Code Form is subject to the terms of the GPL License (MIT).
- * A copy of the license can be found in the LICENSE file distributed with this
- * source code.
+ * This Source Code Form is subject to the terms of the GNU General Public
+ * License License (GNU GPL). A copy of the license can be found in the LICENSE
+ * file distributed with this source code.
  */
 
 #pragma once
@@ -20,9 +20,8 @@
 #include <memory>
 #include <mutex>
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-
+#include <dbot/util/camera_data.hpp>
+#include <dbot/util/object_resource_identifier.hpp>
 #include <dbot/rao_blackwell_coordinate_particle_filter.hpp>
 #include <dbot/model/state_transition/brownian_object_motion_model.hpp>
 #include <dbot/model/observation/kinect_image_observation_model_cpu.hpp>
@@ -39,32 +38,17 @@
 
 namespace bot
 {
-
-
 /**
  * \brief RbcParticleFilterObjectTracker
- *
- * Yaml config file:
- * \code
- * object:
- *  package:
- *  directory:
- *  files: [  ]
- *  sampling_blocks: [ [0, 1, 2], [3, 4], [6, 7] ]
- *
- * \endcode
  */
 class RbcParticleFilterObjectTracker
 {
 public:
     struct Parameters
     {
-        std::vector<std::string> object_names;
-        int downsampling_factor;
+        dbot::ObjectResourceIdentifier ori;
 
-        std::vector<std::vector<size_t> > sampling_blocks;
         bool use_gpu;
-        bool use_new_process;
         int evaluation_count;
         int max_sample_count;
         double max_kl_divergence;
@@ -93,8 +77,6 @@ public:
 
     typedef fl::StateTransitionFunction<State, State, Input> StateTransition;
 
-    typedef fl::LinearStateTransitionModel<State, Input> NewStateTransition;
-
     typedef dbot::BrownianObjectMotionModel<State> OldStateTransition;
 
     typedef dbot::KinectImageObservationModelCPU<Scalar, State>
@@ -105,35 +87,36 @@ public:
 #endif
 
     typedef ObservationModelCPUType::Base ObservationModel;
-    typedef ObservationModelCPUType::Observation Observation;
+    typedef ObservationModelCPUType::Observation Obsrv;
 
     typedef dbot::RBCoordinateParticleFilter<StateTransition, ObservationModel>
         FilterType;
 
     typedef typename Eigen::Transform<fl::Real, 3, Eigen::Affine> Affine;
 
-    RbcParticleFilterObjectTracker(const Parameters& param);
+    RbcParticleFilterObjectTracker(const Parameters& param,
+                                   const std::vector<State>& initial_states,
+                                   const dbot::CameraData& camera_data);
 
-    void Reset(std::vector<Eigen::VectorXd> initial_states,
-               const sensor_msgs::Image& ros_image);
+    void initialize(const std::vector<State>& initial_states);
 
-    void Initialize(std::vector<Eigen::VectorXd> initial_states,
-                    const sensor_msgs::Image& ros_image,
-                    Eigen::Matrix3d camera_matrix);
+    State track(const Obsrv& image);
 
-    Eigen::VectorXd Filter(const sensor_msgs::Image& ros_image);
+    const Parameters& param() { return param_; }
+
+    const dbot::CameraData& camera_data() const { return camera_data_; }
+private:
+    std::vector<std::vector<size_t>> create_sampling_blocks(
+        int blocks,
+        int block_size) const;
 
 private:
     std::mutex mutex_;
     std::shared_ptr<FilterType> filter_;
-    ros::Publisher object_publisher_;
-
-    // parameters
-    //    std::string object_model_uri_;
-    //    std::string object_model_path_;
 
     std::vector<Eigen::Vector3d> centers_;
     std::vector<Affine> default_poses_;
     Parameters param_;
+    dbot::CameraData camera_data_;
 };
 }
