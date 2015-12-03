@@ -183,7 +183,7 @@ public:
         opi::InteractiveMarkerInitializer im_server(
             camera_frame_id, object_package, object_directory, object_names);
 
-        while (!im_server.all_object_poses_set() && ros::ok())
+        while (!im_server.are_all_object_poses_set() && ros::ok())
         {
             ros::Duration(1.e-3).sleep();
             ros::spinOnce();
