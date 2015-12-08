@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dbot_ros_pkg)
 
 add_definitions(-std=c++0x )
-add_definitions(-DPROFILING_ON=1 -DBUILD_GPU=1) #print profiling output
+add_definitions(-DPROFILING_ON=1) #print profiling output
 
 ############################
 # Library Version          #
@@ -30,21 +30,18 @@ find_package(catkin REQUIRED
     image_transport
     fl
     opi
-    dbot
-)
+    dbot)
 
 #Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  ObjectState.msg
-)
+  ObjectState.msg)
 
 # Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
   std_msgs
-  geometry_msgs
-  )
+  geometry_msgs)
 
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
@@ -92,8 +89,7 @@ catkin_package(
         dbot
     DEPENDS
         OpenCV
-        eigen
-)
+        eigen)
 
 ###########
 ## Build ##
@@ -101,33 +97,26 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS} )
 
-set(PROJECT_NAME "dbot_ros_pkg")
-
 file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
                           include/${PROJECT_NAME}/*.h)
 
 set(sources
     ${headers}
     src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
-    src/${PROJECT_NAME}/trackers/rbc_particle_filter_object_tracker.cpp
-#    src/${PROJECT_NAME}/trackers/rms_gaussian_filter_object_tracker.cpp
-#    src/${PROJECT_NAME}/trackers/object_tracker.cpp
-    src/${PROJECT_NAME}/utils/object_file_reader.cpp
     src/${PROJECT_NAME}/utils/pcl_interface.cpp
     src/${PROJECT_NAME}/utils/ros_interface.cpp
     src/${PROJECT_NAME}/utils/cloud_visualizer.cpp
-    src/${PROJECT_NAME}/utils/tracking_dataset.cpp
-)
+    src/${PROJECT_NAME}/utils/tracking_dataset.cpp)
 
-add_library(${PROJECT_NAME} ${dbot_headers}
-                            ${headers}
-                            ${sources})
+add_library(${PROJECT_NAME}
+    ${dbot_headers}
+    ${headers}
+    ${sources})
 
-target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES}
-                                      ${catkin_LIBRARIES}
-                                      ${OpenCV_LIBRARIES})
-
-
+target_link_libraries(${PROJECT_NAME}
+    ${PCL_LIBRARIES}
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES})
 
 add_executable(
     rbc_particle_filter_object_tracker
@@ -140,34 +129,8 @@ target_link_libraries(rbc_particle_filter_object_tracker
     ${PCL_LIBRARIES}
     yaml-cpp)
 
-add_executable(rms_gaussian_filter_object_tracker
-    src/${PROJECT_NAME}/trackers/gaussian/rmsgf_object_tracker_node.cpp)
-target_link_libraries(rms_gaussian_filter_object_tracker
-    ${PROJECT_NAME}
-    ${catkin_LIBRARIES})
-
-#add_executable(tracker  src/${PROJECT_NAME}/trackers/tracker_node.cpp)
-#target_link_libraries(tracker
+#add_executable(rms_gaussian_filter_object_tracker
+#    src/${PROJECT_NAME}/trackers/gaussian/rmsgf_object_tracker_node.cpp)
+#target_link_libraries(rms_gaussian_filter_object_tracker
 #    ${PROJECT_NAME}
-#    ${catkin_LIBRARIES}
-#    ${OpenCV_LIBS}
-#    ${PCL_LIBRARIES}
-#    ${dbot_LIBRARIES}
-#    yaml-cpp)
-
-
-#add_executable(interactive_tracker  src/${PROJECT_NAME}/trackers/tracker_interactive_node.cpp)
-#target_link_libraries(interactive_tracker
-#    ${PROJECT_NAME}
-#    ${catkin_LIBRARIES}
-#    ${OpenCV_LIBS}
-#    ${PCL_LIBRARIES}
-#    ${dbot_LIBRARIES}
-#    yaml-cpp)
-
-
-
-
-
-
-
+#    ${catkin_LIBRARIES})
