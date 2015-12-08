@@ -23,18 +23,15 @@
 #include <fl/util/profiling.hpp>
 
 #include <opi/interactive_marker_initializer.hpp>
-
 #include <osr/free_floating_rigid_bodies_state.hpp>
-
 #include <dbot/util/camera_data.hpp>
+#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/ros_camera_data_provider.hpp>
-#include <dbot_ros_pkg/trackers/rbc_particle_filter_object_tracker.hpp>
 
-using namespace bot;
 
-typedef RbcParticleFilterObjectTracker Tracker;
+typedef dbot::RbcParticleFilterObjectTracker Tracker;
 
 /**
  * \brief Represents the RBC PF tracker node
@@ -136,15 +133,18 @@ int main(int argc, char** argv)
     nh.getParam("initial_occlusion_prob", param.initial_occlusion_prob);
     nh.getParam("p_occluded_visible", param.p_occluded_visible);
     nh.getParam("p_occluded_occluded", param.p_occluded_occluded);
-    nh.getParam("linear_acceleration_sigma", param.linear_acceleration_sigma);
-    nh.getParam("angular_acceleration_sigma", param.angular_acceleration_sigma);
-    nh.getParam("damping", param.damping);
     nh.getParam("velocity_factor", param.velocity_factor);
     nh.getParam("linear_sigma", param.linear_sigma);
     nh.getParam("angular_sigma", param.angular_sigma);
     nh.getParam("tail_weight", param.tail_weight);
     nh.getParam("model_sigma", param.model_sigma);
     nh.getParam("sigma_factor", param.sigma_factor);
+
+    nh.getParam("linear_acceleration_sigma", param.process.linear_acceleration_sigma);
+    nh.getParam("angular_acceleration_sigma", param.process.angular_acceleration_sigma);
+    nh.getParam("damping", param.process.damping);
+    param.process.part_count = object_meshes.size();
+    param.process.delta_time = 1./30.;
 
     // camera parameters
     nh.getParam("camera_info_topic", camera_info_topic);
