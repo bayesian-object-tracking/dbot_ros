@@ -28,4 +28,3 @@ p_occluded_occluded: 0.7 #0.7
 
 min_delta_time: 0.
 
-use_new_process: false
