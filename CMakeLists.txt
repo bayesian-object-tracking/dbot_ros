@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dbot_ros_pkg)
 
 add_definitions(-std=c++0x )
-add_definitions(-DPROFILING_ON=1) #print profiling output
+add_definitions(-DPROFILING_ON=1 -DBUILD_GPU=1) #print profiling output
 
 ############################
 # Library Version          #

@@ -26,6 +26,7 @@
 #include <osr/free_floating_rigid_bodies_state.hpp>
 #include <dbot/util/camera_data.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
+#include <dbot/tracker/builder/rbc_partivle_filter_tracker_builder.hpp>
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/ros_camera_data_provider.hpp>
@@ -133,8 +134,7 @@ int main(int argc, char** argv)
     nh.getParam("max_sample_count", param.obsrv.max_sample_count);
     nh.getParam("p_occluded_visible", param.obsrv.p_occluded_visible);
     nh.getParam("p_occluded_occluded", param.obsrv.p_occluded_occluded);
-    nh.getParam("initial_occlusion_prob",
-                param.obsrv.initial_occlusion_prob);
+    nh.getParam("initial_occlusion_prob", param.obsrv.initial_occlusion_prob);
     nh.getParam("tail_weight", param.obsrv.tail_weight);
     nh.getParam("model_sigma", param.obsrv.model_sigma);
     nh.getParam("sigma_factor", param.obsrv.sigma_factor);
@@ -197,11 +197,17 @@ int main(int argc, char** argv)
         initial_poses.push_back(ri::to_pose_velocity_vector(ros_pose));
     }
 
+    auto tracker_builder =
+        std::make_shared<dbot::RbcParticleFilterTrackerBuilder>(
+            param, initial_poses, camera_data);
+
     /* ------------------------------ */
     /* - Create the tracker         - */
     /* ------------------------------ */
     // get observations from camera
-    auto tracker = std::make_shared<Tracker>(param, initial_poses, camera_data);
+//    auto tracker = std::make_shared<Tracker>(param, initial_poses, camera_data);
+    auto tracker = tracker_builder->build();
+    tracker->initialize(initial_poses);
 
     /* ------------------------------ */
     /* - Create and run tracker     - */
