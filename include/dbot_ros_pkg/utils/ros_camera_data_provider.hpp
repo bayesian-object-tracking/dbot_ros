@@ -46,6 +46,7 @@ public:
     RosCameraDataProvider(const ros::NodeHandle& nh,
                           const std::string& camera_info_topic,
                           const std::string& depth_image_topic,
+                          const CameraData::Resolution& native_res,
                           int downsampling_factor,
                           double timeout);
 
@@ -73,10 +74,16 @@ public:
      */
     int downsampling_factor() const;
 
+    /**
+     * \brief Returns the resolution of the depth camera
+     */
+    CameraData::Resolution native_resolution() const;
+
 private:
     mutable ros::NodeHandle nh_;
     std::string camera_info_topic_;
     std::string depth_image_topic_;
+    CameraData::Resolution native_resolution_;
     int downsampling_factor_;
     double timeout_;
 };

@@ -24,15 +24,16 @@
 
 namespace dbot
 {
-RosCameraDataProvider::RosCameraDataProvider(
-    const ros::NodeHandle& nh,
+RosCameraDataProvider::RosCameraDataProvider(const ros::NodeHandle& nh,
     const std::string& camera_info_topic,
     const std::string& depth_image_topic,
+    const CameraData::Resolution& native_res,
     int downsampling_factor,
     double timeout)
     : nh_(nh),
       camera_info_topic_(camera_info_topic),
       depth_image_topic_(depth_image_topic),
+      native_resolution_(native_res),
       downsampling_factor_(downsampling_factor),
       timeout_(timeout)
 {
@@ -65,5 +66,10 @@ std::string RosCameraDataProvider::frame_id() const
 int RosCameraDataProvider::downsampling_factor() const
 {
     return downsampling_factor_;
+}
+
+CameraData::Resolution RosCameraDataProvider::native_resolution() const
+{
+   return native_resolution_;
 }
 }
