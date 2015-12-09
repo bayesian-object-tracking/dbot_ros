@@ -30,7 +30,6 @@
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/ros_camera_data_provider.hpp>
 
-
 typedef dbot::RbcParticleFilterObjectTracker Tracker;
 
 /**
@@ -129,27 +128,34 @@ int main(int argc, char** argv)
     nh.getParam("use_gpu", param.use_gpu);
     nh.getParam("evaluation_count", param.evaluation_count);
     nh.getParam("max_kl_divergence", param.max_kl_divergence);
-    nh.getParam("max_sample_count", param.max_sample_count);
-    nh.getParam("initial_occlusion_prob", param.initial_occlusion_prob);
-    nh.getParam("p_occluded_visible", param.p_occluded_visible);
-    nh.getParam("p_occluded_occluded", param.p_occluded_occluded);
-    nh.getParam("velocity_factor", param.velocity_factor);
-    nh.getParam("linear_sigma", param.linear_sigma);
-    nh.getParam("angular_sigma", param.angular_sigma);
-    nh.getParam("tail_weight", param.tail_weight);
-    nh.getParam("model_sigma", param.model_sigma);
-    nh.getParam("sigma_factor", param.sigma_factor);
 
-    nh.getParam("linear_acceleration_sigma", param.process.linear_acceleration_sigma);
-    nh.getParam("angular_acceleration_sigma", param.process.angular_acceleration_sigma);
+    // observation model parameters
+    nh.getParam("max_sample_count", param.obsrv.max_sample_count);
+    nh.getParam("p_occluded_visible", param.obsrv.p_occluded_visible);
+    nh.getParam("p_occluded_occluded", param.obsrv.p_occluded_occluded);
+    nh.getParam("initial_occlusion_prob",
+                param.obsrv.initial_occlusion_prob);
+    nh.getParam("tail_weight", param.obsrv.tail_weight);
+    nh.getParam("model_sigma", param.obsrv.model_sigma);
+    nh.getParam("sigma_factor", param.obsrv.sigma_factor);
+    param.obsrv.delta_time = 1. / 30.;
+
+    // process model parameters
+    nh.getParam("linear_acceleration_sigma",
+                param.process.linear_acceleration_sigma);
+    nh.getParam("angular_acceleration_sigma",
+                param.process.angular_acceleration_sigma);
     nh.getParam("damping", param.process.damping);
     param.process.part_count = object_meshes.size();
-    param.process.delta_time = 1./30.;
+    param.process.delta_time = 1. / 30.;
 
     // camera parameters
+    dbot::CameraData::Resolution resolution;
     nh.getParam("camera_info_topic", camera_info_topic);
     nh.getParam("depth_image_topic", depth_image_topic);
     nh.getParam("downsampling_factor", downsampling_factor);
+    nh.getParam("resolution/width", resolution.width);
+    nh.getParam("resolution/height", resolution.height);
 
     // setup object resource identifier
     param.ori.package_path(ros::package::getPath(object_package));
@@ -164,6 +170,7 @@ int main(int argc, char** argv)
         new dbot::RosCameraDataProvider(nh,
                                         camera_info_topic,
                                         depth_image_topic,
+                                        resolution,
                                         downsampling_factor,
                                         2.0));
     dbot::CameraData camera_data(camera_data_provider);
