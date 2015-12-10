@@ -26,7 +26,7 @@
 #include <osr/free_floating_rigid_bodies_state.hpp>
 #include <dbot/util/camera_data.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/tracker/builder/rbc_partivle_filter_tracker_builder.hpp>
+#include <dbot/tracker/builder/rbc_particle_filter_tracker_builder.hpp>
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/ros_camera_data_provider.hpp>
@@ -108,6 +108,7 @@ int main(int argc, char** argv)
     Tracker::Parameters param;
 
     // camera data
+    dbot::CameraData::Resolution resolution;
     std::string camera_info_topic;
     std::string depth_image_topic;
     int downsampling_factor;
@@ -150,7 +151,6 @@ int main(int argc, char** argv)
     param.process.delta_time = 1. / 30.;
 
     // camera parameters
-    dbot::CameraData::Resolution resolution;
     nh.getParam("camera_info_topic", camera_info_topic);
     nh.getParam("depth_image_topic", depth_image_topic);
     nh.getParam("downsampling_factor", downsampling_factor);
@@ -176,15 +176,21 @@ int main(int argc, char** argv)
     dbot::CameraData camera_data(camera_data_provider);
 
     /* ------------------------------ */
-    /* - Get initial poses          - */
-    /* - interactively 				- */
+    /* - Create the tracker         - */
+    /* ------------------------------ */
+    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder(
+        param, camera_data);
+
+
+
+    /* ------------------------------ */
+    /* - Initialize interactively   - */
     /* ------------------------------ */
     opi::InteractiveMarkerInitializer object_initializer(camera_data.frame_id(),
                                                          param.ori.package(),
                                                          param.ori.directory(),
                                                          param.ori.meshes());
-
-    if (!object_initializer.wait_for_all_object_poses())
+    if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
         return 0;
@@ -197,16 +203,8 @@ int main(int argc, char** argv)
         initial_poses.push_back(ri::to_pose_velocity_vector(ros_pose));
     }
 
-    auto tracker_builder =
-        std::make_shared<dbot::RbcParticleFilterTrackerBuilder>(
-            param, initial_poses, camera_data);
 
-    /* ------------------------------ */
-    /* - Create the tracker         - */
-    /* ------------------------------ */
-    // get observations from camera
-//    auto tracker = std::make_shared<Tracker>(param, initial_poses, camera_data);
-    auto tracker = tracker_builder->build();
+    auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses);
 
     /* ------------------------------ */
