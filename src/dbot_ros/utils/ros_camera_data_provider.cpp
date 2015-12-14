@@ -19,8 +19,8 @@
 
 #include <sensor_msgs/Image.h>
 
-#include <dbot_ros_pkg/utils/ros_interface.hpp>
-#include <dbot_ros_pkg/utils/ros_camera_data_provider.hpp>
+#include <dbot_ros/utils/ros_interface.hpp>
+#include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
 namespace dbot
 {
