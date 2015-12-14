@@ -174,14 +174,6 @@ int main(int argc, char** argv)
     dbot::CameraData camera_data(camera_data_provider);
 
     /* ------------------------------ */
-    /* - Create the tracker         - */
-    /* ------------------------------ */
-    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder(
-        param, camera_data);
-
-
-
-    /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
     opi::InteractiveMarkerInitializer object_initializer(camera_data.frame_id(),
@@ -201,6 +193,11 @@ int main(int argc, char** argv)
         initial_poses.push_back(ri::to_pose_velocity_vector(ros_pose));
     }
 
+    /* ------------------------------ */
+    /* - Create the tracker         - */
+    /* ------------------------------ */
+    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder(
+        param, camera_data);
 
     auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses,
