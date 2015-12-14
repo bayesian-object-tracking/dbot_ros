@@ -40,29 +40,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sensor_msgs/Image.h>
 
 #include <dbot/rao_blackwell_coordinate_particle_filter.hpp>
-#include <dbot/models/process_models/brownian_object_motion_model.hpp>
-#include <dbot/models/observation_models/kinect_image_observation_model_cpu.hpp>
+#include <dbot/model/state_transition/brownian_object_motion_model.hpp>
+#include <dbot/model/observation/kinect_image_observation_model_cpu.hpp>
 #ifdef BUILD_GPU
-#include <dbot/models/observation_models/kinect_image_observation_model_gpu/kinect_image_observation_model_gpu.hpp>
+#include <dbot/model/observation/gpu/kinect_image_observation_model_gpu.hpp>
 #endif
 
 class MultiObjectTracker
 {
 public:   
-    typedef ff::FreeFloatingRigidBodiesState<>  State;
+    typedef osr::FreeFloatingRigidBodiesState<>  State;
     typedef State::Scalar                       Scalar;
 
-    typedef ff::BrownianObjectMotionModel<State>        ProcessModel;
-    typedef ff::KinectImageObservationModelCPU<Scalar,
+    typedef dbot::BrownianObjectMotionModel<State>        ProcessModel;
+    typedef dbot::KinectImageObservationModelCPU<Scalar,
                                                 State>  ObservationModelCPUType;
 #ifdef BUILD_GPU
-    typedef ff::KinectImageObservationModelGPU<State>   ObservationModelGPUType;
+    typedef dbot::KinectImageObservationModelGPU<State>   ObservationModelGPUType;
 #endif
 
     typedef ObservationModelCPUType::Base ObservationModel;
     typedef ObservationModelCPUType::Observation Observation;
 
-    typedef ff::RaoBlackwellCoordinateParticleFilter<ProcessModel, ObservationModel> FilterType;
+    typedef dbot::RBCoordinateParticleFilter<ProcessModel, ObservationModel> FilterType;
 
     MultiObjectTracker();
 
@@ -90,7 +90,7 @@ private:
     int downsampling_factor_;
 
 
-    ff::FreeFloatingRigidBodiesState<> shifting_average;
+    osr::FreeFloatingRigidBodiesState<> shifting_average;
 };
 
 

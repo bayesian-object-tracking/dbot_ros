@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/filesystem.hpp>
 
-#include <dbot/utils/profiling.hpp>
+#include <fl/util/profiling.hpp>
 
 
 #include <dbot_ros_pkg/trackers/tracker.hpp>
@@ -76,14 +76,14 @@ public:
     void Filter(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        ff::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
     }
 
     void FilterAndStore(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        ff::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
+        osr::FreeFloatingRigidBodiesState<-1> mean_state = tracker_->Filter(ros_image);
         MEASURE("total time for filtering")
 
         std::ofstream file;
@@ -139,7 +139,7 @@ int main (int argc, char **argv)
     /// THIS IS WHERE WE COULD INITIALIZE FROM AN INTERACTIVE MARKER
     std::vector<Eigen::VectorXd>
             initial_states = pi::SampleTableClusters(
-                ff::hf::Image2Points(image, camera_matrix),
+                dbot::hf::Image2Points(image, camera_matrix),
                 initial_sample_count);
 
     // intialize the filter

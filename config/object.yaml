@@ -1,0 +1,7 @@
+
+object:
+  package:    dbot_ros_pkg
+  directory:  object_models
+  meshes:     [ impact_battery_recenter.obj ]
+
+
