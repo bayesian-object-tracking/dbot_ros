@@ -46,8 +46,9 @@ public:
     /**
      * \brief Creates a TrackerNode
      */
-    TrackerNode(const std::shared_ptr<Tracker>& tracker)
-        : tracker_(tracker), node_handle_("~")
+    TrackerNode(const std::shared_ptr<Tracker>& tracker,
+                const dbot::ObjectResourceIdentifier& ori)
+        : tracker_(tracker), node_handle_("~"), ori_(ori)
     {
         object_publisher_ = node_handle_.advertise<visualization_msgs::Marker>(
             "object_model", 0);
@@ -67,21 +68,17 @@ public:
         publish(mean_state, ros_image.header);
     }
 
-    /**
-     * \brief Provides access to the tracker parameters
-     */
-    const Tracker::Parameters& param() const { return tracker_->param(); }
 private:
     /**
      * \brief Publishes the object markers and it's pose
      */
     void publish(const State& state, const std_msgs::Header& header) const
     {
-        for (int i = 0; i < param().ori.count_meshes(); i++)
+        for (int i = 0; i < ori_.count_meshes(); i++)
         {
             ri::PublishMarker(state.component(i).homogeneous().cast<float>(),
                               header,
-                              param().ori.mesh_uri(i),
+                              ori_.mesh_uri(i),
                               object_publisher_,
                               i,
                               1,
@@ -94,6 +91,7 @@ private:
     std::shared_ptr<Tracker> tracker_;
     ros::NodeHandle node_handle_;
     ros::Publisher object_publisher_;
+    dbot::ObjectResourceIdentifier ori_;
 };
 
 int main(int argc, char** argv)
@@ -105,7 +103,7 @@ int main(int argc, char** argv)
     /* - Parameters                 - */
     /* ------------------------------ */
     // tracker's main parameter container
-    Tracker::Parameters param;
+    dbot::RbcParticleFilterTrackerBuilder::Parameters param;
 
     // camera data
     dbot::CameraData::Resolution resolution;
@@ -205,13 +203,14 @@ int main(int argc, char** argv)
 
 
     auto tracker = tracker_builder.build();
-    tracker->initialize(initial_poses);
+    tracker->initialize(initial_poses,
+                        param.evaluation_count);
 
     /* ------------------------------ */
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    TrackerNode tracker_node(tracker);
+    TrackerNode tracker_node(tracker, param.ori);
     ros::Subscriber subscriber = nh.subscribe(
         depth_image_topic, 1, &TrackerNode::tracking_callback, &tracker_node);
 
