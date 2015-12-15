@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <package>
-  <name>dbot_ros_pkg</name>
+  <name>dbot_ros</name>
   <version>0.0.0</version>
-  <description>The dbot_ros_pkg package</description>
+  <description>The dbot_ros package</description>
 
   <maintainer email="jan.issac@gmail.com">Jan Issac</maintainer>
 
   <license>BSD</license>
 
-  <url type="website">http://github.com/jan-issac/dbot_ros_pkg</url>
+  <url type="website">http://github.com/jan-issac/dbot_ros</url>
 
   <author email="jan.issac@gmail.com">Jan Issac</author>
   <author email="manuel.wuthrich@gmail.com">Manuel Wuthrich</author>

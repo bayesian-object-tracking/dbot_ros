@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(dbot_ros_pkg)
+project(dbot_ros)
 
 add_definitions(-std=c++0x )
 add_definitions(-DPROFILING_ON=1 -DBUILD_GPU=1) #print profiling output
@@ -15,7 +15,7 @@ include(cmake/version.cmake)
 include(cmake/info.cmake)
 
 info_begin()
-  info_project("::bot::dbot_ros_pkg:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
+  info_project("::bot::dbot_ros:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
 info_end()
 
 find_package(catkin REQUIRED
