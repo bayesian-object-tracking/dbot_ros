@@ -234,6 +234,17 @@ void PublishMarker(const Eigen::Matrix4f H,
                    float a = 1.0,
                    std::string ns = "object");
 
+void PublishObjectState(const Eigen::Matrix4f H,
+            std_msgs::Header header,
+            std::string object_name,
+            const ros::Publisher &pub);
+
+void PublishObjectState(const Eigen::Matrix3f R,
+            const Eigen::Vector3f t,
+            std_msgs::Header header,
+            std::string object_name,
+            const ros::Publisher &pub);
+
 void PublishPoints(const std_msgs::Header header,
                    const ros::Publisher& pub,
                    const std::vector<Eigen::Vector3f> points,
