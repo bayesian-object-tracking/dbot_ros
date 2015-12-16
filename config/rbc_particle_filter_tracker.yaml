@@ -6,6 +6,7 @@ evaluation_count: 1000 #the number of evaluations
 update_rate: 1.
 
 max_kl_divergence: 2.0
+update_rate: 1.
 use_gpu: true 
 
 # filtering parameters ----------------------------------------------------------------------
