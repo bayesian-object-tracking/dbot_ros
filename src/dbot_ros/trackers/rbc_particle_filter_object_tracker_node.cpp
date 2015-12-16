@@ -37,6 +37,8 @@
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
+#include <dbot_ros/ObjectState.h>
+
 typedef dbot::RbcParticleFilterObjectTracker Tracker;
 
 /**
@@ -56,8 +58,11 @@ public:
                 const dbot::ObjectResourceIdentifier& ori)
         : tracker_(tracker), node_handle_("~"), ori_(ori)
     {
-        object_publisher_ = node_handle_.advertise<visualization_msgs::Marker>(
-            "object_model", 0);
+        object_marker_publisher_ =
+            node_handle_.advertise<visualization_msgs::Marker>("object_model",
+                                                               0);
+        object_state_publisher_ =
+            node_handle_.advertise<dbot_ros::ObjectState>("object_state", 0);
     }
 
     /**
@@ -85,24 +90,31 @@ private:
             ri::PublishMarker(state.component(i).homogeneous().cast<float>(),
                               header,
                               ori_.mesh_uri(i),
-                              object_publisher_,
+                              object_marker_publisher_,
                               i,
                               1,
                               0,
                               0);
+
+            ri::PublishObjectState(
+                state.component(i).homogeneous().cast<float>(),
+                header,
+                ori_.mesh_without_extension(i),
+                object_state_publisher_);
         }
     }
 
 private:
     std::shared_ptr<Tracker> tracker_;
     ros::NodeHandle node_handle_;
-    ros::Publisher object_publisher_;
+    ros::Publisher object_marker_publisher_;
+    ros::Publisher object_state_publisher_;
     dbot::ObjectResourceIdentifier ori_;
 };
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "test_filter");
+    ros::init(argc, argv, "rbc_particle_filter_tracker");
     ros::NodeHandle nh("~");
 
     /* ------------------------------ */
@@ -134,6 +146,7 @@ int main(int argc, char** argv)
     nh.getParam("use_gpu", param.use_gpu);
     nh.getParam("evaluation_count", param.evaluation_count);
     nh.getParam("max_kl_divergence", param.max_kl_divergence);
+    nh.getParam("update_rate", param.update_rate);
 
     // observation model parameters
     nh.getParam("max_sample_count", param.obsrv.max_sample_count);
@@ -202,12 +215,11 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     /* - Create the tracker         - */
     /* ------------------------------ */
-    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder(
-        param, camera_data);
+    auto tracker_builder =
+        dbot::RbcParticleFilterTrackerBuilder(param, camera_data);
 
     auto tracker = tracker_builder.build();
-    tracker->initialize(initial_poses,
-                        param.evaluation_count);
+    tracker->initialize(initial_poses, param.evaluation_count);
 
     /* ------------------------------ */
     /* - Create and run tracker     - */
