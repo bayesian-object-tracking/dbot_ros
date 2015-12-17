@@ -121,7 +121,7 @@ int main(int argc, char** argv)
     /* - Parameters                 - */
     /* ------------------------------ */
     // tracker's main parameter container
-    dbot::RbcParticleFilterTrackerBuilder::Parameters param;
+    dbot::RbcParticleFilterTrackerBuilder::Parameters params;
 
     // camera data
     dbot::CameraData::Resolution resolution;
@@ -134,6 +134,9 @@ int main(int argc, char** argv)
     std::string object_directory;
     std::vector<std::string> object_meshes;
 
+    // parameter shorthand prefix
+    std::string pre = "particle_filter/";
+
     /* ------------------------------ */
     /* - Read out parameters        - */
     /* ------------------------------ */
@@ -142,30 +145,55 @@ int main(int argc, char** argv)
     nh.getParam("object/package", object_package);
     nh.getParam("object/directory", object_directory);
 
+    params.ori.package_path(ros::package::getPath(object_package));
+    params.ori.directory(object_directory);
+    params.ori.meshes(object_meshes);
+
     // get filter parameters
-    nh.getParam("use_gpu", param.use_gpu);
-    nh.getParam("evaluation_count", param.evaluation_count);
-    nh.getParam("max_kl_divergence", param.max_kl_divergence);
-    nh.getParam("update_rate", param.update_rate);
+    nh.getParam(pre + "use_gpu",
+                params.use_gpu);
 
-    // observation model parameters
-    nh.getParam("max_sample_count", param.obsrv.max_sample_count);
-    nh.getParam("p_occluded_visible", param.obsrv.p_occluded_visible);
-    nh.getParam("p_occluded_occluded", param.obsrv.p_occluded_occluded);
-    nh.getParam("initial_occlusion_prob", param.obsrv.initial_occlusion_prob);
-    nh.getParam("tail_weight", param.obsrv.tail_weight);
-    nh.getParam("model_sigma", param.obsrv.model_sigma);
-    nh.getParam("sigma_factor", param.obsrv.sigma_factor);
-    param.obsrv.delta_time = 1. / 30.;
+    nh.getParam(pre + "cpu/evaluation_count",
+                params.cpu.evaluation_count);
+    nh.getParam(pre + "cpu/update_rate",
+                params.cpu.update_rate);
+    nh.getParam(pre + "cpu/max_kl_divergence",
+                params.cpu.max_kl_divergence);
 
-    // process model parameters
-    nh.getParam("linear_acceleration_sigma",
-                param.process.linear_acceleration_sigma);
-    nh.getParam("angular_acceleration_sigma",
-                param.process.angular_acceleration_sigma);
-    nh.getParam("damping", param.process.damping);
-    param.process.part_count = object_meshes.size();
-    param.process.delta_time = 1. / 30.;
+    nh.getParam(pre + "gpu/evaluation_count",
+                params.gpu.evaluation_count);
+    nh.getParam(pre + "gpu/update_rate",
+                params.gpu.update_rate);
+    nh.getParam(pre + "gpu/max_kl_divergence",
+                params.gpu.max_kl_divergence);
+
+    params.tracker = params.use_gpu ? params.gpu : params.cpu;
+
+    params.observation.sample_count = params.tracker.evaluation_count;
+
+    nh.getParam(pre + "observation/occlusion/p_occluded_visible",
+                params.observation.occlusion.p_occluded_visible);
+    nh.getParam(pre + "observation/occlusion/p_occluded_occluded",
+                params.observation.occlusion.p_occluded_occluded);
+    nh.getParam(pre + "observation/occlusion/initial_occlusion_prob",
+                params.observation.occlusion.initial_occlusion_prob);
+
+    nh.getParam(pre + "observation/kinect/tail_weight",
+                params.observation.kinect.tail_weight);
+    nh.getParam(pre + "observation/kinect/model_sigma",
+                params.observation.kinect.model_sigma);
+    nh.getParam(pre + "observation/kinect/sigma_factor",
+                params.observation.kinect.sigma_factor);
+    params.observation.delta_time = 1. / 30.;
+
+    nh.getParam(pre + "state_transition/linear_acceleration_sigma",
+                params.state_transition.linear_acceleration_sigma);
+    nh.getParam(pre + "state_transition/angular_acceleration_sigma",
+                params.state_transition.angular_acceleration_sigma);
+    nh.getParam(pre + "state_transition/damping",
+                params.state_transition.damping);
+    params.state_transition.part_count = object_meshes.size();
+    params.state_transition.delta_time = 1. / 30.;
 
     // camera parameters
     nh.getParam("camera_info_topic", camera_info_topic);
@@ -174,10 +202,6 @@ int main(int argc, char** argv)
     nh.getParam("resolution/width", resolution.width);
     nh.getParam("resolution/height", resolution.height);
 
-    // setup object resource identifier
-    param.ori.package_path(ros::package::getPath(object_package));
-    param.ori.directory(object_directory);
-    param.ori.meshes(object_meshes);
 
     /* ------------------------------ */
     /* - Setup camera data          - */
@@ -196,9 +220,9 @@ int main(int argc, char** argv)
     /* - Initialize interactively   - */
     /* ------------------------------ */
     opi::InteractiveMarkerInitializer object_initializer(camera_data.frame_id(),
-                                                         param.ori.package(),
-                                                         param.ori.directory(),
-                                                         param.ori.meshes());
+                                                         params.ori.package(),
+                                                         params.ori.directory(),
+                                                         params.ori.meshes());
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
@@ -216,16 +240,16 @@ int main(int argc, char** argv)
     /* - Create the tracker         - */
     /* ------------------------------ */
     auto tracker_builder =
-        dbot::RbcParticleFilterTrackerBuilder(param, camera_data);
+        dbot::RbcParticleFilterTrackerBuilder(params, camera_data);
 
     auto tracker = tracker_builder.build();
-    tracker->initialize(initial_poses, param.evaluation_count);
+    tracker->initialize(initial_poses, params.tracker.evaluation_count);
 
     /* ------------------------------ */
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    TrackerNode tracker_node(tracker, param.ori);
+    TrackerNode tracker_node(tracker, params.ori);
     ros::Subscriber subscriber = nh.subscribe(
         depth_image_topic, 1, &TrackerNode::tracking_callback, &tracker_node);
 

@@ -1,31 +1,52 @@
 
-evaluation_count: 1000 #the number of evaluations
+particle_filter:
+  use_gpu: false 
 
-# value between 0 and 1. 1: unfiltered wiggly estimates. 0: constant
-#update_rate: 0.05
-update_rate: 1.
+  cpu:
+    evaluation_count: 100
 
-max_kl_divergence: 2.0
-update_rate: 1.
-use_gpu: true 
+    # State moving average update rate in [0.0; 1.0]
+    #   1: unfiltered wiggly estimates. 
+    #   0: constant
+    update_rate: 0.8
 
-# filtering parameters ----------------------------------------------------------------------
-initial_sample_count: 1000 #10000 this is the number of samples for the initialization
-max_sample_count: 10000 #10000 this is for the gpu to allocate memory
+    max_kl_divergence: 2.0
 
-linear_acceleration_sigma:   0.2 #0.1  0.2  1.0 2.0
-angular_acceleration_sigma: 3.0 #1.5  3.0  15.0 30.0
-damping: 5.0 #5.0  20.0  1000.0 1000.0
+  gpu:
+    evaluation_count: 2000
 
-# observation model parameters --------------------------------------------------------------
-tail_weight: 0.01 #0.01, 0.998
-model_sigma: 0.003 #0.003, 0.005
-sigma_factor: 0.0014247 #0.0014247
+    # State moving average update rate in [0.0; 1.0]
+    #   1: unfiltered wiggly estimates. 
+    #   0: constant
+    update_rate: 1.
 
-# occlusion process model 
-initial_occlusion_prob: 0.1 #0.1
-p_occluded_visible: 0.1 #0.1
-p_occluded_occluded: 0.7 #0.7
+    max_kl_divergence: 2.0
 
-min_delta_time: 0.
+    # this is for the gpu to allocate memory
+    max_sample_count: 10000 
+  
+    # set true to use custom shader definitions file defined below
+    # if set to false, the default shader will be used
+    use_custom_shader: false  
+
+    vertex_shader_file: /path/to/custom/vertex_shader.vertexshader
+    fragment_shader_file: /path/to/custom/fragment_shader.fragmentshader
+
+    # optional (values: none | /path/to/shader)
+    geometry_shader_file: none  
+
+  observation:
+    occlusion:
+      initial_occlusion_prob: 0.1 #0.1
+      p_occluded_visible: 0.1 #0.1
+      p_occluded_occluded: 0.7 #0.7
+    kinect:
+      tail_weight: 0.01 #0.01, 0.998
+      model_sigma: 0.003 #0.003, 0.005
+      sigma_factor: 0.0014247 #0.0014247
+
+  state_transition:
+    linear_acceleration_sigma:   0.2 #0.1  0.2  1.0 2.0
+    angular_acceleration_sigma: 3.0 #1.5  3.0  15.0 30.0
+    damping: 5.0 #5.0  20.0  1000.0 1000.0
 
