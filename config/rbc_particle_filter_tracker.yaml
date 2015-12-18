@@ -1,12 +1,12 @@
 
 particle_filter:
-  use_gpu: false 
+  use_gpu: true
 
   cpu:
     evaluation_count: 100
 
     # State moving average update rate in [0.0; 1.0]
-    #   1: unfiltered wiggly estimates. 
+    #   1: unfiltered wiggly estimates.
     #   0: constant
     update_rate: 0.8
 
@@ -16,24 +16,24 @@ particle_filter:
     evaluation_count: 2000
 
     # State moving average update rate in [0.0; 1.0]
-    #   1: unfiltered wiggly estimates. 
+    #   1: unfiltered wiggly estimates.
     #   0: constant
     update_rate: 1.
 
     max_kl_divergence: 2.0
 
     # this is for the gpu to allocate memory
-    max_sample_count: 10000 
-  
+    max_sample_count: 10000
+
     # set true to use custom shader definitions file defined below
     # if set to false, the default shader will be used
-    use_custom_shader: false  
+    use_custom_shaders: false
 
     vertex_shader_file: /path/to/custom/vertex_shader.vertexshader
     fragment_shader_file: /path/to/custom/fragment_shader.fragmentshader
 
     # optional (values: none | /path/to/shader)
-    geometry_shader_file: none  
+    geometry_shader_file: none
 
   observation:
     occlusion:
@@ -45,8 +45,14 @@ particle_filter:
       model_sigma: 0.003 #0.003, 0.005
       sigma_factor: 0.0014247 #0.0014247
 
-  state_transition:
+  object_transition:
+    linear_sigma: 0.002
+    angular_sigma: 0.01
+    velocity_factor: 0.8
+
+  brownian_transition:
     linear_acceleration_sigma:   0.2 #0.1  0.2  1.0 2.0
     angular_acceleration_sigma: 3.0 #1.5  3.0  15.0 30.0
     damping: 5.0 #5.0  20.0  1000.0 1000.0
+
 

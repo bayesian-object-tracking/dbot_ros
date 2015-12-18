@@ -167,6 +167,15 @@ int main(int argc, char** argv)
     nh.getParam(pre + "gpu/max_kl_divergence",
                 params.gpu.max_kl_divergence);
 
+    nh.getParam(pre + "gpu/use_custom_shaders",
+                params.observation.use_custom_shaders);
+    nh.getParam(pre + "gpu/vertex_shader_file",
+                params.observation.vertex_shader_file);
+    nh.getParam(pre + "gpu/fragment_shader_file",
+                params.observation.fragment_shader_file);
+    nh.getParam(pre + "gpu/geometry_shader_file",
+                params.observation.geometry_shader_file);
+
     params.tracker = params.use_gpu ? params.gpu : params.cpu;
 
     params.observation.sample_count = params.tracker.evaluation_count;
@@ -186,14 +195,24 @@ int main(int argc, char** argv)
                 params.observation.kinect.sigma_factor);
     params.observation.delta_time = 1. / 30.;
 
-    nh.getParam(pre + "state_transition/linear_acceleration_sigma",
-                params.state_transition.linear_acceleration_sigma);
-    nh.getParam(pre + "state_transition/angular_acceleration_sigma",
-                params.state_transition.angular_acceleration_sigma);
-    nh.getParam(pre + "state_transition/damping",
-                params.state_transition.damping);
-    params.state_transition.part_count = object_meshes.size();
-    params.state_transition.delta_time = 1. / 30.;
+    // brownian process parameters
+    nh.getParam(pre + "brownian_transition/linear_acceleration_sigma",
+                params.brownian_transition.linear_acceleration_sigma);
+    nh.getParam(pre + "brownian_transition/angular_acceleration_sigma",
+                params.brownian_transition.angular_acceleration_sigma);
+    nh.getParam(pre + "brownian_transition/damping",
+                params.brownian_transition.damping);
+    params.brownian_transition.part_count = object_meshes.size();
+    params.brownian_transition.delta_time = 1. / 30.;
+
+    // linear state transition parameters
+    nh.getParam(pre + "object_transition/linear_sigma",
+                params.object_transition.linear_sigma);
+    nh.getParam(pre + "object_transition/angular_sigma",
+                params.object_transition.angular_sigma);
+    nh.getParam(pre + "object_transition/velocity_factor",
+                params.object_transition.velocity_factor);
+    params.object_transition.part_count = object_meshes.size();
 
     // camera parameters
     nh.getParam("camera_info_topic", camera_info_topic);
@@ -201,7 +220,6 @@ int main(int argc, char** argv)
     nh.getParam("downsampling_factor", downsampling_factor);
     nh.getParam("resolution/width", resolution.width);
     nh.getParam("resolution/height", resolution.height);
-
 
     /* ------------------------------ */
     /* - Setup camera data          - */
