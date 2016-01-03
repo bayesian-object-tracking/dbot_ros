@@ -18,7 +18,7 @@ particle_filter:
     # State moving average update rate in [0.0; 1.0]
     #   1: unfiltered wiggly estimates.
     #   0: constant
-    update_rate: 1.
+    update_rate: .99
 
     max_kl_divergence: 2.0
 

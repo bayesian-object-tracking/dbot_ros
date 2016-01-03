@@ -1,15 +1,15 @@
 <launch>
-  <arg name="filter_config" default="$(find dbot_ros_pkg)/config/rms_gaussian_filter_object_tracker.yaml"/>
-  <arg name="camera_config" default="$(find dbot_ros_pkg)/config/camera.yaml"/>
-  <arg name="object_config" default="$(find dbot_ros_pkg)/config/object.yaml"/>
+  <arg name="filter_config" default="$(find dbot_ros)/config/rms_gaussian_filter_object_tracker.yaml"/>
+  <arg name="camera_config" default="$(find dbot_ros)/config/camera.yaml"/>
+  <arg name="object_config" default="$(find dbot_ros)/config/object.yaml"/>
 
   <node 
     name="rms_gaussian_filter_object_tracker" 
     type="rms_gaussian_filter_object_tracker"
-    pkg="dbot_ros_pkg" 
+    pkg="dbot_ros" 
     output="screen" 
     respawn="false"
-    launch-prefix="">
+    launch-prefix="gdb --ex run --args ">
         <rosparam command="load" file="$(arg filter_config)" />
         <rosparam command="load" file="$(arg camera_config)" />
         <rosparam command="load" file="$(arg object_config)" />

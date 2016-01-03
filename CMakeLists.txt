@@ -140,8 +140,15 @@ target_link_libraries(rbc_particle_filter_object_tracker
   ${PCL_LIBRARIES}
   yaml-cpp)
 
-#add_executable(rms_gaussian_filter_object_tracker
-#  src/${PROJECT_NAME}/trackers/gaussian/rmsgf_object_tracker_node.cpp)
-#target_link_libraries(rms_gaussian_filter_object_tracker
-#  ${PROJECT_NAME}
-#  ${catkin_LIBRARIES})
+add_executable(rms_gaussian_filter_object_tracker
+  src/${PROJECT_NAME}/trackers/rms_gaussian_filter_object_tracker_node.cpp)
+
+add_dependencies(rms_gaussian_filter_object_tracker
+  dbot_ros_generate_messages_cpp)
+
+target_link_libraries(rms_gaussian_filter_object_tracker
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${PCL_LIBRARIES}
+  yaml-cpp)

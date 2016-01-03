@@ -62,7 +62,7 @@ public:
     typedef ObservationModelCPUType::Base ObservationModel;
     typedef ObservationModelCPUType::Observation Observation;
 
-    typedef dbot::RBCoordinateParticleFilter<ProcessModel, ObservationModel> FilterType;
+    typedef dbot::RaoBlackwellCoordinateParticleFilter<ProcessModel, ObservationModel> FilterType;
 
     MultiObjectTracker();
 

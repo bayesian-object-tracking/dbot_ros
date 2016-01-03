@@ -16,6 +16,8 @@
  * \author Manuel Wuthrich (manuel.wuthrich@gmail.com)
  */
 
+#pragma once
+
 #include <string>
 #include <limits>
 

@@ -1,21 +1,25 @@
 
-ut_alpha: 1.0
+gaussian_filter:
+  update_rate: 1.0
 
-# state transition model 
-/rmsgf/linear_sigma: 0.002
-/rmsgf/angular_sigma: 0.01
-/rmsgf/velocity_factor: 0.8
+  unscented_transform:
+    alpha: 1.0
 
-# observation model 
-obsrv_fg_noise_std: 0.001
+  object_transition:
+    linear_sigma: 0.002
+    angular_sigma: 0.01
+    velocity_factor: 0.8
 
-# uniform tail arguments
-obsrv_body_tail_weight: 0.1
-uniform_tail_min: -5000.0
-uniform_tail_max: 5000.0
+  observation:
+    fg_noise_std: 0.001
 
-obsrv_bg_depth: -3.0
-obsrv_bg_noise_std: 100.1
+    # uniform tail arguments
+    tail_weight: 0.1
+    uniform_tail_min: -5000.0
+    uniform_tail_max: 5000.0
+
+    bg_depth: -3.0
+    bg_noise_std: 100.0
 
 # object colors
 gt_color_r: 97

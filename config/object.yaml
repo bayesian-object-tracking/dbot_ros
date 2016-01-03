@@ -2,6 +2,6 @@
 object:
   package:    dbot_ros
   directory:  object_models
-  meshes:     [ calib_obj_recenter.obj ]
+  meshes:     [ calib_obj.obj ]
 
 

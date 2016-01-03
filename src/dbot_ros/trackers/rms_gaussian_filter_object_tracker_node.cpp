@@ -12,8 +12,8 @@
  */
 
 /**
- * \file rbc_particle_filter_object_tracker_node.cpp
- * \date November 2015
+ * \file rms_gaussian_filter_object_tracker_node.cpp
+ * \date December 2015
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
@@ -31,15 +31,14 @@
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
 #include <dbot/util/camera_data.hpp>
-#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/tracker/builder/rbc_particle_filter_tracker_builder.hpp>
+#include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
+#include <dbot/tracker/builder/rms_gaussian_filter_tracker_builder.hpp>
 
+#include <dbot_ros/ObjectState.h>
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
-#include <dbot_ros/ObjectState.h>
-
-typedef dbot::RbcParticleFilterObjectTracker Tracker;
+typedef dbot::RmsGaussianFilterObjectTracker Tracker;
 
 /**
  * \brief Represents the RBC PF tracker node
@@ -71,14 +70,14 @@ public:
      */
     void tracking_callback(const sensor_msgs::Image& ros_image)
     {
+        INIT_PROFILING
         auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
             ros_image, tracker_->camera_data().downsampling_factor());
 
         auto mean_state = tracker_->track(image);
 
-        PVT(mean_state);
-
         publish(mean_state, ros_image.header);
+        MEASURE_FLUSH("Tracking rate ");
     }
 
 private:
@@ -116,14 +115,14 @@ private:
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "rbc_particle_filter_tracker");
+    ros::init(argc, argv, "rms_gaussian_filter_object_tracker");
     ros::NodeHandle nh("~");
 
     /* ------------------------------ */
     /* - Parameters                 - */
     /* ------------------------------ */
     // tracker's main parameter container
-    dbot::RbcParticleFilterTrackerBuilder::Parameters params;
+    dbot::RmsGaussianFilterTrackerBuilder::Parameters params;
 
     // camera data
     dbot::CameraData::Resolution resolution;
@@ -137,7 +136,7 @@ int main(int argc, char** argv)
     std::vector<std::string> object_meshes;
 
     // parameter shorthand prefix
-    std::string pre = "particle_filter/";
+    std::string pre = "gaussian_filter/";
 
     /* ------------------------------ */
     /* - Read out parameters        - */
@@ -152,60 +151,23 @@ int main(int argc, char** argv)
     params.ori.meshes(object_meshes);
 
     // get filter parameters
-    nh.getParam(pre + "use_gpu",
-                params.use_gpu);
+    nh.getParam(pre + "unscented_transform/alpha",
+                params.ut_alpha);
+    nh.getParam(pre + "update_rate",
+                params.update_rate);
 
-    nh.getParam(pre + "cpu/evaluation_count",
-                params.cpu.evaluation_count);
-    nh.getParam(pre + "cpu/update_rate",
-                params.cpu.update_rate);
-    nh.getParam(pre + "cpu/max_kl_divergence",
-                params.cpu.max_kl_divergence);
-
-    nh.getParam(pre + "gpu/evaluation_count",
-                params.gpu.evaluation_count);
-    nh.getParam(pre + "gpu/update_rate",
-                params.gpu.update_rate);
-    nh.getParam(pre + "gpu/max_kl_divergence",
-                params.gpu.max_kl_divergence);
-
-    nh.getParam(pre + "gpu/use_custom_shaders",
-                params.observation.use_custom_shaders);
-    nh.getParam(pre + "gpu/vertex_shader_file",
-                params.observation.vertex_shader_file);
-    nh.getParam(pre + "gpu/fragment_shader_file",
-                params.observation.fragment_shader_file);
-    nh.getParam(pre + "gpu/geometry_shader_file",
-                params.observation.geometry_shader_file);
-
-    params.tracker = params.use_gpu ? params.gpu : params.cpu;
-
-    params.observation.sample_count = params.tracker.evaluation_count;
-
-    nh.getParam(pre + "observation/occlusion/p_occluded_visible",
-                params.observation.occlusion.p_occluded_visible);
-    nh.getParam(pre + "observation/occlusion/p_occluded_occluded",
-                params.observation.occlusion.p_occluded_occluded);
-    nh.getParam(pre + "observation/occlusion/initial_occlusion_prob",
-                params.observation.occlusion.initial_occlusion_prob);
-
-    nh.getParam(pre + "observation/kinect/tail_weight",
-                params.observation.kinect.tail_weight);
-    nh.getParam(pre + "observation/kinect/model_sigma",
-                params.observation.kinect.model_sigma);
-    nh.getParam(pre + "observation/kinect/sigma_factor",
-                params.observation.kinect.sigma_factor);
-    params.observation.delta_time = 1. / 30.;
-
-    // brownian process parameters
-    nh.getParam(pre + "brownian_transition/linear_acceleration_sigma",
-                params.brownian_transition.linear_acceleration_sigma);
-    nh.getParam(pre + "brownian_transition/angular_acceleration_sigma",
-                params.brownian_transition.angular_acceleration_sigma);
-    nh.getParam(pre + "brownian_transition/damping",
-                params.brownian_transition.damping);
-    params.brownian_transition.part_count = object_meshes.size();
-    params.brownian_transition.delta_time = 1. / 30.;
+    nh.getParam(pre + "observation/tail_weight",
+                params.observation.tail_weight);
+    nh.getParam(pre + "observation/bg_depth",
+                params.observation.bg_depth);
+    nh.getParam(pre + "observation/fg_noise_std",
+                params.observation.fg_noise_std);
+    nh.getParam(pre + "observation/bg_noise_std",
+                params.observation.bg_noise_std);
+    nh.getParam(pre + "observation/uniform_tail_max",
+                params.observation.uniform_tail_max);
+    nh.getParam(pre + "observation/uniform_tail_min",
+                params.observation.uniform_tail_min);
 
     // linear state transition parameters
     nh.getParam(pre + "object_transition/linear_sigma",
@@ -236,6 +198,9 @@ int main(int argc, char** argv)
                                         2.0));
     dbot::CameraData camera_data(camera_data_provider);
 
+    // finally, set number of pixels
+    params.observation.sensors = camera_data.pixels();
+
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
@@ -262,7 +227,7 @@ int main(int argc, char** argv)
     /* - Create the tracker         - */
     /* ------------------------------ */
     auto tracker_builder =
-        dbot::RbcParticleFilterTrackerBuilder(params, camera_data);
+        dbot::RmsGaussianFilterTrackerBuilder(params, camera_data);
 
     auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses);
