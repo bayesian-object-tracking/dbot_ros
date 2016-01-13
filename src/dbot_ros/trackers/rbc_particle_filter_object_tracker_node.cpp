@@ -76,8 +76,6 @@ public:
 
         auto mean_state = tracker_->track(image);
 
-        PVT(mean_state);
-
         publish(mean_state, ros_image.header);
     }
 

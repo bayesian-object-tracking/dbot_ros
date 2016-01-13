@@ -50,6 +50,17 @@ Eigen::MatrixXd RosCameraDataProvider::depth_image() const
     return image;
 }
 
+Eigen::VectorXd RosCameraDataProvider::depth_image_vector() const
+{
+    sensor_msgs::Image::ConstPtr ros_image =
+        ros::topic::waitForMessage<sensor_msgs::Image>(
+            depth_image_topic_, nh_, ros::Duration(timeout_));
+
+    auto image = ri::Ros2EigenVector<double>(*ros_image, downsampling_factor_);
+
+    return image;
+}
+
 Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
 {
     auto cam_mat =

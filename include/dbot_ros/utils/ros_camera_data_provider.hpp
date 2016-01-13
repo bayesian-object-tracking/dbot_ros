@@ -58,6 +58,11 @@ public:
     Eigen::MatrixXd depth_image() const;
 
     /**
+     * \brief returns an obtained depth image as an Eigen vector
+     */
+    Eigen::VectorXd depth_image_vector() const;
+
+    /**
      * \brief Reads and returns the camera matrix from the camera info topic and
      * adapts its enties if the downsampling_factor is not equal 1.
      */
