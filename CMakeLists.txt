@@ -122,6 +122,9 @@ add_library(${PROJECT_NAME}
   ${headers}
   ${sources})
 
+add_dependencies(${PROJECT_NAME}
+  dbot_ros_generate_messages_cpp)
+
 target_link_libraries(${PROJECT_NAME}
   ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
