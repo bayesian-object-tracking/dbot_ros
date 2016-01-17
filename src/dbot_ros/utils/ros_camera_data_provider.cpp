@@ -24,7 +24,8 @@
 
 namespace dbot
 {
-RosCameraDataProvider::RosCameraDataProvider(const ros::NodeHandle& nh,
+RosCameraDataProvider::RosCameraDataProvider(
+    const ros::NodeHandle& nh,
     const std::string& camera_info_topic,
     const std::string& depth_image_topic,
     const CameraData::Resolution& native_res,
@@ -35,7 +36,8 @@ RosCameraDataProvider::RosCameraDataProvider(const ros::NodeHandle& nh,
       depth_image_topic_(depth_image_topic),
       native_resolution_(native_res),
       downsampling_factor_(downsampling_factor),
-      timeout_(timeout)
+      timeout_(timeout),
+      camera_matrix_(Eigen::MatrixXd::Zero(1, 1))
 {
 }
 
@@ -63,15 +65,25 @@ Eigen::VectorXd RosCameraDataProvider::depth_image_vector() const
 
 Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
 {
-    auto cam_mat =
-        ri::GetCameraMatrix<double>(camera_info_topic_, nh_, timeout_);
-    cam_mat.topLeftCorner(2, 3) /= downsampling_factor();
-    return cam_mat;
+    if (camera_matrix_.isZero())
+    {
+        camera_matrix_ =
+            ri::GetCameraMatrix<double>(camera_info_topic_, nh_, timeout_);
+        camera_matrix_.topLeftCorner(2, 3) /= downsampling_factor_;
+    }
+
+    return camera_matrix_;
 }
 
 std::string RosCameraDataProvider::frame_id() const
 {
-    return ri::GetCameraFrame<double>(camera_info_topic_, nh_, timeout_);
+    if (frame_id_.empty())
+    {
+        frame_id_ =
+            ri::GetCameraFrame<double>(camera_info_topic_, nh_, timeout_);
+    }
+
+    return frame_id_;
 }
 
 int RosCameraDataProvider::downsampling_factor() const
@@ -81,6 +93,6 @@ int RosCameraDataProvider::downsampling_factor() const
 
 CameraData::Resolution RosCameraDataProvider::native_resolution() const
 {
-   return native_resolution_;
+    return native_resolution_;
 }
 }

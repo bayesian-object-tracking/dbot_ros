@@ -88,6 +88,8 @@ private:
     mutable ros::NodeHandle nh_;
     std::string camera_info_topic_;
     std::string depth_image_topic_;
+    mutable std::string frame_id_;
+    mutable Eigen::MatrixXd camera_matrix_;
     CameraData::Resolution native_resolution_;
     int downsampling_factor_;
     double timeout_;

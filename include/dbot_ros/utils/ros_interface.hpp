@@ -182,7 +182,6 @@ Eigen::Matrix<Scalar, 3, 3> GetCameraMatrix(
             seconds);
         return camera_matrix;
     }
-    ROS_INFO("Valid CameraInfo was received");
 
     for (size_t col = 0; col < 3; col++)
         for (size_t row = 0; row < 3; row++)
