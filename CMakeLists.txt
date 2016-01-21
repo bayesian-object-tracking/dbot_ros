@@ -4,7 +4,6 @@ project(dbot_ros)
 ############################
 # Options                  #
 ############################
-option(DBOT_BUILD_GPU "Compile CUDA enabled trackers" OFF)
 
 ############################
 # Flags                    #
@@ -111,6 +110,8 @@ file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
 
 set(sources
   ${headers}
+  src/${PROJECT_NAME}/object_tracker_publisher.cpp
+  src/${PROJECT_NAME}/object_tracker_node.cpp
   src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
   src/${PROJECT_NAME}/utils/pcl_interface.cpp
   src/${PROJECT_NAME}/utils/ros_interface.cpp
