@@ -9,7 +9,7 @@
     pkg="dbot_ros" 
     output="screen" 
     respawn="false"
-    launch-prefix="gdb --ex run --args ">
+    launch-prefix="">
         <rosparam command="load" file="$(arg filter_config)" />
         <rosparam command="load" file="$(arg camera_config)" />
         <rosparam command="load" file="$(arg object_config)" />
