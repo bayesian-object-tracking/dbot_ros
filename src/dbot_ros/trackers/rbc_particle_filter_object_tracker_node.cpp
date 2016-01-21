@@ -30,201 +30,81 @@
 
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
+
 #include <dbot/util/camera_data.hpp>
+#include <dbot/util/simple_wavefront_object_loader.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
 #include <dbot/tracker/builder/rbc_particle_filter_tracker_builder.hpp>
 
+#include <dbot_ros/tracker_node.h>
+#include <dbot_ros/object_tracker_publisher.h>
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
-#include <dbot_ros/ObjectState.h>
-
-typedef dbot::RbcParticleFilterObjectTracker Tracker;
-
-/**
- * \brief Represents the RBC PF tracker node
- */
-class TrackerNode
-{
-public:
-    typedef Tracker::State State;
-    typedef Tracker::Obsrv Obsrv;
-
-public:
-    /**
-     * \brief Creates a TrackerNode
-     */
-    TrackerNode(const std::shared_ptr<Tracker>& tracker,
-                const dbot::ObjectResourceIdentifier& ori)
-        : tracker_(tracker), node_handle_("~"), ori_(ori)
-    {
-        object_marker_publisher_ =
-            node_handle_.advertise<visualization_msgs::Marker>("object_model",
-                                                               0);
-        object_state_publisher_ =
-            node_handle_.advertise<dbot_ros::ObjectState>("object_state", 0);
-    }
-
-    /**
-     * \brief Tracking callback function which is invoked whenever a new image
-     *        is available
-     */
-    void tracking_callback(const sensor_msgs::Image& ros_image)
-    {
-        auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
-            ros_image, tracker_->camera_data().downsampling_factor());
-
-        auto mean_state = tracker_->track(image);
-
-        publish(mean_state, ros_image.header);
-    }
-
-private:
-    /**
-     * \brief Publishes the object markers and it's pose
-     */
-    void publish(const State& state, const std_msgs::Header& header) const
-    {
-        for (int i = 0; i < ori_.count_meshes(); i++)
-        {
-            ri::PublishMarker(state.component(i).homogeneous().cast<float>(),
-                              header,
-                              ori_.mesh_uri(i),
-                              object_marker_publisher_,
-                              i,
-                              1,
-                              0,
-                              0);
-
-            ri::PublishObjectState(
-                state.component(i).homogeneous().cast<float>(),
-                header,
-                ori_.mesh_without_extension(i),
-                object_state_publisher_);
-        }
-    }
-
-private:
-    std::shared_ptr<Tracker> tracker_;
-    ros::NodeHandle node_handle_;
-    ros::Publisher object_marker_publisher_;
-    ros::Publisher object_state_publisher_;
-    dbot::ObjectResourceIdentifier ori_;
-};
-
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "rbc_particle_filter_tracker");
+    ros::init(argc, argv, "rbc_particle_filter_object_tracker");
     ros::NodeHandle nh("~");
 
-    /* ------------------------------ */
-    /* - Parameters                 - */
-    /* ------------------------------ */
-    // tracker's main parameter container
-    dbot::RbcParticleFilterTrackerBuilder::Parameters params;
+    /* ---------------------------------------------------------------------- */
+    /* Roa-Blackwellized Coordinate Particle Filter Object Tracking           */
+    /*                                                                        */
+    /* Ingredients:                                                           */
+    /*   - TrackerNode                                                        */
+    /*     - Tracker                                                          */
+    /*       - Rbc Particle Filter Algorithm                                  */
+    /*         - State transition model                                       */
+    /*         - Observation model                                            */
+    /*       - Object model                                                   */
+    /*       - Camera data                                                    */
+    /*     - Tracker publisher to advertise the estimated state               */
+    /*                                                                        */
+    /*  Construnction of the tracker will utilize few builders and factories. */
+    /*  For that, we the following builders/factories:                        */
+    /*    - State transition model builder                                    */
+    /*    - Observation model builder to build GPU or CPU based models        */
+    /*    - Filter builder                                                    */
+    /* ---------------------------------------------------------------------- */
 
-    // camera data
-    dbot::CameraData::Resolution resolution;
-    std::string camera_info_topic;
-    std::string depth_image_topic;
-    int downsampling_factor;
-
-    // object data
+    /* ------------------------------ */
+    /* - Create the object model    - */
+    /* ------------------------------ */
+    // get object parameters
     std::string object_package;
     std::string object_directory;
     std::vector<std::string> object_meshes;
-
-    // parameter shorthand prefix
-    std::string pre = "particle_filter/";
-
-    /* ------------------------------ */
-    /* - Read out parameters        - */
-    /* ------------------------------ */
-    // get object parameters
     nh.getParam("object/meshes", object_meshes);
     nh.getParam("object/package", object_package);
     nh.getParam("object/directory", object_directory);
 
-    params.ori.package_path(ros::package::getPath(object_package));
-    params.ori.directory(object_directory);
-    params.ori.meshes(object_meshes);
+    // Use the ORI to load the object model usign the
+    // SimpleWavefrontObjectLoader
+    dbot::ObjectResourceIdentifier ori;
+    ori.package_path(ros::package::getPath(object_package));
+    ori.directory(object_directory);
+    ori.meshes(object_meshes);
 
-    // get filter parameters
-    nh.getParam(pre + "use_gpu",
-                params.use_gpu);
+    auto object_model_loader = std::shared_ptr<dbot::ObjectModelLoader>(
+        new dbot::SimpleWavefrontObjectModelLoader(ori));
 
-    nh.getParam(pre + "cpu/evaluation_count",
-                params.cpu.evaluation_count);
-    nh.getParam(pre + "cpu/update_rate",
-                params.cpu.update_rate);
-    nh.getParam(pre + "cpu/max_kl_divergence",
-                params.cpu.max_kl_divergence);
+    // Load the model usign the simple wavefront load and center the frames
+    // of all object part meshes
+    auto object_model =
+        std::make_shared<dbot::ObjectModel>(object_model_loader, true);
 
-    nh.getParam(pre + "gpu/evaluation_count",
-                params.gpu.evaluation_count);
-    nh.getParam(pre + "gpu/update_rate",
-                params.gpu.update_rate);
-    nh.getParam(pre + "gpu/max_kl_divergence",
-                params.gpu.max_kl_divergence);
-
-    nh.getParam(pre + "gpu/use_custom_shaders",
-                params.observation.use_custom_shaders);
-    nh.getParam(pre + "gpu/vertex_shader_file",
-                params.observation.vertex_shader_file);
-    nh.getParam(pre + "gpu/fragment_shader_file",
-                params.observation.fragment_shader_file);
-    nh.getParam(pre + "gpu/geometry_shader_file",
-                params.observation.geometry_shader_file);
-
-    params.tracker = params.use_gpu ? params.gpu : params.cpu;
-
-    params.observation.sample_count = params.tracker.evaluation_count;
-
-    nh.getParam(pre + "observation/occlusion/p_occluded_visible",
-                params.observation.occlusion.p_occluded_visible);
-    nh.getParam(pre + "observation/occlusion/p_occluded_occluded",
-                params.observation.occlusion.p_occluded_occluded);
-    nh.getParam(pre + "observation/occlusion/initial_occlusion_prob",
-                params.observation.occlusion.initial_occlusion_prob);
-
-    nh.getParam(pre + "observation/kinect/tail_weight",
-                params.observation.kinect.tail_weight);
-    nh.getParam(pre + "observation/kinect/model_sigma",
-                params.observation.kinect.model_sigma);
-    nh.getParam(pre + "observation/kinect/sigma_factor",
-                params.observation.kinect.sigma_factor);
-    params.observation.delta_time = 1. / 30.;
-
-    // brownian process parameters
-    nh.getParam(pre + "brownian_transition/linear_acceleration_sigma",
-                params.brownian_transition.linear_acceleration_sigma);
-    nh.getParam(pre + "brownian_transition/angular_acceleration_sigma",
-                params.brownian_transition.angular_acceleration_sigma);
-    nh.getParam(pre + "brownian_transition/damping",
-                params.brownian_transition.damping);
-    params.brownian_transition.part_count = object_meshes.size();
-    params.brownian_transition.delta_time = 1. / 30.;
-
-    // linear state transition parameters
-    nh.getParam(pre + "object_transition/linear_sigma",
-                params.object_transition.linear_sigma);
-    nh.getParam(pre + "object_transition/angular_sigma",
-                params.object_transition.angular_sigma);
-    nh.getParam(pre + "object_transition/velocity_factor",
-                params.object_transition.velocity_factor);
-    params.object_transition.part_count = object_meshes.size();
-
-    // camera parameters
+    /* ------------------------------ */
+    /* - Setup camera data          - */
+    /* ------------------------------ */
+    int downsampling_factor;
+    std::string camera_info_topic;
+    std::string depth_image_topic;
+    dbot::CameraData::Resolution resolution;
     nh.getParam("camera_info_topic", camera_info_topic);
     nh.getParam("depth_image_topic", depth_image_topic);
     nh.getParam("downsampling_factor", downsampling_factor);
     nh.getParam("resolution/width", resolution.width);
     nh.getParam("resolution/height", resolution.height);
 
-    /* ------------------------------ */
-    /* - Setup camera data          - */
-    /* ------------------------------ */
-    // setup camera data
     auto camera_data_provider = std::shared_ptr<dbot::CameraDataProvider>(
         new dbot::RosCameraDataProvider(nh,
                                         camera_info_topic,
@@ -232,15 +112,105 @@ int main(int argc, char** argv)
                                         resolution,
                                         downsampling_factor,
                                         2.0));
-    dbot::CameraData camera_data(camera_data_provider);
+    // Create camera data from the RosCameraDataProvider which takes the data
+    // from a ros camera topic
+    auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
+
+    /* ------------------------------ */
+    /* - Few types we will be using - */
+    /* ------------------------------ */
+    typedef osr::FreeFloatingRigidBodiesState<> State;
+    typedef dbot::RbcParticleFilterObjectTracker Tracker;
+    typedef dbot::RbcParticleFilterTrackerBuilder<Tracker> TrackerBuilder;
+    typedef TrackerBuilder::StateTransitionBuilder StateTransitionBuilder;
+    typedef TrackerBuilder::ObservationModelBuilder ObservationModelBuilder;
+
+    // parameter shorthand prefix
+    std::string pre = "particle_filter/";
+
+    /* ------------------------------ */
+    /* - State transition function  - */
+    /* ------------------------------ */
+    // We will use a linear observation model built by the object transition
+    // model builder. The linear model will generate a random walk.
+    dbot::ObjectTransitionModelBuilder<State>::Parameters params_state;
+    nh.getParam(pre + "object_transition/linear_sigma",
+                params_state.linear_sigma);
+    nh.getParam(pre + "object_transition/angular_sigma",
+                params_state.angular_sigma);
+    nh.getParam(pre + "object_transition/velocity_factor",
+                params_state.velocity_factor);
+    params_state.part_count = object_meshes.size();
+
+    auto state_trans_builder = std::shared_ptr<StateTransitionBuilder>(
+        new dbot::ObjectTransitionModelBuilder<State>(params_state));
+
+    /* ------------------------------ */
+    /* - Observation model          - */
+    /* ------------------------------ */
+    dbot::RbObservationModelBuilder<State>::Parameters params_obsrv;
+    nh.getParam(pre + "use_gpu", params_obsrv.use_gpu);
+
+    if (params_obsrv.use_gpu)
+    {
+        nh.getParam(pre + "gpu/sample_count", params_obsrv.sample_count);
+    }
+    else
+    {
+        nh.getParam(pre + "cpu/sample_count", params_obsrv.sample_count);
+    }
+
+    nh.getParam(pre + "observation/occlusion/p_occluded_visible",
+                params_obsrv.occlusion.p_occluded_visible);
+    nh.getParam(pre + "observation/occlusion/p_occluded_occluded",
+                params_obsrv.occlusion.p_occluded_occluded);
+    nh.getParam(pre + "observation/occlusion/initial_occlusion_prob",
+                params_obsrv.occlusion.initial_occlusion_prob);
+
+    nh.getParam(pre + "observation/kinect/tail_weight",
+                params_obsrv.kinect.tail_weight);
+    nh.getParam(pre + "observation/kinect/model_sigma",
+                params_obsrv.kinect.model_sigma);
+    nh.getParam(pre + "observation/kinect/sigma_factor",
+                params_obsrv.kinect.sigma_factor);
+    params_obsrv.delta_time = 1. / 30.;
+
+    // gpu only parameters
+    nh.getParam(pre + "gpu/use_custom_shaders",
+                params_obsrv.use_custom_shaders);
+    nh.getParam(pre + "gpu/vertex_shader_file",
+                params_obsrv.vertex_shader_file);
+    nh.getParam(pre + "gpu/fragment_shader_file",
+                params_obsrv.fragment_shader_file);
+    nh.getParam(pre + "gpu/geometry_shader_file",
+                params_obsrv.geometry_shader_file);
+
+    auto obsrv_model_builder = std::shared_ptr<ObservationModelBuilder>(
+        new dbot::RbObservationModelBuilder<State>(
+            object_model, camera_data, params_obsrv));
+
+    /* ------------------------------ */
+    /* - Filter & Tracker           - */
+    /* ------------------------------ */
+    TrackerBuilder::Parameters params_tracker;
+    params_tracker.evaluation_count = params_obsrv.sample_count;
+    nh.getParam(pre + "moving_average_update_rate",
+                params_tracker.moving_average_update_rate);
+    nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
+
+    auto tracker_builder =
+        dbot::RbcParticleFilterTrackerBuilder<Tracker>(state_trans_builder,
+                                                       obsrv_model_builder,
+                                                       object_model,
+                                                       camera_data,
+                                                       params_tracker);
+    auto tracker = tracker_builder.build();
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
-    opi::InteractiveMarkerInitializer object_initializer(camera_data.frame_id(),
-                                                         params.ori.package(),
-                                                         params.ori.directory(),
-                                                         params.ori.meshes());
+    opi::InteractiveMarkerInitializer object_initializer(
+        camera_data->frame_id(), ori.package(), ori.directory(), ori.meshes());
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
@@ -249,30 +219,29 @@ int main(int argc, char** argv)
 
     auto initial_ros_poses = object_initializer.poses();
     std::vector<Tracker::State> initial_poses;
-    initial_poses.push_back(Tracker::State(params.ori.count_meshes()));
+    initial_poses.push_back(Tracker::State(ori.count_meshes()));
     int i = 0;
     for (auto& ros_pose : initial_ros_poses)
     {
         initial_poses[0].component(i++) = ri::to_pose_velocity_vector(ros_pose);
     }
 
-    /* ------------------------------ */
-    /* - Create the tracker         - */
-    /* ------------------------------ */
-    auto tracker_builder =
-        dbot::RbcParticleFilterTrackerBuilder(params, camera_data);
-
-    auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses);
 
     /* ------------------------------ */
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    TrackerNode tracker_node(tracker, params.ori);
-    ros::Subscriber subscriber = nh.subscribe(
-        depth_image_topic, 1, &TrackerNode::tracking_callback, &tracker_node);
+    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<Tracker>>(
+        new dbot::ObjectTrackerPublisher<Tracker>(ori));
 
+    dbot::TrackerNode<Tracker> tracker_node(tracker, tracker_publisher);
+    ros::Subscriber subscriber =
+        nh.subscribe(depth_image_topic,
+                     1,
+                     &dbot::TrackerNode<Tracker>::tracking_callback,
+                     &tracker_node);
+    (void)subscriber;
     ros::spin();
 
     return 0;
