@@ -18,7 +18,7 @@
  */
 
 #include <sensor_msgs/Image.h>
-
+#include <fl/util/profiling.hpp>
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
@@ -65,11 +65,13 @@ Eigen::VectorXd RosCameraDataProvider::depth_image_vector() const
 
 Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
 {
-    if (camera_matrix_.isZero())
+    while (camera_matrix_.isZero())
     {
         camera_matrix_ =
             ri::GetCameraMatrix<double>(camera_info_topic_, nh_, timeout_);
         camera_matrix_.topLeftCorner(2, 3) /= downsampling_factor_;
+
+        ros::Duration(0.1).sleep();
     }
 
     return camera_matrix_;
@@ -77,10 +79,11 @@ Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
 
 std::string RosCameraDataProvider::frame_id() const
 {
-    if (frame_id_.empty())
+    while (frame_id_.empty())
     {
         frame_id_ =
             ri::GetCameraFrame<double>(camera_info_topic_, nh_, timeout_);
+        ros::Duration(0.1).sleep();
     }
 
     return frame_id_;
