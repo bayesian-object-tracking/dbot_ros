@@ -72,7 +72,7 @@ public:
     {
         INIT_PROFILING
         auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
-            ros_image, tracker_->camera_data().downsampling_factor());
+            ros_image, tracker_->camera_data()->downsampling_factor());
 
         auto mean_state = tracker_->track(image);
 
@@ -196,15 +196,15 @@ int main(int argc, char** argv)
                                         resolution,
                                         downsampling_factor,
                                         2.0));
-    dbot::CameraData camera_data(camera_data_provider);
+   auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
 
     // finally, set number of pixels
-    params.observation.sensors = camera_data.pixels();
+    params.observation.sensors = camera_data->pixels();
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
-    opi::InteractiveMarkerInitializer object_initializer(camera_data.frame_id(),
+    opi::InteractiveMarkerInitializer object_initializer(camera_data->frame_id(),
                                                          params.ori.package(),
                                                          params.ori.directory(),
                                                          params.ori.meshes());
