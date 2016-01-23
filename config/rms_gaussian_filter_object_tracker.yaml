@@ -21,6 +21,11 @@ gaussian_filter:
     bg_depth: -3.0
     bg_noise_std: 100.0
 
+  object_color:
+   R: 97
+   G: 117
+   B: 123
+
 # object colors
 gt_color_r: 97
 gt_color_g: 117

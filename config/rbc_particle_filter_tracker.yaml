@@ -36,7 +36,12 @@ particle_filter:
       sigma_factor: 0.0014247 #0.0014247
 
   object_transition:
-    linear_sigma: 0.0125
+    linear_sigma: 0.0025
     angular_sigma: 0.02
     velocity_factor: 0.8
+
+  object_color:
+   R: 97
+   G: 117
+   B: 123
 
