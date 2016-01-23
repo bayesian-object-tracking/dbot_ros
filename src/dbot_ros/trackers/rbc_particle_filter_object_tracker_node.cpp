@@ -47,21 +47,21 @@ int main(int argc, char** argv)
     ros::NodeHandle nh("~");
 
     /* ---------------------------------------------------------------------- */
-    /* Roa-Blackwellized Coordinate Particle Filter Object Tracking           */
+    /* Roa-Blackwellized Coordinate Particle Filter Object Tracker            */
     /*                                                                        */
     /* Ingredients:                                                           */
     /*   - TrackerNode                                                        */
     /*     - Tracker                                                          */
     /*       - Rbc Particle Filter Algorithm                                  */
-    /*         - State transition model                                       */
+    /*         - Objects tate transition model                                */
     /*         - Observation model                                            */
     /*       - Object model                                                   */
     /*       - Camera data                                                    */
     /*     - Tracker publisher to advertise the estimated state               */
     /*                                                                        */
     /*  Construnction of the tracker will utilize few builders and factories. */
-    /*  For that, we the following builders/factories:                        */
-    /*    - State transition model builder                                    */
+    /*  For that, we need the following builders/factories:                   */
+    /*    - Object state transition model builder                             */
     /*    - Observation model builder to build GPU or CPU based models        */
     /*    - Filter builder                                                    */
     /* ---------------------------------------------------------------------- */
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
                                         depth_image_topic,
                                         resolution,
                                         downsampling_factor,
-                                        2.0));
+                                        60.0));
     // Create camera data from the RosCameraDataProvider which takes the data
     // from a ros camera topic
     auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
@@ -190,7 +190,7 @@ int main(int argc, char** argv)
             object_model, camera_data, params_obsrv));
 
     /* ------------------------------ */
-    /* - Filter & Tracker           - */
+    /* - Create Filter & Tracker    - */
     /* ------------------------------ */
     TrackerBuilder::Parameters params_tracker;
     params_tracker.evaluation_count = params_obsrv.sample_count;
@@ -205,6 +205,23 @@ int main(int argc, char** argv)
                                                        camera_data,
                                                        params_tracker);
     auto tracker = tracker_builder.build();
+
+    /* ------------------------------ */
+    /* - Tracker publisher          - */
+    /* ------------------------------ */
+    int object_color[3];
+    nh.getParam(pre + "object_color/R", object_color[0]);
+    nh.getParam(pre + "object_color/G", object_color[1]);
+    nh.getParam(pre + "object_color/B", object_color[2]);
+    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<Tracker>>(
+        new dbot::ObjectTrackerPublisher<Tracker>(
+            ori, object_color[0], object_color[1], object_color[2]));
+
+    /* ------------------------------ */
+    /* - Create tracker node        - */
+    /* ------------------------------ */
+
+    dbot::TrackerNode<Tracker> tracker_node(tracker, tracker_publisher);
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
@@ -229,13 +246,8 @@ int main(int argc, char** argv)
     tracker->initialize(initial_poses);
 
     /* ------------------------------ */
-    /* - Create and run tracker     - */
-    /* - node                       - */
+    /* - Run the tracker            - */
     /* ------------------------------ */
-    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<Tracker>>(
-        new dbot::ObjectTrackerPublisher<Tracker>(ori));
-
-    dbot::TrackerNode<Tracker> tracker_node(tracker, tracker_publisher);
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
                      1,

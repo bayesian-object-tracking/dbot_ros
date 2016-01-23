@@ -34,14 +34,16 @@ namespace dbot
  * estimated state and its marker.
  */
 template <typename Tracker>
-class ObjectTrackerPublisher
-        : public TrackerPublisher<Tracker>
+class ObjectTrackerPublisher : public TrackerPublisher<Tracker>
 {
 public:
     typedef typename Tracker::State State;
 
 public:
-    ObjectTrackerPublisher(const dbot::ObjectResourceIdentifier& ori);
+    ObjectTrackerPublisher(const dbot::ObjectResourceIdentifier& ori,
+                           int object_color_red,
+                           int object_color_green,
+                           int object_color_blue);
 
     void publish(const State& state,
                  const sensor_msgs::Image& image,
@@ -52,5 +54,8 @@ protected:
     ros::Publisher object_marker_publisher_;
     ros::Publisher object_state_publisher_;
     dbot::ObjectResourceIdentifier ori_;
+    int object_color_red_;
+    int object_color_green_;
+    int object_color_blue_;
 };
 }

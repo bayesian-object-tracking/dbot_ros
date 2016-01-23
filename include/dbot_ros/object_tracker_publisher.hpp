@@ -34,11 +34,17 @@
 
 namespace dbot
 {
-
 template <typename Tracker>
 ObjectTrackerPublisher<Tracker>::ObjectTrackerPublisher(
-    const dbot::ObjectResourceIdentifier& ori)
-    : node_handle_("~"), ori_(ori)
+    const dbot::ObjectResourceIdentifier& ori,
+    int object_color_red,
+    int object_color_green,
+    int object_color_blue)
+    : node_handle_("~"),
+      ori_(ori),
+      object_color_red_(object_color_red),
+      object_color_green_(object_color_green),
+      object_color_blue_(object_color_blue)
 {
     object_marker_publisher_ =
         node_handle_.advertise<visualization_msgs::Marker>("object_model", 0);
@@ -61,9 +67,9 @@ void ObjectTrackerPublisher<Tracker>::publish(
             ori_.mesh_uri(i),
             object_marker_publisher_,
             i,
-            1,
-            0,
-            0);
+            object_color_red_ / 255.,
+            object_color_green_ / 255.,
+            object_color_blue_ / 255.);
 
         ri::PublishObjectState(
             state.component(i).homogeneous().template cast<float>(),
@@ -72,5 +78,4 @@ void ObjectTrackerPublisher<Tracker>::publish(
             object_state_publisher_);
     }
 }
-
 }
