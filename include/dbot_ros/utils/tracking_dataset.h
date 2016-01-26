@@ -43,8 +43,8 @@ public:
     sensor_msgs::CameraInfo::ConstPtr info_;
     sensor_msgs::JointState::ConstPtr ground_truth_joints_;
     sensor_msgs::JointState::ConstPtr noisy_joints_;
-  tf::tfMessage::ConstPtr gt_tf_;
-  tf::tfMessage::ConstPtr gt_tf_fixed_;
+    tf::tfMessage::ConstPtr gt_tf_;
+    tf::tfMessage::ConstPtr gt_tf_fixed_;
     Eigen::VectorXd ground_truth_;
     Eigen::VectorXd deviation_;
 
@@ -53,54 +53,62 @@ public:
               const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
               const Eigen::VectorXd& deviation = Eigen::VectorXd());
 
-  DataFrame(const sensor_msgs::Image::ConstPtr& image,
-        const sensor_msgs::CameraInfo::ConstPtr& info,
-        const sensor_msgs::JointState::ConstPtr& ground_truth_joints,
-        const sensor_msgs::JointState::ConstPtr& noisy_joints,
-        const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-        const Eigen::VectorXd& deviation = Eigen::VectorXd());
+    DataFrame(const sensor_msgs::Image::ConstPtr& image,
+              const sensor_msgs::CameraInfo::ConstPtr& info,
+              const tf::tfMessage::ConstPtr gt_tf,
+              const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
+              const Eigen::VectorXd& deviation = Eigen::VectorXd());
 
-  DataFrame(const sensor_msgs::Image::ConstPtr& image,
-        const sensor_msgs::CameraInfo::ConstPtr& info,
-        const sensor_msgs::JointState::ConstPtr& ground_truth_joints,
-        const sensor_msgs::JointState::ConstPtr& noisy_joints,
-        const tf::tfMessage::ConstPtr& tf,
-        const tf::tfMessage::ConstPtr& fixed_tf,
-        const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-        const Eigen::VectorXd& deviation = Eigen::VectorXd());
+    DataFrame(const sensor_msgs::Image::ConstPtr& image,
+              const sensor_msgs::CameraInfo::ConstPtr& info,
+              const sensor_msgs::JointState::ConstPtr& ground_truth_joints,
+              const sensor_msgs::JointState::ConstPtr& noisy_joints,
+              const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
+              const Eigen::VectorXd& deviation = Eigen::VectorXd());
 
+    DataFrame(const sensor_msgs::Image::ConstPtr& image,
+              const sensor_msgs::CameraInfo::ConstPtr& info,
+              const sensor_msgs::JointState::ConstPtr& ground_truth_joints,
+              const sensor_msgs::JointState::ConstPtr& noisy_joints,
+              const tf::tfMessage::ConstPtr& tf,
+              const tf::tfMessage::ConstPtr& fixed_tf,
+              const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
+              const Eigen::VectorXd& deviation = Eigen::VectorXd());
 };
 
 template <class M>
 class BagSubscriber : public message_filters::SimpleFilter<M>
 {
 public:
-    void newMessage(const boost::shared_ptr<M const> &msg)
+    void newMessage(const boost::shared_ptr<M const>& msg)
     {
-      this->signalMessage(msg);
+        this->signalMessage(msg);
     }
 };
-
 
 class TrackingDataset
 {
 public:
-
-  enum DataType {
-    GROUND_TRUTH = 1,
-    DEVIATION
-  };
+    enum DataType
+    {
+        GROUND_TRUTH = 1,
+        DEVIATION
+    };
 
     TrackingDataset(const std::string& path);
     ~TrackingDataset();
 
-    void AddFrame(const sensor_msgs::Image::ConstPtr& image,
-                  const sensor_msgs::CameraInfo::ConstPtr& info,
-                  const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-                  const Eigen::VectorXd& deviation = Eigen::VectorXd());
+//    void AddFrame(const sensor_msgs::Image::ConstPtr& image,
+//                  const sensor_msgs::CameraInfo::ConstPtr& info,
+//                  const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
+//                  const Eigen::VectorXd& deviation = Eigen::VectorXd());
 
     void AddFrame(const sensor_msgs::Image::ConstPtr& image,
                   const sensor_msgs::CameraInfo::ConstPtr& info);
+
+    void AddFrame(const sensor_msgs::Image::ConstPtr& image,
+                  const sensor_msgs::CameraInfo::ConstPtr& info,
+                  const tf::tfMessage::ConstPtr& gt_tf);
 
     sensor_msgs::Image::ConstPtr GetImage(const size_t& index);
 
@@ -119,18 +127,18 @@ public:
     void Store();
 
 protected:
+    bool LoadTextFile(const char* filename, DataType type);
+    bool StoreTextFile(const char* filename, DataType type);
 
-  bool LoadTextFile(const char *filename, DataType type);
-  bool StoreTextFile(const char *filename, DataType type);
+    std::vector<DataFrame> data_;
+    const boost::filesystem::path path_;
 
-  std::vector<DataFrame> data_;
-  const boost::filesystem::path path_;
-
-  const std::string image_topic_;
-  const std::string info_topic_;
-  const std::string observations_filename_;
-  const std::string ground_truth_filename_;
+    const std::string image_topic_;
+    const std::string info_topic_;
+    const std::string observations_filename_;
+    const std::string ground_truth_filename_;
 
 private:
-  const double admissible_delta_time_; // admissible time difference in s for comparing time stamps
+    const double admissible_delta_time_;  // admissible time difference in s for
+                                          // comparing time stamps
 };
