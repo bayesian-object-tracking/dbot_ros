@@ -113,6 +113,7 @@ set(sources
   src/${PROJECT_NAME}/object_tracker_publisher.cpp
   src/${PROJECT_NAME}/object_tracker_node.cpp
   src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
+  src/${PROJECT_NAME}/utils/data_set_camera_data_provider.cpp
   src/${PROJECT_NAME}/utils/pcl_interface.cpp
   src/${PROJECT_NAME}/utils/ros_interface.cpp
   src/${PROJECT_NAME}/utils/cloud_visualizer.cpp

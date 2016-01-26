@@ -37,7 +37,7 @@ public:
 
 public:
     virtual void publish(
-        const State& state,
+        State& state,
         const sensor_msgs::Image& image,
         const std::shared_ptr<dbot::CameraData>& camera_data) = 0;
 };
