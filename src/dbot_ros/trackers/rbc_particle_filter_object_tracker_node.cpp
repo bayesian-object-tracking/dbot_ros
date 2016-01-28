@@ -213,8 +213,8 @@ int main(int argc, char** argv)
     nh.getParam(pre + "object_color/R", object_color[0]);
     nh.getParam(pre + "object_color/G", object_color[1]);
     nh.getParam(pre + "object_color/B", object_color[2]);
-    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<Tracker>>(
-        new dbot::ObjectTrackerPublisher<Tracker>(
+    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<State>>(
+        new dbot::ObjectTrackerPublisher<State>(
             ori, object_color[0], object_color[1], object_color[2]));
 
     /* ------------------------------ */

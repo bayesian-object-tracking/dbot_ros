@@ -28,7 +28,7 @@ namespace dbot
 template <typename Tracker>
 TrackerNode<Tracker>::TrackerNode(
     const std::shared_ptr<Tracker>& tracker,
-    const std::shared_ptr<TrackerPublisher<Tracker>>& publisher)
+    const std::shared_ptr<TrackerPublisher<State>>& publisher)
     : tracker_(tracker), publisher_(publisher)
 {
 }

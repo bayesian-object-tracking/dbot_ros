@@ -29,12 +29,9 @@ namespace dbot
  * publish the estimated state result along object markers, robot models,
  * point clouds and images.
  */
-template <typename Tracker>
+template <typename State>
 class TrackerPublisher
 {
-public:
-    typedef typename Tracker::State State;
-
 public:
     virtual void publish(
         State& state,

@@ -34,8 +34,8 @@
 
 namespace dbot
 {
-template <typename Tracker>
-ObjectTrackerPublisher<Tracker>::ObjectTrackerPublisher(
+template <typename State>
+ObjectTrackerPublisher<State>::ObjectTrackerPublisher(
     const dbot::ObjectResourceIdentifier& ori,
     int object_color_red,
     int object_color_green,
@@ -52,9 +52,9 @@ ObjectTrackerPublisher<Tracker>::ObjectTrackerPublisher(
         node_handle_.advertise<dbot_ros::ObjectState>("object_state", 0);
 }
 
-template <typename Tracker>
-void ObjectTrackerPublisher<Tracker>::publish(
-    const State& state,
+template <typename State>
+void ObjectTrackerPublisher<State>::publish(
+    State& state,
     const sensor_msgs::Image& image,
     const std::shared_ptr<dbot::CameraData>& camera_data)
 {

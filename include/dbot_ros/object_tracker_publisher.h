@@ -33,19 +33,16 @@ namespace dbot
  * \brief Represents the object tracker publisher. This publishes the object
  * estimated state and its marker.
  */
-template <typename Tracker>
-class ObjectTrackerPublisher : public TrackerPublisher<Tracker>
+template <typename State>
+class ObjectTrackerPublisher : public TrackerPublisher<State>
 {
-public:
-    typedef typename Tracker::State State;
-
 public:
     ObjectTrackerPublisher(const dbot::ObjectResourceIdentifier& ori,
                            int object_color_red,
                            int object_color_green,
                            int object_color_blue);
 
-    void publish(const State& state,
+    void publish(State& state,
                  const sensor_msgs::Image& image,
                  const std::shared_ptr<dbot::CameraData>& camera_data);
 

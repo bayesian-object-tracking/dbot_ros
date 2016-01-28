@@ -39,7 +39,7 @@ public:
      * \brief Creates a TrackerNode
      */
     TrackerNode(const std::shared_ptr<Tracker>& tracker,
-                const std::shared_ptr<TrackerPublisher<Tracker>>& publisher);
+                const std::shared_ptr<TrackerPublisher<State>> &publisher);
 
     /**
      * \brief Tracking callback function which is invoked whenever a new image
@@ -49,6 +49,6 @@ public:
 
 protected:
     std::shared_ptr<Tracker> tracker_;
-    std::shared_ptr<TrackerPublisher<Tracker>> publisher_;
+    std::shared_ptr<TrackerPublisher<State>> publisher_;
 };
 }

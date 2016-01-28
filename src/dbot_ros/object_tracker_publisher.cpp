@@ -23,6 +23,6 @@
 
 namespace dbot
 {
-template class ObjectTrackerPublisher<RbcParticleFilterObjectTracker>;
+template class ObjectTrackerPublisher<osr::FreeFloatingRigidBodiesState<>>;
 }
 
