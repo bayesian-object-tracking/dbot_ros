@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <fl/util/profiling.hpp>
+
 #include <dbot_ros/tracker_node.h>
 
 #include <dbot_ros/utils/ros_interface.hpp>
