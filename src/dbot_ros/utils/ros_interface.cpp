@@ -33,59 +33,64 @@ template void ri::ReadParameter(const std::string& path,
                                 std::string& parameter,
                                 ros::NodeHandle node_handle);
 
-template<>
-void ri::ReadParameter<std::vector<std::string> >(const std::string& path,
-                                               std::vector<std::string>& parameter,
-                                               ros::NodeHandle node_handle)
+template <>
+void ri::ReadParameter<std::vector<std::string>>(
+    const std::string& path,
+    std::vector<std::string>& parameter,
+    ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
     node_handle.getParam(path, ros_parameter);
     parameter.resize(ros_parameter.size());
-    for(size_t i = 0; i < parameter.size(); i++)
+    for (size_t i = 0; i < parameter.size(); i++)
         parameter[i] = std::string(ros_parameter[i]);
 }
 
-
-template<>
-void ri::ReadParameter<std::vector<double> >(const std::string& path,
-                                               std::vector<double>& parameter,
-                                               ros::NodeHandle node_handle)
+template <>
+void ri::ReadParameter<std::vector<double>>(const std::string& path,
+                                            std::vector<double>& parameter,
+                                            ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
     node_handle.getParam(path, ros_parameter);
     parameter.resize(ros_parameter.size());
-    for(size_t i = 0; i < parameter.size(); i++)
+    for (size_t i = 0; i < parameter.size(); i++)
         parameter[i] = double(ros_parameter[i]);
 }
 
-template<>
-void ri::ReadParameter<std::vector<std::vector<size_t> > >(const std::string& path,
-                                                        std::vector<std::vector<size_t> >& parameter,
-                                                        ros::NodeHandle node_handle)
+template <>
+void ri::ReadParameter<std::vector<std::vector<int>>>(
+    const std::string& path,
+    std::vector<std::vector<int>>& parameter,
+    ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
     node_handle.getParam(path, ros_parameter);
     parameter.resize(ros_parameter.size());
-    for(size_t i = 0; i < parameter.size(); i++)
+    for (size_t i = 0; i < parameter.size(); i++)
     {
         parameter[i].resize(ros_parameter[i].size());
-        for(size_t j = 0; j < parameter[i].size(); j++)
+        for (size_t j = 0; j < parameter[i].size(); j++)
             parameter[i][j] = int(ros_parameter[i][j]);
     }
 }
 
-void ri::PublishMarker(const Eigen::Matrix3f R, const Eigen::Vector3f t,
-        std_msgs::Header header,
-        std::string object_model_path,
-        const ros::Publisher &pub,
-        int marker_id, float r, float g, float b, float a,
-        std::string ns)
+void ri::PublishMarker(const Eigen::Matrix3f R,
+                       const Eigen::Vector3f t,
+                       std_msgs::Header header,
+                       std::string object_model_path,
+                       const ros::Publisher& pub,
+                       int marker_id,
+                       float r,
+                       float g,
+                       float b,
+                       float a,
+                       std::string ns)
 {
-
     Eigen::Quaternion<float> q(R);
 
     geometry_msgs::PoseWithCovarianceStamped pose;
-    pose.header =  header;
+    pose.header = header;
     pose.pose.pose.position.x = t(0);
     pose.pose.pose.position.y = t(1);
     pose.pose.pose.position.z = t(2);
@@ -95,10 +100,9 @@ void ri::PublishMarker(const Eigen::Matrix3f R, const Eigen::Vector3f t,
     pose.pose.pose.orientation.z = q.z();
     pose.pose.pose.orientation.w = q.w();
 
-
     visualization_msgs::Marker marker;
-    marker.header.frame_id =  pose.header.frame_id;
-    marker.header.stamp =  pose.header.stamp;
+    marker.header.frame_id = pose.header.frame_id;
+    marker.header.stamp = pose.header.stamp;
     marker.ns = ns;
     marker.id = marker_id;
     marker.scale.x = 1.0;
@@ -119,94 +123,107 @@ void ri::PublishMarker(const Eigen::Matrix3f R, const Eigen::Vector3f t,
 }
 
 void ri::PublishMarker(const Eigen::Matrix4f H,
-        std_msgs::Header header,
-        std::string object_model_path,
-        const ros::Publisher &pub,
-        int marker_id, float r, float g, float b, float a,
-        std::string ns)
+                       std_msgs::Header header,
+                       std::string object_model_path,
+                       const ros::Publisher& pub,
+                       int marker_id,
+                       float r,
+                       float g,
+                       float b,
+                       float a,
+                       std::string ns)
 {
-    PublishMarker(H.topLeftCorner(3,3),
-                  H.topRightCorner(3,1),
+    PublishMarker(H.topLeftCorner(3, 3),
+                  H.topRightCorner(3, 1),
                   header,
-                  object_model_path, pub,
-                  marker_id, r, g, b, a,
+                  object_model_path,
+                  pub,
+                  marker_id,
+                  r,
+                  g,
+                  b,
+                  a,
                   ns);
 }
 
 void ri::PublishObjectState(const Eigen::Matrix4f H,
-                std_msgs::Header header,
-                std::string object_name,
-                const ros::Publisher &pub)
+                            std_msgs::Header header,
+                            std::string object_name,
+                            const ros::Publisher& pub)
 {
-  PublishObjectState(H.topLeftCorner(3,3),
-             H.topRightCorner(3,1),
-             header,
-             object_name,
-             pub);
+    PublishObjectState(H.topLeftCorner(3, 3),
+                       H.topRightCorner(3, 1),
+                       header,
+                       object_name,
+                       pub);
 }
 
-void ri::PublishObjectState(const Eigen::Matrix3f R, const Eigen::Vector3f t,
-                std_msgs::Header header,
-                std::string object_name,
-                const ros::Publisher &pub)
+void ri::PublishObjectState(const Eigen::Matrix3f R,
+                            const Eigen::Vector3f t,
+                            std_msgs::Header header,
+                            std::string object_name,
+                            const ros::Publisher& pub)
 {
-  Eigen::Quaternion<float> q(R);
+    Eigen::Quaternion<float> q(R);
 
-  geometry_msgs::PoseStamped pose;
-  pose.header =  header;
-  pose.pose.position.x = t(0);
-  pose.pose.position.y = t(1);
-  pose.pose.position.z = t(2);
+    geometry_msgs::PoseStamped pose;
+    pose.header = header;
+    pose.pose.position.x = t(0);
+    pose.pose.position.y = t(1);
+    pose.pose.position.z = t(2);
 
-  pose.pose.orientation.x = q.x();
-  pose.pose.orientation.y = q.y();
-  pose.pose.orientation.z = q.z();
-  pose.pose.orientation.w = q.w();
+    pose.pose.orientation.x = q.x();
+    pose.pose.orientation.y = q.y();
+    pose.pose.orientation.z = q.z();
+    pose.pose.orientation.w = q.w();
 
-  dbot_ros::ObjectState object_state;
-  object_state.name = object_name;
-  object_state.pose = pose;
+    dbot_ros::ObjectState object_state;
+    object_state.name = object_name;
+    object_state.pose = pose;
 
-  pub.publish(object_state);
-
+    pub.publish(object_state);
 }
 
 void ri::PublishPoints(const std_msgs::Header header,
-        const ros::Publisher &pub,
-        const std::vector<Eigen::Vector3f> points,
-        std::vector<float> colors,
-        const Eigen::Matrix3f R,
-        Eigen::Vector3f t)
+                       const ros::Publisher& pub,
+                       const std::vector<Eigen::Vector3f> points,
+                       std::vector<float> colors,
+                       const Eigen::Matrix3f R,
+                       Eigen::Vector3f t)
 {
-    // if no color has been given we set it to some value -----------------------------
-    if(colors.size() == 0)
-        colors = std::vector<float> (points.size(), 1);
+    // if no color has been given we set it to some value
+    // -----------------------------
+    if (colors.size() == 0) colors = std::vector<float>(points.size(), 1);
 
     // renormalize colors -----------------------------
     float max = -std::numeric_limits<float>::max();
     float min = std::numeric_limits<float>::max();
-    for(int i = 0; i < int(colors.size()); i++)
+    for (int i = 0; i < int(colors.size()); i++)
     {
         min = colors[i] < min ? colors[i] : min;
         max = colors[i] > max ? colors[i] : max;
     }
-    if(min == max) min = 0;
+    if (min == max) min = 0;
 
     pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
     point_cloud.header = header;
-    point_cloud.width    = points.size(); point_cloud.height   = 1; point_cloud.is_dense = false;
-    point_cloud.points.resize (point_cloud.width * point_cloud.height);
+    point_cloud.width = points.size();
+    point_cloud.height = 1;
+    point_cloud.is_dense = false;
+    point_cloud.points.resize(point_cloud.width * point_cloud.height);
 
     for (int point_index = 0; point_index < int(points.size()); ++point_index)
     {
-        Eigen::Vector3f new_point = R*points[point_index] + t;
+        Eigen::Vector3f new_point = R * points[point_index] + t;
         point_cloud.points[point_index].x = new_point(0);
         point_cloud.points[point_index].y = new_point(1);
         point_cloud.points[point_index].z = new_point(2);
 
-        point_cloud.points[point_index].r = (colors[point_index]-min)/(max-min) * 255.;
+        point_cloud.points[point_index].r =
+            (colors[point_index] - min) / (max - min) * 255.;
         point_cloud.points[point_index].g = 0.;
-        point_cloud.points[point_index].b = (1 - (colors[point_index]-min)/(max-min)) * 255.;
+        point_cloud.points[point_index].b =
+            (1 - (colors[point_index] - min) / (max - min)) * 255.;
     }
     sensor_msgs::PointCloud2 point_cloud2;
     pcl::toROSMsg(point_cloud, point_cloud2);
