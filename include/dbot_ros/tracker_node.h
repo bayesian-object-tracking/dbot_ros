@@ -49,6 +49,8 @@ public:
 
     const State& current_state() const;
 
+    std::shared_ptr<Tracker> tracker() { return tracker_; }
+
 protected:
     State current_state_;
     std::shared_ptr<Tracker> tracker_;
