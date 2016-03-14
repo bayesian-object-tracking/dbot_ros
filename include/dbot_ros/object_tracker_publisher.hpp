@@ -53,8 +53,7 @@ ObjectTrackerPublisher<State>::ObjectTrackerPublisher(
 }
 
 template <typename State>
-void ObjectTrackerPublisher<State>::publish(
-    State& state,
+void ObjectTrackerPublisher<State>::publish(const State &state,
     const sensor_msgs::Image& image,
     const std::shared_ptr<dbot::CameraData>& camera_data)
 {

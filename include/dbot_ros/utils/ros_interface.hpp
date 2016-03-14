@@ -118,9 +118,9 @@ void ReadParameter<std::vector<double>>(const std::string& path,
                                         ros::NodeHandle node_handle);
 
 template <>
-void ReadParameter<std::vector<std::vector<size_t>>>(
+void ReadParameter<std::vector<std::vector<int>>>(
     const std::string& path,
-    std::vector<std::vector<size_t>>& parameter,
+    std::vector<std::vector<int>>& parameter,
     ros::NodeHandle node_handle);
 
 template <typename Scalar>

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <fl/util/profiling.hpp>
+
 #include <dbot_ros/tracker_node.h>
 
 #include <dbot_ros/utils/ros_interface.hpp>
@@ -34,12 +36,19 @@ TrackerNode<Tracker>::TrackerNode(
 }
 
 template <typename Tracker>
-void TrackerNode<Tracker>::tracking_callback(const sensor_msgs::Image& ros_image)
+void TrackerNode<Tracker>::tracking_callback(
+    const sensor_msgs::Image& ros_image)
 {
     auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
         ros_image, tracker_->camera_data()->downsampling_factor());
 
-    auto state = tracker_->track(image);
-    publisher_->publish(state, ros_image, tracker_->camera_data());
+    current_state_ = tracker_->track(image);
+    publisher_->publish(current_state_, ros_image, tracker_->camera_data());
+}
+
+template <typename Tracker>
+auto TrackerNode<Tracker>::current_state() const -> const State &
+{
+    return current_state_;
 }
 }

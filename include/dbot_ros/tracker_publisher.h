@@ -34,7 +34,7 @@ class TrackerPublisher
 {
 public:
     virtual void publish(
-        State& state,
+        const State& state,
         const sensor_msgs::Image& image,
         const std::shared_ptr<dbot::CameraData>& camera_data) = 0;
 };

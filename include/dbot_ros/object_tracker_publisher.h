@@ -42,8 +42,11 @@ public:
                            int object_color_green,
                            int object_color_blue);
 
-    void publish(State& state,
+    void publish(const State& state,
                  const sensor_msgs::Image& image,
+                 const std::shared_ptr<dbot::CameraData>& camera_data);
+
+    void publish(const sensor_msgs::Image& image,
                  const std::shared_ptr<dbot::CameraData>& camera_data);
 
 protected:
