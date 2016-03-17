@@ -15,16 +15,16 @@ add_definitions(-DPROFILING_ON=1 -fPIC) #print profiling output
 ############################
 # Library Version          #
 ############################
-include(cmake/version.cmake)
+#include(cmake/version.cmake)
 
 ############################
 # Library info summary     #
 ############################
-include(cmake/info.cmake)
+#include(cmake/info.cmake)
 
-info_begin()
-  info_project("::bot::dbot_ros:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
-info_end()
+#info_begin()
+#  info_project("::bot::dbot_ros:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
+#info_end()
 
 find_package(catkin REQUIRED
   roscpp
