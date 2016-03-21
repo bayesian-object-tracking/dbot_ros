@@ -39,6 +39,7 @@ public:
      * \brief Creates a TrackerNode
      */
     TrackerNode(const std::shared_ptr<Tracker>& tracker,
+                const std::shared_ptr<dbot::CameraData>& camera_data,
                 const std::shared_ptr<TrackerPublisher<State>>& publisher);
 
     /**
@@ -50,10 +51,17 @@ public:
     const State& current_state() const;
 
     std::shared_ptr<Tracker> tracker() { return tracker_; }
+    std::shared_ptr<dbot::CameraData>
+
+    camera_data() const
+    {
+        return camera_data_;
+    }
 
 protected:
     State current_state_;
     std::shared_ptr<Tracker> tracker_;
+    std::shared_ptr<dbot::CameraData> camera_data_;
     std::shared_ptr<TrackerPublisher<State>> publisher_;
 };
 }
