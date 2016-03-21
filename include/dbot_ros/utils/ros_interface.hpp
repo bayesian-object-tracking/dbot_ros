@@ -31,9 +31,9 @@
 #include <visualization_msgs/Marker.h>
 #include <sensor_msgs/CameraInfo.h>
 
-#include <pcl/ros/conversions.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
+//#include <pcl/ros/conversions.h>
+//#include <pcl/point_cloud.h>
+//#include <pcl/point_types.h>
 
 //#include <cv.h>
 
@@ -246,10 +246,10 @@ void PublishObjectState(const Eigen::Matrix3f R,
             std::string object_name,
             const ros::Publisher &pub);
 
-void PublishPoints(const std_msgs::Header header,
-                   const ros::Publisher& pub,
-                   const std::vector<Eigen::Vector3f> points,
-                   std::vector<float> colors = std::vector<float>(0),
-                   const Eigen::Matrix3f R = Eigen::Matrix3f::Identity(),
-                   Eigen::Vector3f t = Eigen::Vector3f::Zero());
+//void PublishPoints(const std_msgs::Header header,
+//                   const ros::Publisher& pub,
+//                   const std::vector<Eigen::Vector3f> points,
+//                   std::vector<float> colors = std::vector<float>(0),
+//                   const Eigen::Matrix3f R = Eigen::Matrix3f::Identity(),
+//                   Eigen::Vector3f t = Eigen::Vector3f::Zero());
 }

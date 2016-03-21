@@ -33,8 +33,8 @@
 
 #include <boost/filesystem.hpp>
 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
+//#include <pcl/point_types.h>
+//#include <pcl/point_cloud.h>
 
 class DataFrame
 {
@@ -114,7 +114,7 @@ public:
 
     sensor_msgs::CameraInfo::ConstPtr GetInfo(const size_t& index);
 
-    pcl::PointCloud<pcl::PointXYZ>::ConstPtr GetPointCloud(const size_t& index);
+//    pcl::PointCloud<pcl::PointXYZ>::ConstPtr GetPointCloud(const size_t& index);
 
     Eigen::Matrix3d GetCameraMatrix(const size_t& index);
 

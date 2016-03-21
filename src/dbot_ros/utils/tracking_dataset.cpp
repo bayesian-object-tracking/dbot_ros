@@ -32,7 +32,7 @@
 #include <dbot/util/helper_functions.hpp>
 
 #include <dbot_ros/utils/ros_interface.hpp>
-#include <dbot_ros/utils/pcl_interface.hpp>
+//#include <dbot_ros/utils/pcl_interface.hpp>
 #include <dbot_ros/utils/tracking_dataset.h>
 
 DataFrame::DataFrame(const sensor_msgs::Image::ConstPtr& image,
@@ -144,21 +144,21 @@ sensor_msgs::CameraInfo::ConstPtr TrackingDataset::GetInfo(const size_t& index)
 {
     return data_[index].info_;
 }
-pcl::PointCloud<pcl::PointXYZ>::ConstPtr TrackingDataset::GetPointCloud(
-    const size_t& index)
-{
-    Eigen::MatrixXd image = ri::Ros2Eigen<double>(*data_[index].image_);
-    Eigen::Matrix<Eigen::Matrix<double, 3, 1>, -1, -1> points =
-        dbot::hf::Image2Points(image, GetCameraMatrix(index));
-    pcl::PointCloud<pcl::PointXYZ>::Ptr point_cloud(
-        pcl::PointCloud<pcl::PointXYZ>::Ptr(
-            new pcl::PointCloud<pcl::PointXYZ>));
+//pcl::PointCloud<pcl::PointXYZ>::ConstPtr TrackingDataset::GetPointCloud(
+//    const size_t& index)
+//{
+//    Eigen::MatrixXd image = ri::Ros2Eigen<double>(*data_[index].image_);
+//    Eigen::Matrix<Eigen::Matrix<double, 3, 1>, -1, -1> points =
+//        dbot::hf::Image2Points(image, GetCameraMatrix(index));
+//    pcl::PointCloud<pcl::PointXYZ>::Ptr point_cloud(
+//        pcl::PointCloud<pcl::PointXYZ>::Ptr(
+//            new pcl::PointCloud<pcl::PointXYZ>));
 
-    point_cloud->header = data_[index].image_->header;
-    pi::Eigen2Pcl(points, *point_cloud);
+//    point_cloud->header = data_[index].image_->header;
+//    pi::Eigen2Pcl(points, *point_cloud);
 
-    return point_cloud;
-}
+//    return point_cloud;
+//}
 
 Eigen::Matrix3d TrackingDataset::GetCameraMatrix(const size_t& index)
 {

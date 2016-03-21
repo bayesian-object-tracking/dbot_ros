@@ -65,13 +65,13 @@ endif(NOT osr_FOUND)
 find_package(Boost REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(PCL 1.3 REQUIRED)
+#find_package(PCL 1.3 REQUIRED)
 
 include_directories(${dbot_INCLUDE_DIRS})
 include_directories(${osr_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Eigen_INCLUDE_DIRS})
-include_directories(${PCL_INCLUDE_DIRS})
+#include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 ###################################
@@ -114,10 +114,11 @@ set(sources
   src/${PROJECT_NAME}/object_tracker_node.cpp
   src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
   src/${PROJECT_NAME}/utils/data_set_camera_data_provider.cpp
-  src/${PROJECT_NAME}/utils/pcl_interface.cpp
+#  src/${PROJECT_NAME}/utils/pcl_interface.cpp
   src/${PROJECT_NAME}/utils/ros_interface.cpp
-  src/${PROJECT_NAME}/utils/cloud_visualizer.cpp
-  src/${PROJECT_NAME}/utils/tracking_dataset.cpp)
+#  src/${PROJECT_NAME}/utils/cloud_visualizer.cpp
+  src/${PROJECT_NAME}/utils/tracking_dataset.cpp
+)
 
 add_library(${PROJECT_NAME}
   ${dbot_headers}

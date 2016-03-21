@@ -184,48 +184,48 @@ void ri::PublishObjectState(const Eigen::Matrix3f R,
     pub.publish(object_state);
 }
 
-void ri::PublishPoints(const std_msgs::Header header,
-                       const ros::Publisher& pub,
-                       const std::vector<Eigen::Vector3f> points,
-                       std::vector<float> colors,
-                       const Eigen::Matrix3f R,
-                       Eigen::Vector3f t)
-{
-    // if no color has been given we set it to some value
-    // -----------------------------
-    if (colors.size() == 0) colors = std::vector<float>(points.size(), 1);
+//void ri::PublishPoints(const std_msgs::Header header,
+//                       const ros::Publisher& pub,
+//                       const std::vector<Eigen::Vector3f> points,
+//                       std::vector<float> colors,
+//                       const Eigen::Matrix3f R,
+//                       Eigen::Vector3f t)
+//{
+//    // if no color has been given we set it to some value
+//    // -----------------------------
+//    if (colors.size() == 0) colors = std::vector<float>(points.size(), 1);
 
-    // renormalize colors -----------------------------
-    float max = -std::numeric_limits<float>::max();
-    float min = std::numeric_limits<float>::max();
-    for (int i = 0; i < int(colors.size()); i++)
-    {
-        min = colors[i] < min ? colors[i] : min;
-        max = colors[i] > max ? colors[i] : max;
-    }
-    if (min == max) min = 0;
+//    // renormalize colors -----------------------------
+//    float max = -std::numeric_limits<float>::max();
+//    float min = std::numeric_limits<float>::max();
+//    for (int i = 0; i < int(colors.size()); i++)
+//    {
+//        min = colors[i] < min ? colors[i] : min;
+//        max = colors[i] > max ? colors[i] : max;
+//    }
+//    if (min == max) min = 0;
 
-    pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
-    point_cloud.header = header;
-    point_cloud.width = points.size();
-    point_cloud.height = 1;
-    point_cloud.is_dense = false;
-    point_cloud.points.resize(point_cloud.width * point_cloud.height);
+//    pcl::PointCloud<pcl::PointXYZRGB> point_cloud;
+//    point_cloud.header = header;
+//    point_cloud.width = points.size();
+//    point_cloud.height = 1;
+//    point_cloud.is_dense = false;
+//    point_cloud.points.resize(point_cloud.width * point_cloud.height);
 
-    for (int point_index = 0; point_index < int(points.size()); ++point_index)
-    {
-        Eigen::Vector3f new_point = R * points[point_index] + t;
-        point_cloud.points[point_index].x = new_point(0);
-        point_cloud.points[point_index].y = new_point(1);
-        point_cloud.points[point_index].z = new_point(2);
+//    for (int point_index = 0; point_index < int(points.size()); ++point_index)
+//    {
+//        Eigen::Vector3f new_point = R * points[point_index] + t;
+//        point_cloud.points[point_index].x = new_point(0);
+//        point_cloud.points[point_index].y = new_point(1);
+//        point_cloud.points[point_index].z = new_point(2);
 
-        point_cloud.points[point_index].r =
-            (colors[point_index] - min) / (max - min) * 255.;
-        point_cloud.points[point_index].g = 0.;
-        point_cloud.points[point_index].b =
-            (1 - (colors[point_index] - min) / (max - min)) * 255.;
-    }
-    sensor_msgs::PointCloud2 point_cloud2;
-    pcl::toROSMsg(point_cloud, point_cloud2);
-    pub.publish(point_cloud2);
-}
+//        point_cloud.points[point_index].r =
+//            (colors[point_index] - min) / (max - min) * 255.;
+//        point_cloud.points[point_index].g = 0.;
+//        point_cloud.points[point_index].b =
+//            (1 - (colors[point_index] - min) / (max - min)) * 255.;
+//    }
+//    sensor_msgs::PointCloud2 point_cloud2;
+//    pcl::toROSMsg(point_cloud, point_cloud2);
+//    pub.publish(point_cloud2);
+//}
