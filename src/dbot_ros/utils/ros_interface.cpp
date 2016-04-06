@@ -89,39 +89,28 @@ void ri::publish_marker(const Eigen::Matrix4d &H,
                         const float &a,
                         const std::string &ns)
 {
+    visualization_msgs::Marker marker;
 
-    std_msgs::Header header;
-    header.frame_id = frame_id;
-    header.stamp = stamp;
+    marker.pose = to_ros_pose(H);
 
-    PublishMarker(H, header, object_model_path, pub,
-                  marker_id, r, g, b, a, ns);
+    marker.header.frame_id = frame_id;
+    marker.header.stamp = stamp;
+    marker.ns = ns;
+    marker.id = marker_id;
 
+    marker.mesh_resource = object_model_path;
+    marker.scale.x = 1.0;
+    marker.scale.y = 1.0;
+    marker.scale.z = 1.0;
+    marker.color.r = r;
+    marker.color.g = g;
+    marker.color.b = b;
+    marker.color.a = a;
 
+    marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+    marker.action = visualization_msgs::Marker::ADD;
 
-
-//    visualization_msgs::Marker marker;
-
-//    marker.pose = to_ros_pose(H);
-
-//    marker.header.frame_id = frame_id;
-//    marker.header.stamp = stamp;
-//    marker.ns = ns;
-//    marker.id = marker_id;
-
-//    marker.mesh_resource = object_model_path;
-//    marker.scale.x = 1.0;
-//    marker.scale.y = 1.0;
-//    marker.scale.z = 1.0;
-//    marker.color.r = r;
-//    marker.color.g = g;
-//    marker.color.b = b;
-//    marker.color.a = a;
-
-//    marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-//    marker.action = visualization_msgs::Marker::ADD;
-
-//    pub.publish(marker);
+    pub.publish(marker);
 }
 
 void ri::publish_pose(const Eigen::Matrix4d H,
@@ -140,120 +129,6 @@ void ri::publish_pose(const Eigen::Matrix4d H,
 
     pub.publish(object_state_message);
 }
-
-
-
-
-
-
-void ri::PublishMarker(const Eigen::Matrix3d R,
-                       const Eigen::Vector3d t,
-                       std_msgs::Header header,
-                       std::string object_model_path,
-                       const ros::Publisher& pub,
-                       int marker_id,
-                       float r,
-                       float g,
-                       float b,
-                       float a,
-                       std::string ns)
-{
-    Eigen::Quaterniond q(R);
-
-    geometry_msgs::PoseWithCovarianceStamped pose;
-    pose.header = header;
-    pose.pose.pose.position.x = t(0);
-    pose.pose.pose.position.y = t(1);
-    pose.pose.pose.position.z = t(2);
-
-    pose.pose.pose.orientation.x = q.x();
-    pose.pose.pose.orientation.y = q.y();
-    pose.pose.pose.orientation.z = q.z();
-    pose.pose.pose.orientation.w = q.w();
-
-    visualization_msgs::Marker marker;
-    marker.header.frame_id = pose.header.frame_id;
-    marker.header.stamp = pose.header.stamp;
-    marker.ns = ns;
-    marker.id = marker_id;
-    marker.scale.x = 1.0;
-    marker.scale.y = 1.0;
-    marker.scale.z = 1.0;
-    marker.color.r = r;
-    marker.color.g = g;
-    marker.color.b = b;
-    marker.color.a = a;
-
-    marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-    marker.action = visualization_msgs::Marker::ADD;
-    marker.pose = pose.pose.pose;
-
-    marker.mesh_resource = object_model_path;
-
-    pub.publish(marker);
-}
-
-void ri::PublishMarker(const Eigen::Matrix4d H,
-                       std_msgs::Header header,
-                       std::string object_model_path,
-                       const ros::Publisher& pub,
-                       int marker_id,
-                       float r,
-                       float g,
-                       float b,
-                       float a,
-                       std::string ns)
-{
-    PublishMarker(H.topLeftCorner(3, 3),
-                  H.topRightCorner(3, 1),
-                  header,
-                  object_model_path,
-                  pub,
-                  marker_id,
-                  r,
-                  g,
-                  b,
-                  a,
-                  ns);
-}
-
-//void ri::PublishObjectState(const Eigen::Matrix4d H,
-//                            std_msgs::Header header,
-//                            std::string object_name,
-//                            const ros::Publisher& pub)
-//{
-//    PublishObjectState(H.topLeftCorner(3, 3),
-//                       H.topRightCorner(3, 1),
-//                       header,
-//                       object_name,
-//                       pub);
-//}
-
-//void ri::PublishObjectState(const Eigen::Matrix3d R,
-//                            const Eigen::Vector3d t,
-//                            std_msgs::Header header,
-//                            std::string object_name,
-//                            const ros::Publisher& pub)
-//{
-//    Eigen::Quaternion<double> q(R);
-
-//    geometry_msgs::PoseStamped pose;
-//    pose.header = header;
-//    pose.pose.position.x = t(0);
-//    pose.pose.position.y = t(1);
-//    pose.pose.position.z = t(2);
-
-//    pose.pose.orientation.x = q.x();
-//    pose.pose.orientation.y = q.y();
-//    pose.pose.orientation.z = q.z();
-//    pose.pose.orientation.w = q.w();
-
-//    dbot_ros::ObjectState object_state;
-//    object_state.name = object_name;
-//    object_state.pose = pose;
-
-//    pub.publish(object_state);
-//}
 
 
 
