@@ -57,12 +57,17 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
     const sensor_msgs::Image& image,
     const std::shared_ptr<dbot::CameraData>& camera_data)
 {
-    std_msgs::Header header = image.header;
+//    std_msgs::Header header = image.header;
+
+    std::string frame_id = image.header.frame_id;
+    ros::Time stamp = image.header.stamp;
+
     for (int i = 0; i < ori_.count_meshes(); i++)
     {
         ri::publish_marker(
             state.component(i).homogeneous(),
-            header,
+            frame_id,
+            stamp,
             ori_.mesh_uri(i),
             object_marker_publisher_,
             i,
@@ -72,7 +77,8 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
 
         ri::publish_pose(
             state.component(i).homogeneous(),
-            header,
+            frame_id,
+            stamp,
             ori_.mesh_without_extension(i),
             object_state_publisher_);
     }

@@ -86,10 +86,14 @@ private:
      */
     void publish(const State& state, const std_msgs::Header& header) const
     {
+        std::string frame_id = header.frame_id;
+        ros::Time stamp = header.stamp;
+
         for (int i = 0; i < ori_.count_meshes(); i++)
         {
             ri::publish_marker(state.component(i).homogeneous(),
-                              header,
+                              frame_id,
+                              stamp,
                               ori_.mesh_uri(i),
                               object_marker_publisher_,
                               i,
@@ -99,7 +103,8 @@ private:
 
             ri::publish_pose(
                 state.component(i).homogeneous(),
-                header,
+                frame_id,
+                stamp,
                 ori_.mesh_without_extension(i),
                 object_state_publisher_);
         }

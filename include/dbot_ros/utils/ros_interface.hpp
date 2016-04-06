@@ -249,7 +249,8 @@ std::string GetCameraFrame(const std::string& camera_info_topic,
 
 
 void publish_marker(const Eigen::Matrix4d H,
-                   std_msgs::Header header,
+                    const std::string& frame_id,
+                    const ros::Time& stamp,
                    std::string object_model_path,
                    const ros::Publisher& pub,
                    int marker_id = 0,
@@ -260,7 +261,9 @@ void publish_marker(const Eigen::Matrix4d H,
                    std::string ns = "object");
 
 void publish_pose(const Eigen::Matrix4d H,
-            std_msgs::Header header,
+                  const std::string& frame_id,
+                  const ros::Time& stamp,
+//            std_msgs::Header header,
             std::string object_name,
             const ros::Publisher &pub);
 

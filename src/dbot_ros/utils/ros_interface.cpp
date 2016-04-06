@@ -78,7 +78,9 @@ void ri::ReadParameter<std::vector<std::vector<int>>>(
 
 
 void ri::publish_marker(const Eigen::Matrix4d H,
-                       std_msgs::Header header,
+                        const std::string& frame_id,
+                        const ros::Time& stamp,
+//                       std_msgs::Header header,
                        std::string object_model_path,
                        const ros::Publisher& pub,
                        int marker_id,
@@ -92,8 +94,12 @@ void ri::publish_marker(const Eigen::Matrix4d H,
 
     marker.pose = to_ros_pose(H);
 
-    marker.header.frame_id = header.frame_id;
-    marker.header.stamp = header.stamp;
+
+//    std::string frame_id = header.frame_id;
+//    ros::Time stamp = header.stamp;
+
+    marker.header.frame_id = frame_id;
+    marker.header.stamp = stamp;
     marker.ns = ns;
     marker.id = marker_id;
 
@@ -113,15 +119,20 @@ void ri::publish_marker(const Eigen::Matrix4d H,
 }
 
 void ri::publish_pose(const Eigen::Matrix4d H,
-                            std_msgs::Header header,
+                      const std::string& frame_id,
+                      const ros::Time& stamp,
+//                            std_msgs::Header header,
                             std::string object_name,
                             const ros::Publisher& pub)
 {
     dbot_ros::ObjectState object_state_message;
 
     object_state_message.pose.pose = to_ros_pose(H);
-    object_state_message.pose.header.frame_id = header.frame_id;
-    object_state_message.pose.header.stamp = header.stamp;
+
+//    std::string frame_id = header.frame_id;
+//    ros::Time stamp = header.stamp;
+    object_state_message.pose.header.frame_id = frame_id;
+    object_state_message.pose.header.stamp = stamp;
 
     object_state_message.name = object_name;
 
