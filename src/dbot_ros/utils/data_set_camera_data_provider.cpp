@@ -38,7 +38,7 @@ Eigen::MatrixXd DataSetCameraDataProvider::depth_image() const
 {
     auto ros_image = data_set_->GetImage(0);
 
-    auto image = ri::Ros2Eigen<double>(*ros_image, downsampling_factor_);
+    auto image = ri::to_eigen_matrix<double>(*ros_image, downsampling_factor_);
 
     return image;
 }
@@ -47,7 +47,7 @@ Eigen::VectorXd DataSetCameraDataProvider::depth_image_vector() const
 {
     auto ros_image = data_set_->GetImage(0);
 
-    auto image = ri::Ros2EigenVector<double>(*ros_image, downsampling_factor_);
+    auto image = ri::to_eigen_vector<double>(*ros_image, downsampling_factor_);
 
     return image;
 }

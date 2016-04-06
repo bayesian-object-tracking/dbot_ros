@@ -49,6 +49,8 @@
 
 namespace ri
 {
+/// conversions between ros and internal types *********************************
+
 /**
  * \brief Converts a ros pose message to osr::PoseVector
  */
@@ -111,7 +113,6 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
     return ros_pose;
 }
 
-
 inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
 {
     osr::PoseVector pose_vector;
@@ -128,38 +129,8 @@ inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
     return to_ros_pose(pose_vector);
 }
 
-
-
-
-template <typename Parameter>
-void ReadParameter(const std::string& path,
-                   Parameter& parameter,
-                   ros::NodeHandle node_handle)
-{
-    XmlRpc::XmlRpcValue ros_parameter;
-    node_handle.getParam(path, ros_parameter);
-    parameter = Parameter(ros_parameter);
-}
-
-template <>
-void ReadParameter<std::vector<std::string>>(
-    const std::string& path,
-    std::vector<std::string>& parameter,
-    ros::NodeHandle node_handle);
-
-template <>
-void ReadParameter<std::vector<double>>(const std::string& path,
-                                        std::vector<double>& parameter,
-                                        ros::NodeHandle node_handle);
-
-template <>
-void ReadParameter<std::vector<std::vector<int>>>(
-    const std::string& path,
-    std::vector<std::vector<int>>& parameter,
-    ros::NodeHandle node_handle);
-
-template <typename Scalar>
-Eigen::Matrix<Scalar, -1, -1> Ros2Eigen(const sensor_msgs::Image& ros_image,
+template <typename Scalar>Eigen::Matrix<Scalar, -1, -1>
+                        to_eigen_matrix(const sensor_msgs::Image& ros_image,
                                         const size_t& n_downsampling = 1)
 {
     cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
@@ -176,7 +147,7 @@ Eigen::Matrix<Scalar, -1, -1> Ros2Eigen(const sensor_msgs::Image& ros_image,
 }
 
 template <typename Scalar>
-Eigen::Matrix<Scalar, -1, 1> Ros2EigenVector(
+Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
     const sensor_msgs::Image& ros_image,
     const size_t& n_downsampling = 1)
 {
@@ -194,8 +165,40 @@ Eigen::Matrix<Scalar, -1, 1> Ros2EigenVector(
     return eigen_image;
 }
 
+
+
+/// access ros data ************************************************************
+template <typename Parameter>
+void read_parameter(const std::string& path,
+                   Parameter& parameter,
+                   ros::NodeHandle node_handle)
+{
+    XmlRpc::XmlRpcValue ros_parameter;
+    node_handle.getParam(path, ros_parameter);
+    parameter = Parameter(ros_parameter);
+}
+
+template <>
+void read_parameter<std::vector<std::string>>(
+    const std::string& path,
+    std::vector<std::string>& parameter,
+    ros::NodeHandle node_handle);
+
+template <>
+void read_parameter<std::vector<double>>(const std::string& path,
+                                        std::vector<double>& parameter,
+                                        ros::NodeHandle node_handle);
+
+template <>
+void read_parameter<std::vector<std::vector<int>>>(
+    const std::string& path,
+    std::vector<std::vector<int>>& parameter,
+    ros::NodeHandle node_handle);
+
+
+
 template <typename Scalar>
-Eigen::Matrix<Scalar, 3, 3> GetCameraMatrix(
+Eigen::Matrix<Scalar, 3, 3> get_camera_matrix(
     const std::string& camera_info_topic,
     ros::NodeHandle& node_handle,
     const Scalar& seconds)
@@ -226,7 +229,7 @@ Eigen::Matrix<Scalar, 3, 3> GetCameraMatrix(
 }
 
 template <typename Scalar>
-std::string GetCameraFrame(const std::string& camera_info_topic,
+std::string get_camera_frame(const std::string& camera_info_topic,
                            ros::NodeHandle& node_handle,
                            const Scalar& seconds)
 {
@@ -247,24 +250,23 @@ std::string GetCameraFrame(const std::string& camera_info_topic,
     return camera_info->header.frame_id;
 }
 
-
-void publish_marker(const Eigen::Matrix4d H,
+/// publish to ros *************************************************************
+void publish_marker(const Eigen::Matrix4d& H,
                     const std::string& frame_id,
                     const ros::Time& stamp,
-                   std::string object_model_path,
-                   const ros::Publisher& pub,
-                   int marker_id = 0,
-                   float r = 0,
-                   float g = 0,
-                   float b = 1,
-                   float a = 1.0,
-                   std::string ns = "object");
+                    const std::string& object_model_path,
+                    const ros::Publisher& pub,
+                    const int& marker_id = 0,
+                    const float& r = 0,
+                    const float& g = 0,
+                    const float& b = 1,
+                    const float& a = 1.0,
+                    const std::string& ns = "object");
 
 void publish_pose(const Eigen::Matrix4d H,
                   const std::string& frame_id,
                   const ros::Time& stamp,
-//            std_msgs::Header header,
-            std::string object_name,
-            const ros::Publisher &pub);
+                  const std::string& object_name,
+                  const ros::Publisher& pub);
 
 }

@@ -41,7 +41,7 @@ template <typename Tracker>
 void TrackerNode<Tracker>::tracking_callback(
     const sensor_msgs::Image& ros_image)
 {
-    auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
+    auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
         ros_image, camera_data_->downsampling_factor());
 
     current_state_ = tracker_->track(image);

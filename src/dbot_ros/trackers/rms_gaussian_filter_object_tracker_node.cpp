@@ -71,7 +71,7 @@ public:
     void tracking_callback(const sensor_msgs::Image& ros_image)
     {
         INIT_PROFILING
-        auto image = ri::Ros2EigenVector<typename Obsrv::Scalar>(
+        auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
             ros_image, tracker_->camera_data()->downsampling_factor());
 
         auto mean_state = tracker_->track(image);

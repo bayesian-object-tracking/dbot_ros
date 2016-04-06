@@ -47,7 +47,7 @@ Eigen::MatrixXd RosCameraDataProvider::depth_image() const
         ros::topic::waitForMessage<sensor_msgs::Image>(
             depth_image_topic_, nh_, ros::Duration(timeout_));
 
-    auto image = ri::Ros2Eigen<double>(*ros_image, downsampling_factor_);
+    auto image = ri::to_eigen_matrix<double>(*ros_image, downsampling_factor_);
 
     return image;
 }
@@ -58,7 +58,7 @@ Eigen::VectorXd RosCameraDataProvider::depth_image_vector() const
         ros::topic::waitForMessage<sensor_msgs::Image>(
             depth_image_topic_, nh_, ros::Duration(timeout_));
 
-    auto image = ri::Ros2EigenVector<double>(*ros_image, downsampling_factor_);
+    auto image = ri::to_eigen_vector<double>(*ros_image, downsampling_factor_);
 
     return image;
 }
@@ -68,7 +68,7 @@ Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
     while (camera_matrix_.isZero())
     {
         camera_matrix_ =
-            ri::GetCameraMatrix<double>(camera_info_topic_, nh_, timeout_);
+            ri::get_camera_matrix<double>(camera_info_topic_, nh_, timeout_);
         camera_matrix_.topLeftCorner(2, 3) /= downsampling_factor_;
 
         ros::Duration(0.1).sleep();
@@ -82,7 +82,7 @@ std::string RosCameraDataProvider::frame_id() const
     while (frame_id_.empty())
     {
         frame_id_ =
-            ri::GetCameraFrame<double>(camera_info_topic_, nh_, timeout_);
+            ri::get_camera_frame<double>(camera_info_topic_, nh_, timeout_);
         ros::Duration(0.1).sleep();
     }
 

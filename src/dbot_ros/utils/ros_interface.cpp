@@ -21,20 +21,20 @@
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/ObjectState.h>
 
-template void ri::ReadParameter(const std::string& path,
+template void ri::read_parameter(const std::string& path,
                                 double& parameter,
                                 ros::NodeHandle node_handle);
 
-template void ri::ReadParameter(const std::string& path,
+template void ri::read_parameter(const std::string& path,
                                 int& parameter,
                                 ros::NodeHandle node_handle);
 
-template void ri::ReadParameter(const std::string& path,
+template void ri::read_parameter(const std::string& path,
                                 std::string& parameter,
                                 ros::NodeHandle node_handle);
 
 template <>
-void ri::ReadParameter<std::vector<std::string>>(
+void ri::read_parameter<std::vector<std::string>>(
     const std::string& path,
     std::vector<std::string>& parameter,
     ros::NodeHandle node_handle)
@@ -47,7 +47,7 @@ void ri::ReadParameter<std::vector<std::string>>(
 }
 
 template <>
-void ri::ReadParameter<std::vector<double>>(const std::string& path,
+void ri::read_parameter<std::vector<double>>(const std::string& path,
                                             std::vector<double>& parameter,
                                             ros::NodeHandle node_handle)
 {
@@ -59,7 +59,7 @@ void ri::ReadParameter<std::vector<double>>(const std::string& path,
 }
 
 template <>
-void ri::ReadParameter<std::vector<std::vector<int>>>(
+void ri::read_parameter<std::vector<std::vector<int>>>(
     const std::string& path,
     std::vector<std::vector<int>>& parameter,
     ros::NodeHandle node_handle)
@@ -77,26 +77,21 @@ void ri::ReadParameter<std::vector<std::vector<int>>>(
 
 
 
-void ri::publish_marker(const Eigen::Matrix4d H,
+void ri::publish_marker(const Eigen::Matrix4d &H,
                         const std::string& frame_id,
                         const ros::Time& stamp,
-//                       std_msgs::Header header,
-                       std::string object_model_path,
-                       const ros::Publisher& pub,
-                       int marker_id,
-                       float r,
-                       float g,
-                       float b,
-                       float a,
-                       std::string ns)
+                        const std::string &object_model_path,
+                        const ros::Publisher& pub,
+                        const int &marker_id,
+                        const float &r,
+                        const float &g,
+                        const float &b,
+                        const float &a,
+                        const std::string &ns)
 {
     visualization_msgs::Marker marker;
 
     marker.pose = to_ros_pose(H);
-
-
-//    std::string frame_id = header.frame_id;
-//    ros::Time stamp = header.stamp;
 
     marker.header.frame_id = frame_id;
     marker.header.stamp = stamp;
@@ -121,16 +116,12 @@ void ri::publish_marker(const Eigen::Matrix4d H,
 void ri::publish_pose(const Eigen::Matrix4d H,
                       const std::string& frame_id,
                       const ros::Time& stamp,
-//                            std_msgs::Header header,
-                            std::string object_name,
-                            const ros::Publisher& pub)
+                      const std::string& object_name,
+                      const ros::Publisher& pub)
 {
     dbot_ros::ObjectState object_state_message;
 
     object_state_message.pose.pose = to_ros_pose(H);
-
-//    std::string frame_id = header.frame_id;
-//    ros::Time stamp = header.stamp;
     object_state_message.pose.header.frame_id = frame_id;
     object_state_message.pose.header.stamp = stamp;
 
