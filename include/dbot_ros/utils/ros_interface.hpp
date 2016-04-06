@@ -94,6 +94,41 @@ inline osr::PoseVelocityVector to_pose_velocity_vector(
     return pose;
 }
 
+inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
+{
+    auto p = pose_vector.position();
+    auto q = pose_vector.orientation();
+
+    geometry_msgs::Pose ros_pose;
+    ros_pose.position.x  = p[0];
+    ros_pose.position.y  = p[1];
+    ros_pose.position.z  = p[2];
+    ros_pose.orientation.w = q.w();
+    ros_pose.orientation.x = q.x();
+    ros_pose.orientation.y = q.y();
+    ros_pose.orientation.z = q.z();
+
+    return ros_pose;
+}
+
+
+inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
+{
+    osr::PoseVector pose_vector;
+    pose_vector.homogeneous(H);
+    return to_ros_pose(pose_vector);
+}
+
+inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
+                                       const Eigen::Vector3d& t)
+{
+    osr::PoseVector pose_vector;
+    pose_vector.orientation().rotation_matrix(R);
+    pose_vector.position() = t;
+    return to_ros_pose(pose_vector);
+}
+
+
 
 
 template <typename Parameter>
@@ -212,44 +247,21 @@ std::string GetCameraFrame(const std::string& camera_info_topic,
     return camera_info->header.frame_id;
 }
 
-void PublishMarker(const Eigen::Matrix3d R,
-                   const Eigen::Vector3d t,
+
+void publish_marker(const Eigen::Matrix4d H,
                    std_msgs::Header header,
                    std::string object_model_path,
                    const ros::Publisher& pub,
                    int marker_id = 0,
                    float r = 0,
-                   float g = 1,
-                   float b = 0,
+                   float g = 0,
+                   float b = 1,
                    float a = 1.0,
                    std::string ns = "object");
 
-void PublishMarker(const Eigen::Matrix4d H,
-                   std_msgs::Header header,
-                   std::string object_model_path,
-                   const ros::Publisher& pub,
-                   int marker_id = 0,
-                   float r = 0,
-                   float g = 1,
-                   float b = 0,
-                   float a = 1.0,
-                   std::string ns = "object");
-
-void PublishObjectState(const Eigen::Matrix4d H,
+void publish_pose(const Eigen::Matrix4d H,
             std_msgs::Header header,
             std::string object_name,
             const ros::Publisher &pub);
 
-void PublishObjectState(const Eigen::Matrix3d R,
-            const Eigen::Vector3d t,
-            std_msgs::Header header,
-            std::string object_name,
-            const ros::Publisher &pub);
-
-//void PublishPoints(const std_msgs::Header header,
-//                   const ros::Publisher& pub,
-//                   const std::vector<Eigen::Vector3f> points,
-//                   std::vector<float> colors = std::vector<float>(0),
-//                   const Eigen::Matrix3f R = Eigen::Matrix3f::Identity(),
-//                   Eigen::Vector3f t = Eigen::Vector3f::Zero());
 }

@@ -60,7 +60,7 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
     std_msgs::Header header = image.header;
     for (int i = 0; i < ori_.count_meshes(); i++)
     {
-        ri::PublishMarker(
+        ri::publish_marker(
             state.component(i).homogeneous(),
             header,
             ori_.mesh_uri(i),
@@ -70,7 +70,7 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
             object_color_green_ / 255.,
             object_color_blue_ / 255.);
 
-        ri::PublishObjectState(
+        ri::publish_pose(
             state.component(i).homogeneous(),
             header,
             ori_.mesh_without_extension(i),

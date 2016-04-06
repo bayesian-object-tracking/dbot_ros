@@ -88,7 +88,7 @@ private:
     {
         for (int i = 0; i < ori_.count_meshes(); i++)
         {
-            ri::PublishMarker(state.component(i).homogeneous(),
+            ri::publish_marker(state.component(i).homogeneous(),
                               header,
                               ori_.mesh_uri(i),
                               object_marker_publisher_,
@@ -97,7 +97,7 @@ private:
                               0,
                               0);
 
-            ri::PublishObjectState(
+            ri::publish_pose(
                 state.component(i).homogeneous(),
                 header,
                 ori_.mesh_without_extension(i),
