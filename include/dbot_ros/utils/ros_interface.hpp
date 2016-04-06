@@ -269,4 +269,28 @@ void publish_pose(const Eigen::Matrix4d H,
                   const std::string& object_name,
                   const ros::Publisher& pub);
 
+
+void PublishMarker(const Eigen::Matrix3d R,
+                   const Eigen::Vector3d t,
+                   std_msgs::Header header,
+                   std::string object_model_path,
+                   const ros::Publisher& pub,
+                   int marker_id = 0,
+                   float r = 0,
+                   float g = 1,
+                   float b = 0,
+                   float a = 1.0,
+                   std::string ns = "object");
+
+void PublishMarker(const Eigen::Matrix4d H,
+                   std_msgs::Header header,
+                   std::string object_model_path,
+                   const ros::Publisher& pub,
+                   int marker_id = 0,
+                   float r = 0,
+                   float g = 1,
+                   float b = 0,
+                   float a = 1.0,
+                   std::string ns = "object");
+
 }
