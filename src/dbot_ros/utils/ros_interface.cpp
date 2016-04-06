@@ -75,8 +75,8 @@ void ri::ReadParameter<std::vector<std::vector<int>>>(
     }
 }
 
-void ri::PublishMarker(const Eigen::Matrix3f R,
-                       const Eigen::Vector3f t,
+void ri::PublishMarker(const Eigen::Matrix3d R,
+                       const Eigen::Vector3d t,
                        std_msgs::Header header,
                        std::string object_model_path,
                        const ros::Publisher& pub,
@@ -87,7 +87,7 @@ void ri::PublishMarker(const Eigen::Matrix3f R,
                        float a,
                        std::string ns)
 {
-    Eigen::Quaternion<float> q(R);
+    Eigen::Quaterniond q(R);
 
     geometry_msgs::PoseWithCovarianceStamped pose;
     pose.header = header;
@@ -122,7 +122,7 @@ void ri::PublishMarker(const Eigen::Matrix3f R,
     pub.publish(marker);
 }
 
-void ri::PublishMarker(const Eigen::Matrix4f H,
+void ri::PublishMarker(const Eigen::Matrix4d H,
                        std_msgs::Header header,
                        std::string object_model_path,
                        const ros::Publisher& pub,
@@ -146,7 +146,7 @@ void ri::PublishMarker(const Eigen::Matrix4f H,
                   ns);
 }
 
-void ri::PublishObjectState(const Eigen::Matrix4f H,
+void ri::PublishObjectState(const Eigen::Matrix4d H,
                             std_msgs::Header header,
                             std::string object_name,
                             const ros::Publisher& pub)
@@ -158,13 +158,13 @@ void ri::PublishObjectState(const Eigen::Matrix4f H,
                        pub);
 }
 
-void ri::PublishObjectState(const Eigen::Matrix3f R,
-                            const Eigen::Vector3f t,
+void ri::PublishObjectState(const Eigen::Matrix3d R,
+                            const Eigen::Vector3d t,
                             std_msgs::Header header,
                             std::string object_name,
                             const ros::Publisher& pub)
 {
-    Eigen::Quaternion<float> q(R);
+    Eigen::Quaternion<double> q(R);
 
     geometry_msgs::PoseStamped pose;
     pose.header = header;

@@ -212,8 +212,8 @@ std::string GetCameraFrame(const std::string& camera_info_topic,
     return camera_info->header.frame_id;
 }
 
-void PublishMarker(const Eigen::Matrix3f R,
-                   const Eigen::Vector3f t,
+void PublishMarker(const Eigen::Matrix3d R,
+                   const Eigen::Vector3d t,
                    std_msgs::Header header,
                    std::string object_model_path,
                    const ros::Publisher& pub,
@@ -224,7 +224,7 @@ void PublishMarker(const Eigen::Matrix3f R,
                    float a = 1.0,
                    std::string ns = "object");
 
-void PublishMarker(const Eigen::Matrix4f H,
+void PublishMarker(const Eigen::Matrix4d H,
                    std_msgs::Header header,
                    std::string object_model_path,
                    const ros::Publisher& pub,
@@ -235,13 +235,13 @@ void PublishMarker(const Eigen::Matrix4f H,
                    float a = 1.0,
                    std::string ns = "object");
 
-void PublishObjectState(const Eigen::Matrix4f H,
+void PublishObjectState(const Eigen::Matrix4d H,
             std_msgs::Header header,
             std::string object_name,
             const ros::Publisher &pub);
 
-void PublishObjectState(const Eigen::Matrix3f R,
-            const Eigen::Vector3f t,
+void PublishObjectState(const Eigen::Matrix3d R,
+            const Eigen::Vector3d t,
             std_msgs::Header header,
             std::string object_name,
             const ros::Publisher &pub);

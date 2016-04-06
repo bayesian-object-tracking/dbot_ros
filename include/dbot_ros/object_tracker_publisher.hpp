@@ -61,7 +61,7 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
     for (int i = 0; i < ori_.count_meshes(); i++)
     {
         ri::PublishMarker(
-            state.component(i).homogeneous().template cast<float>(),
+            state.component(i).homogeneous(),
             header,
             ori_.mesh_uri(i),
             object_marker_publisher_,
@@ -71,7 +71,7 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
             object_color_blue_ / 255.);
 
         ri::PublishObjectState(
-            state.component(i).homogeneous().template cast<float>(),
+            state.component(i).homogeneous(),
             header,
             ori_.mesh_without_extension(i),
             object_state_publisher_);
