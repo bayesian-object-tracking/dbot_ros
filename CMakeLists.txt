@@ -38,7 +38,9 @@ find_package(catkin REQUIRED
   image_transport
   fl
   opi
-  dbot)
+  dbot
+  dbot_ros_msgs
+  )
 
 #Generate messages in the 'msg' folder
 add_message_files(
@@ -49,7 +51,8 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
     std_msgs
-    geometry_msgs)
+    geometry_msgs
+    dbot_ros_msgs)
 
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
@@ -65,13 +68,11 @@ endif(NOT osr_FOUND)
 find_package(Boost REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(OpenCV REQUIRED)
-#find_package(PCL 1.3 REQUIRED)
 
 include_directories(${dbot_INCLUDE_DIRS})
 include_directories(${osr_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Eigen_INCLUDE_DIRS})
-#include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 ###################################
@@ -95,6 +96,7 @@ catkin_package(
     opi
     osr
     dbot
+    dbot_ros_msgs
   DEPENDS
     OpenCV
     eigen)
@@ -140,6 +142,19 @@ add_dependencies(rbc_particle_filter_object_tracker
   dbot_ros_generate_messages_cpp)
 
 target_link_libraries(rbc_particle_filter_object_tracker
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${PCL_LIBRARIES}
+  yaml-cpp)
+
+add_executable(object_tracker_service
+  src/${PROJECT_NAME}/trackers/object_tracker_service_node.cpp)
+
+add_dependencies(object_tracker_service
+  dbot_ros_generate_messages_cpp)
+
+target_link_libraries(object_tracker_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}

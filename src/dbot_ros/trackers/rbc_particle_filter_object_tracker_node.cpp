@@ -221,7 +221,8 @@ int main(int argc, char** argv)
     /* - Create tracker node        - */
     /* ------------------------------ */
 
-    dbot::TrackerNode<Tracker> tracker_node(tracker, camera_data, tracker_publisher);
+    dbot::TrackerNode<Tracker> tracker_node(
+        tracker, camera_data, tracker_publisher);
 
     /* ------------------------------ */
     /* - Initialize interactively   - */

@@ -1,0 +1,11 @@
+
+service_name: object_tracker_service
+
+objects:
+  # ros package name which contains the object models
+  package: dbot_ros
+
+  # directory to the object models within the package
+  directory: object_models
+
+
