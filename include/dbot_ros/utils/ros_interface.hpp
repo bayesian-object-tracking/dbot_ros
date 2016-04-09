@@ -99,7 +99,7 @@ inline osr::PoseVelocityVector to_pose_velocity_vector(
 inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
 {
     auto p = pose_vector.position();
-    auto q = pose_vector.orientation();
+    auto q = pose_vector.orientation().quaternion();
 
     geometry_msgs::Pose ros_pose;
     ros_pose.position.x  = p[0];
