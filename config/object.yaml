@@ -1,6 +1,6 @@
 
 object:
-  package:    dbot_ros
+  package:    sab_data
   directory:  object_models
   meshes:     [ impact_battery.obj ]
 

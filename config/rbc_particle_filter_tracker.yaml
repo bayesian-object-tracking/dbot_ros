@@ -21,7 +21,7 @@ particle_filter:
   # State moving average update rate in [0.0; 1.0]
   #   1: unfiltered wiggly estimates.
   #   0: constant
-  moving_average_update_rate: 1.0
+  moving_average_update_rate: 0.8
 
   max_kl_divergence: 2.0
 
@@ -41,7 +41,7 @@ particle_filter:
     velocity_factor: 0.8
 
   object_color:
-   R: 97
-   G: 117
-   B: 123
+   R: 102
+   G: 178
+   B: 255
 
