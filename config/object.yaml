@@ -1,6 +1,6 @@
 
 object:
-  package:    dbot_ros
+  package:    sab_data
   directory:  object_models
 
   # tracked objects used by non-service nodes 

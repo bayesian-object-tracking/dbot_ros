@@ -135,3 +135,18 @@ void ri::publish_pose(const Eigen::Matrix4d H,
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

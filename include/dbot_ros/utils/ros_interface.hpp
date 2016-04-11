@@ -267,4 +267,5 @@ void publish_pose(const Eigen::Matrix4d H,
                   const std::string& object_directory,
                   const std::string& object_package,
                   const ros::Publisher& pub);
+
 }
