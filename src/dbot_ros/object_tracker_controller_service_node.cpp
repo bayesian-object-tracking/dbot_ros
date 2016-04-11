@@ -53,6 +53,8 @@ static std::shared_ptr<opi::InteractiveMarkerInitializer> object_initializer;
 static ros::ServiceClient object_finder_service_client;
 static ros::ServiceClient object_tracker_service_client;
 
+static dbot_ros_msgs::TrackObjectRequest last_req;
+
 bool stop_object_tracker()
 {
     ros::NodeHandle nh_prv("~");
@@ -76,6 +78,52 @@ bool stop_object_tracker()
     return true;
 }
 
+void marker_callback(const geometry_msgs::PoseArray& poses)
+{
+    // stop tracker first
+    if (!stop_object_tracker())
+    {
+        return;
+    }
+
+    ROS_INFO(
+        "Object pose set. Confirm the pose by clicking on the "
+        "interactive marker!");
+
+    if (!object_initializer->wait_for_object_poses())
+    {
+        ROS_INFO("Setting object poses was interrupted.");
+        return;
+    }
+
+    ROS_INFO("Object pose confirmed. Triggering object tracker ...");
+
+    geometry_msgs::PoseStamped pose;
+    pose.pose = object_initializer->poses()[0];
+
+
+    // find new pose
+    ros::NodeHandle nh_prv("~");
+    std::string objects_package;
+    std::string objects_directory;
+    nh_prv.getParam("objects/package", objects_package);
+    nh_prv.getParam("objects/directory", objects_directory);
+
+    // trigger tracking
+    dbot_ros_msgs::RunObjectTracker run_object_tracker_srv;
+    run_object_tracker_srv.request.object_state.ori.package = objects_package;
+    run_object_tracker_srv.request.object_state.ori.directory =
+        objects_directory;
+    run_object_tracker_srv.request.object_state.ori.name =
+        last_req.object_name + ".obj";
+    run_object_tracker_srv.request.object_state.pose = pose;
+    if (!object_tracker_service_client.call(run_object_tracker_srv))
+    {
+        ROS_ERROR("Running object tracker for '%s' failed.",
+                  last_req.object_name.c_str());
+    }
+}
+
 bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
                       dbot_ros_msgs::TrackObjectResponse& res)
 {
@@ -83,6 +131,8 @@ bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
     {
         return stop_object_tracker();
     }
+
+    object_initializer->delete_poses_update_callback();
 
     // stop tracker first
     if (!stop_object_tracker())
@@ -167,6 +217,9 @@ bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
                   req.object_name.c_str());
         return false;
     }
+
+    last_req = req;
+    object_initializer->poses_update_callback(marker_callback);
 
     return true;
 }
