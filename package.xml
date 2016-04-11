@@ -23,7 +23,6 @@
   <build_depend>OpenCV</build_depend>
   <build_depend>cv_bridge</build_depend>
   <build_depend>message_filters</build_depend>
-  <build_depend>message_generation</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>fl</build_depend>
   <build_depend>opi</build_depend>
@@ -39,7 +38,6 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>OpenCV</run_depend>
   <run_depend>message_filters</run_depend>
-  <run_depend>message_runtime</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>fl</run_depend>
   <run_depend>opi</run_depend>

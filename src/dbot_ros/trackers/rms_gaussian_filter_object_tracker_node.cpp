@@ -34,7 +34,7 @@
 #include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
 #include <dbot/tracker/builder/rms_gaussian_filter_tracker_builder.hpp>
 
-#include <dbot_ros/ObjectState.h>
+#include <dbot_ros_msgs/ObjectState.h>
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
@@ -61,7 +61,7 @@ public:
             node_handle_.advertise<visualization_msgs::Marker>("object_model",
                                                                0);
         object_state_publisher_ =
-            node_handle_.advertise<dbot_ros::ObjectState>("object_state", 0);
+            node_handle_.advertise<dbot_ros_msgs::ObjectState>("object_state", 0);
     }
 
     /**
@@ -105,7 +105,9 @@ private:
                 state.component(i).homogeneous(),
                 frame_id,
                 stamp,
-                ori_.mesh_without_extension(i),
+                ori_.mesh(i),
+                ori_.directory(),
+                ori_.package(),
                 object_state_publisher_);
         }
     }
@@ -212,7 +214,7 @@ int main(int argc, char** argv)
     opi::InteractiveMarkerInitializer object_initializer(camera_data->frame_id(),
                                                          params.ori.package(),
                                                          params.ori.directory(),
-                                                         params.ori.meshes());
+                                                         params.ori.meshes(), {}, true);
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");

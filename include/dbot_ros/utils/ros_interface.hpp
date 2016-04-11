@@ -102,9 +102,9 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
     auto q = pose_vector.orientation().quaternion();
 
     geometry_msgs::Pose ros_pose;
-    ros_pose.position.x  = p[0];
-    ros_pose.position.y  = p[1];
-    ros_pose.position.z  = p[2];
+    ros_pose.position.x = p[0];
+    ros_pose.position.y = p[1];
+    ros_pose.position.z = p[2];
     ros_pose.orientation.w = q.w();
     ros_pose.orientation.x = q.x();
     ros_pose.orientation.y = q.y();
@@ -129,9 +129,10 @@ inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
     return to_ros_pose(pose_vector);
 }
 
-template <typename Scalar>Eigen::Matrix<Scalar, -1, -1>
-                        to_eigen_matrix(const sensor_msgs::Image& ros_image,
-                                        const size_t& n_downsampling = 1)
+template <typename Scalar>
+Eigen::Matrix<Scalar, -1, -1> to_eigen_matrix(
+    const sensor_msgs::Image& ros_image,
+    const size_t& n_downsampling = 1)
 {
     cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
 
@@ -165,13 +166,11 @@ Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
     return eigen_image;
 }
 
-
-
 /// access ros data ************************************************************
 template <typename Parameter>
 void read_parameter(const std::string& path,
-                   Parameter& parameter,
-                   ros::NodeHandle node_handle)
+                    Parameter& parameter,
+                    ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
     node_handle.getParam(path, ros_parameter);
@@ -186,16 +185,14 @@ void read_parameter<std::vector<std::string>>(
 
 template <>
 void read_parameter<std::vector<double>>(const std::string& path,
-                                        std::vector<double>& parameter,
-                                        ros::NodeHandle node_handle);
+                                         std::vector<double>& parameter,
+                                         ros::NodeHandle node_handle);
 
 template <>
 void read_parameter<std::vector<std::vector<int>>>(
     const std::string& path,
     std::vector<std::vector<int>>& parameter,
     ros::NodeHandle node_handle);
-
-
 
 template <typename Scalar>
 Eigen::Matrix<Scalar, 3, 3> get_camera_matrix(
@@ -230,8 +227,8 @@ Eigen::Matrix<Scalar, 3, 3> get_camera_matrix(
 
 template <typename Scalar>
 std::string get_camera_frame(const std::string& camera_info_topic,
-                           ros::NodeHandle& node_handle,
-                           const Scalar& seconds)
+                             ros::NodeHandle& node_handle,
+                             const Scalar& seconds)
 {
     // TODO: Check if const pointer is valid before accessing memory
     sensor_msgs::CameraInfo::ConstPtr camera_info =
@@ -267,6 +264,7 @@ void publish_pose(const Eigen::Matrix4d H,
                   const std::string& frame_id,
                   const ros::Time& stamp,
                   const std::string& object_name,
+                  const std::string& object_directory,
+                  const std::string& object_package,
                   const ros::Publisher& pub);
-
 }

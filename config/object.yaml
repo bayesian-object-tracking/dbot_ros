@@ -2,6 +2,8 @@
 object:
   package:    dbot_ros
   directory:  object_models
-  meshes:     [ impact_battery.obj ]
+
+  # tracked objects used by non-service nodes 
+  meshes:     [ calib_obj_recenter.obj ]
 
 

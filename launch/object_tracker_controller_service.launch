@@ -1,0 +1,18 @@
+<launch>
+  <arg name="camera_config" default="$(find dbot_ros)/config/camera.yaml"/>
+  <arg name="service_config" default="$(find dbot_ros)/config/object_tracker_services.yaml"/>
+
+  <include file="$(find dbot_ros)/launch/object_tracker_service.launch" />
+  <include file="$(find table_object_finder)/launch/object_finder_service.launch" />
+
+  <node 
+    name="object_tracker_controller_service" 
+    type="object_tracker_controller_service"
+    pkg="dbot_ros" 
+    output="screen" 
+    respawn="false"
+    launch-prefix="">
+        <rosparam command="load" file="$(arg camera_config)" />
+        <rosparam command="load" file="$(arg service_config)" />
+  </node>
+</launch>

@@ -19,7 +19,7 @@
  */
 
 #include <dbot_ros/utils/ros_interface.hpp>
-#include <dbot_ros/ObjectState.h>
+#include <dbot_ros_msgs/ObjectState.h>
 
 template void ri::read_parameter(const std::string& path,
                                 double& parameter,
@@ -117,15 +117,19 @@ void ri::publish_pose(const Eigen::Matrix4d H,
                       const std::string& frame_id,
                       const ros::Time& stamp,
                       const std::string& object_name,
+                      const std::string& object_directory,
+                      const std::string& object_package,
                       const ros::Publisher& pub)
 {
-    dbot_ros::ObjectState object_state_message;
+    dbot_ros_msgs::ObjectState object_state_message;
 
     object_state_message.pose.pose = to_ros_pose(H);
     object_state_message.pose.header.frame_id = frame_id;
     object_state_message.pose.header.stamp = stamp;
 
-    object_state_message.name = object_name;
+    object_state_message.ori.name = object_name;
+    object_state_message.ori.directory = object_directory;
+    object_state_message.ori.package = object_package;
 
     pub.publish(object_state_message);
 }

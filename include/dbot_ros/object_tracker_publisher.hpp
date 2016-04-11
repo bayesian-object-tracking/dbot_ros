@@ -29,7 +29,7 @@
 #include <dbot_ros/object_tracker_publisher.h>
 
 /* ros messages */
-#include <dbot_ros/ObjectState.h>
+#include <dbot_ros_msgs/ObjectState.h>
 #include <visualization_msgs/Marker.h>
 
 namespace dbot
@@ -49,7 +49,7 @@ ObjectTrackerPublisher<State>::ObjectTrackerPublisher(
     object_marker_publisher_ =
         node_handle_.advertise<visualization_msgs::Marker>("object_model", 0);
     object_state_publisher_ =
-        node_handle_.advertise<dbot_ros::ObjectState>("object_state", 0);
+        node_handle_.advertise<dbot_ros_msgs::ObjectState>("object_state", 0);
 }
 
 template <typename State>
@@ -79,7 +79,9 @@ void ObjectTrackerPublisher<State>::publish(const State &state,
             state.component(i).homogeneous(),
             frame_id,
             stamp,
-            ori_.mesh_without_extension(i),
+            ori_.mesh(i),
+            ori_.directory(),
+            ori_.package(),
             object_state_publisher_);
     }
 }

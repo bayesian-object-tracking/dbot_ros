@@ -228,7 +228,8 @@ int main(int argc, char** argv)
     /* - Initialize interactively   - */
     /* ------------------------------ */
     opi::InteractiveMarkerInitializer object_initializer(
-        camera_data->frame_id(), ori.package(), ori.directory(), ori.meshes());
+        camera_data->frame_id(), ori.package(), ori.directory(), ori.meshes(),
+    {}, true);
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
