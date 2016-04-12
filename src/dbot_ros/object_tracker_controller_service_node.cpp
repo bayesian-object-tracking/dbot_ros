@@ -68,6 +68,8 @@ bool stop_object_tracker()
     run_object_tracker_srv.request.object_state.ori.directory =
         objects_directory;
     run_object_tracker_srv.request.object_state.ori.name = "stop";
+    run_object_tracker_srv.request.object_state.name = "stop";
+
 
     ROS_INFO("Stopping object tracker ...");
     if (!object_tracker_service_client.call(run_object_tracker_srv))
@@ -116,6 +118,7 @@ void marker_callback(const geometry_msgs::PoseArray& poses)
         objects_directory;
     run_object_tracker_srv.request.object_state.ori.name =
         last_req.object_name + ".obj";
+    run_object_tracker_srv.request.object_state.name = last_req.object_name;
     run_object_tracker_srv.request.object_state.pose = pose;
     if (!object_tracker_service_client.call(run_object_tracker_srv))
     {
@@ -210,6 +213,8 @@ bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
         objects_directory;
     run_object_tracker_srv.request.object_state.ori.name =
         req.object_name + ".obj";
+    run_object_tracker_srv.request.object_state.name =
+        req.object_name;
     run_object_tracker_srv.request.object_state.pose = pose;
     if (!object_tracker_service_client.call(run_object_tracker_srv))
     {

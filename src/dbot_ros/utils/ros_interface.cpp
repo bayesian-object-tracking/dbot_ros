@@ -127,9 +127,13 @@ void ri::publish_pose(const Eigen::Matrix4d H,
     object_state_message.pose.header.frame_id = frame_id;
     object_state_message.pose.header.stamp = stamp;
 
+
     object_state_message.ori.name = object_name;
     object_state_message.ori.directory = object_directory;
     object_state_message.ori.package = object_package;
+
+    size_t ind = object_name.find_last_of(".");
+    object_state_message.name = object_name.substr(0, ind);
 
     pub.publish(object_state_message);
 }
