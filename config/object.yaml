@@ -2,8 +2,6 @@
 object:
   package:    sab_data
   directory:  object_models
-
-  # tracked objects used by non-service nodes 
-  meshes:     [ calib_obj_recenter.obj ]
+  meshes:     [ impact_battery.obj ]
 
 
