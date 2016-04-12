@@ -301,7 +301,7 @@ int main(int argc, char** argv)
     ros::NodeHandle nh_prv("~");
 
     std::string service_name;
-    nh_prv.getParam("service_name", service_name);
+    nh_prv.getParam("object_tracker_service_name", service_name);
 
     auto srv = nh.advertiseService(service_name, run_object_tracker_srv);
 
