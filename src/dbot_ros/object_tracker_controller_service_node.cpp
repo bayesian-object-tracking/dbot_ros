@@ -232,9 +232,11 @@ int main(int argc, char** argv)
 
     std::string object_tracker_controller_service_name;
     std::string object_tracker_service_name;
+    std::string object_finder_service_name;
     nh_prv.getParam("object_tracker_controller_service_name",
                     object_tracker_controller_service_name);
     nh_prv.getParam("object_tracker_service_name", object_tracker_service_name);
+    nh_prv.getParam("object_finder_service_name", object_finder_service_name);
 
     auto camera_frame =
         ri::get_camera_frame("/XTION/depth/camera_info", nh, 5.);
@@ -248,16 +250,16 @@ int main(int argc, char** argv)
     object_initializer =
         std::make_shared<opi::InteractiveMarkerInitializer>(camera_frame);
 
-    auto srv = nh.advertiseService("object_tracker_controller_service",
+    auto srv = nh.advertiseService(object_tracker_controller_service_name,
                                    track_object_srv);
 
     object_finder_service_client =
-        nh.serviceClient<dbot_ros_msgs::FindObject>("object_finder_service");
+        nh.serviceClient<dbot_ros_msgs::FindObject>(object_finder_service_name);
     object_finder_service_client.waitForExistence();
 
     object_tracker_service_client =
         nh.serviceClient<dbot_ros_msgs::RunObjectTracker>(
-            "object_tracker_service");
+            object_tracker_service_name);
     object_tracker_service_client.waitForExistence();
 
     ROS_INFO("Object tracker controller service up and running.");
