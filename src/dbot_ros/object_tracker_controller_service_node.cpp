@@ -57,11 +57,9 @@ static dbot_ros_msgs::TrackObjectRequest last_req;
 
 bool stop_object_tracker()
 {
-    ros::NodeHandle nh_prv("~");
-    std::string objects_package;
-    std::string objects_directory;
-    nh_prv.getParam("objects/package", objects_package);
-    nh_prv.getParam("objects/directory", objects_directory);
+    ros::NodeHandle nh_prv("~");   
+    auto objects_package = ri::read<std::string>("objects/package", nh_prv);
+    auto objects_directory = ri::read<std::string>("objects/directory", nh_prv);
 
     dbot_ros_msgs::RunObjectTracker run_object_tracker_srv;
     run_object_tracker_srv.request.object_state.ori.package = objects_package;
@@ -106,10 +104,9 @@ void marker_callback(const geometry_msgs::PoseArray& poses)
 
     // find new pose
     ros::NodeHandle nh_prv("~");
-    std::string objects_package;
-    std::string objects_directory;
-    nh_prv.getParam("objects/package", objects_package);
-    nh_prv.getParam("objects/directory", objects_directory);
+    auto objects_package = ri::read<std::string>("objects/package", nh_prv);
+    auto objects_directory = ri::read<std::string>("objects/directory", nh_prv);
+
 
     // trigger tracking
     dbot_ros_msgs::RunObjectTracker run_object_tracker_srv;
@@ -145,10 +142,8 @@ bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
 
     // find new pose
     ros::NodeHandle nh_prv("~");
-    std::string objects_package;
-    std::string objects_directory;
-    nh_prv.getParam("objects/package", objects_package);
-    nh_prv.getParam("objects/directory", objects_directory);
+    auto objects_package = ri::read<std::string>("objects/package", nh_prv);
+    auto objects_directory = ri::read<std::string>("objects/directory", nh_prv);
 
     geometry_msgs::PoseStamped pose;
 
@@ -235,13 +230,13 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::NodeHandle nh_prv("~");
 
-    std::string object_tracker_controller_service_name;
-    std::string object_tracker_service_name;
-    std::string object_finder_service_name;
-    nh_prv.getParam("object_tracker_controller_service_name",
-                    object_tracker_controller_service_name);
-    nh_prv.getParam("object_tracker_service_name", object_tracker_service_name);
-    nh_prv.getParam("object_finder_service_name", object_finder_service_name);
+
+    auto object_tracker_controller_service_name = ri::read<std::string>(
+                "object_tracker_controller_service_name", nh_prv);
+    auto object_tracker_service_name = ri::read<std::string>(
+                "object_tracker_service_name", nh_prv);
+    auto object_finder_service_name = ri::read<std::string>(
+                "object_finder_service_name", nh_prv);
 
     auto camera_frame =
         ri::get_camera_frame("/XTION/depth/camera_info", nh, 5.);
