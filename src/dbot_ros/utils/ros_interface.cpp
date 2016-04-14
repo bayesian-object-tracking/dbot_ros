@@ -21,6 +21,9 @@
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros_msgs/ObjectState.h>
 
+
+
+
 template void ri::read_parameter(const std::string& path,
                                 double& parameter,
                                 ros::NodeHandle node_handle);
