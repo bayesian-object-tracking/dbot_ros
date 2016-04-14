@@ -200,7 +200,7 @@ struct CastFromRos<std::vector<T>>
 };
 
 template <typename Parameter>
-Parameter read_parameter(const std::string& path, ros::NodeHandle node_handle)
+Parameter read(const std::string& path, ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
     if(!node_handle.getParam(path, ros_parameter))
