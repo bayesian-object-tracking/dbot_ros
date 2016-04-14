@@ -173,10 +173,17 @@ void read_parameter(const std::string& path,
                     ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
-    node_handle.getParam(path, ros_parameter);
+    if(!node_handle.getParam(path, ros_parameter))
+    {
+        ROS_ERROR("could not get parameter at %s", path.c_str());
+        exit(-1);
+    }
     parameter = Parameter(ros_parameter);
 }
 
+
+/// \todo: in the following functions we should also check that it is bein read
+/// properly
 template <>
 void read_parameter<std::vector<std::string>>(
     const std::string& path,
