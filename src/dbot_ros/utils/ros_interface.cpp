@@ -22,64 +22,6 @@
 #include <dbot_ros_msgs/ObjectState.h>
 
 
-
-
-template void ri::read_parameter(const std::string& path,
-                                double& parameter,
-                                ros::NodeHandle node_handle);
-
-template void ri::read_parameter(const std::string& path,
-                                int& parameter,
-                                ros::NodeHandle node_handle);
-
-template void ri::read_parameter(const std::string& path,
-                                std::string& parameter,
-                                ros::NodeHandle node_handle);
-
-template <>
-void ri::read_parameter<std::vector<std::string>>(
-    const std::string& path,
-    std::vector<std::string>& parameter,
-    ros::NodeHandle node_handle)
-{
-    XmlRpc::XmlRpcValue ros_parameter;
-    node_handle.getParam(path, ros_parameter);
-    parameter.resize(ros_parameter.size());
-    for (size_t i = 0; i < parameter.size(); i++)
-        parameter[i] = std::string(ros_parameter[i]);
-}
-
-template <>
-void ri::read_parameter<std::vector<double>>(const std::string& path,
-                                            std::vector<double>& parameter,
-                                            ros::NodeHandle node_handle)
-{
-    XmlRpc::XmlRpcValue ros_parameter;
-    node_handle.getParam(path, ros_parameter);
-    parameter.resize(ros_parameter.size());
-    for (size_t i = 0; i < parameter.size(); i++)
-        parameter[i] = double(ros_parameter[i]);
-}
-
-template <>
-void ri::read_parameter<std::vector<std::vector<int>>>(
-    const std::string& path,
-    std::vector<std::vector<int>>& parameter,
-    ros::NodeHandle node_handle)
-{
-    XmlRpc::XmlRpcValue ros_parameter;
-    node_handle.getParam(path, ros_parameter);
-    parameter.resize(ros_parameter.size());
-    for (size_t i = 0; i < parameter.size(); i++)
-    {
-        parameter[i].resize(ros_parameter[i].size());
-        for (size_t j = 0; j < parameter[i].size(); j++)
-            parameter[i][j] = int(ros_parameter[i][j]);
-    }
-}
-
-
-
 void ri::publish_marker(const Eigen::Matrix4d &H,
                         const std::string& frame_id,
                         const ros::Time& stamp,

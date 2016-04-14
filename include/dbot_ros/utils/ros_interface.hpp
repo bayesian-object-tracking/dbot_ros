@@ -167,20 +167,6 @@ Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
 }
 
 /// access ros data ************************************************************
-//template <typename Parameter>
-//Parameter cast_from_ros(XmlRpc::XmlRpcValue ros_parameter)
-//{
-//    return Parameter(ros_parameter);
-//}
-
-
-//template <typename Scalar>
-//std::vector<Scalar> cast_from_ros<std::vector<Scalar>>(XmlRpc::XmlRpcValue ros_parameter)
-//{
-//    return Parameter(ros_parameter);
-//}
-
-
 template<typename T>
 struct CastFromRos;
 
@@ -207,7 +193,7 @@ struct CastFromRos<std::vector<T>>
         std::vector<T> parameter(ros_parameter.size());
         for (size_t i = 0; i < parameter.size(); i++)
         {
-            parameter[i] = T(ros_parameter[i]);
+            parameter[i] = cast_from_ros<T>(ros_parameter[i]);
         }
         return parameter;
     }
@@ -228,31 +214,6 @@ void read_parameter(const std::string& path,
     parameter = cast_from_ros<Parameter>(ros_parameter);
 }
 
-
-template <>
-void read_parameter<std::vector<std::vector<int>>>(
-    const std::string& path,
-    std::vector<std::vector<int>>& parameter,
-    ros::NodeHandle node_handle);
-
-/// \todo: in the following functions we should also check that it is bein read
-/// properly
-template <>
-void read_parameter<std::vector<std::string>>(
-    const std::string& path,
-    std::vector<std::string>& parameter,
-    ros::NodeHandle node_handle);
-
-template <>
-void read_parameter<std::vector<double>>(const std::string& path,
-                                         std::vector<double>& parameter,
-                                         ros::NodeHandle node_handle);
-
-template <>
-void read_parameter<std::vector<std::vector<int>>>(
-    const std::string& path,
-    std::vector<std::vector<int>>& parameter,
-    ros::NodeHandle node_handle);
 
 template <typename Scalar>
 Eigen::Matrix<Scalar, 3, 3> get_camera_matrix(
