@@ -1,8 +1,13 @@
 <launch>
-  <arg name="camera_config" default="$(find dbot_ros)/config/camera.yaml"/>
-  <arg name="service_config" default="$(find dbot_ros)/config/object_tracker_services.yaml"/>
+  <arg name="finder_config" />
+  <arg name="filter_config" />
+  <include file="$(find table_object_finder)/launch/object_finder_service.launch">
+    <arg name="finder_config" value="$(arg finder_config)"/>
+  </include>
+  
+  <include file="$(find dbot_ros)/launch/object_tracker_service.launch">
+    <arg name="filter_config" value="$(arg filter_config)" />
+  </include>
 
-  <include file="$(find table_object_finder)/launch/object_finder_service.launch" />
-  <include file="$(find dbot_ros)/launch/object_tracker_service.launch" />
   <include file="$(find dbot_ros)/launch/object_tracker_controller_service.launch" />
 </launch>
