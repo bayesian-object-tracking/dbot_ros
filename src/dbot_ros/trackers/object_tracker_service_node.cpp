@@ -239,7 +239,9 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     while (running)
     {
         pause_duration.sleep();
+        INIT_PROFILING
         tracker_node.run_once();
+        MEASURE("Object Tracker");
     }
     ROS_INFO("Tracking terminated.");
 }
