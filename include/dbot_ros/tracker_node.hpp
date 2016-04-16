@@ -97,6 +97,7 @@ void TrackerNode<Tracker>::run_once()
 {
     if (!obsrv_updated_) return;
 
+    INIT_PROFILING
     Obsrv obsrv;
     sensor_msgs::Image ros_image;
     {
@@ -105,6 +106,7 @@ void TrackerNode<Tracker>::run_once()
         obsrv_updated_ = false;
     }
     tracking_callback(ros_image);
+    MEASURE("Object Tracker");
 }
 
 template <typename Tracker>
