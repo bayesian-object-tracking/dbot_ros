@@ -20,10 +20,12 @@
 #include <dbot_ros/tracker_node.h>
 #include <dbot_ros/tracker_node.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
+#include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
 
 namespace dbot
 {
 
-template class TrackerNode<RbcParticleFilterObjectTracker>;
+template class RosObjectTracker<RbcParticleFilterObjectTracker>;
+template class RosObjectTracker<RmsGaussianFilterObjectTracker>;
 
 }

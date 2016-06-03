@@ -28,11 +28,10 @@
 namespace dbot
 {
 template <typename Tracker>
-TrackerNode<Tracker>::TrackerNode(
+RosObjectTracker<Tracker>::RosObjectTracker(
     const std::shared_ptr<Tracker>& tracker,
-    const std::shared_ptr<dbot::CameraData>& camera_data,
-    const std::shared_ptr<TrackerPublisher<State>>& publisher)
-    : tracker_(tracker), publisher_(publisher),
+    const std::shared_ptr<dbot::CameraData>& camera_data)
+    : tracker_(tracker),
       camera_data_(camera_data),
       obsrv_updated_(false),
       running_(false)
@@ -40,78 +39,78 @@ TrackerNode<Tracker>::TrackerNode(
 }
 
 template <typename Tracker>
-void TrackerNode<Tracker>::tracking_callback(
-    const sensor_msgs::Image& ros_image)
+void RosObjectTracker<Tracker>::track(const sensor_msgs::Image& ros_image)
 {
     auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
         ros_image, camera_data_->downsampling_factor());
 
     current_state_ = tracker_->track(image);
-
-    publisher_->publish(current_state_, ros_image, camera_data_);
+    current_pose_.pose = ri::to_ros_pose(current_state_);
+    current_pose_.header.stamp = ros_image.header.stamp; 
+    current_pose_.header.frame_id= ros_image.header.frame_id;
 }
 
 
 template <typename Tracker>
-void TrackerNode<Tracker>::obsrv_callback(
+void RosObjectTracker<Tracker>::update_obsrv(
     const sensor_msgs::Image& ros_image)
 {
     std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
     current_ros_image_ = ros_image;
-    obsrv_updated_ = true;
+    obsrv_updated_     = true;
 }
 
 
 template <typename Tracker>
-void TrackerNode<Tracker>::shutdown()
+void RosObjectTracker<Tracker>::shutdown()
 {
     running_ = false;
 }
 
-//template <typename Tracker>
-//void TrackerNode<Tracker>::run()
-//{
-//    running_ = true;
+template <typename Tracker>
+void RosObjectTracker<Tracker>::run()
+{
+    running_ = true;
 
-//    while (ros::ok() && running_)
-//    {
-//        if (!obsrv_updated_)
-//        {
-//            usleep(100);
-//            continue;
-//        }
+    while (ros::ok() && running_)
+    {
+        if (!obsrv_updated_)
+        {
+            usleep(100);
+            continue;
+        }
 
-//        Obsrv obsrv;
-//        sensor_msgs::Image ros_image;
-//        {
-//            std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
-//            ros_image = current_ros_image_;
-//            obsrv_updated_ = false;
-//        }
-//        tracking_callback(ros_image);
-//    }
-//}
+        run_once();
+    }
+}
 
 template <typename Tracker>
-void TrackerNode<Tracker>::run_once()
+bool RosObjectTracker<Tracker>::run_once()
 {
-    if (!obsrv_updated_) return;
+    if (!obsrv_updated_) return false;
 
-    INIT_PROFILING
     Obsrv obsrv;
     sensor_msgs::Image ros_image;
     {
         std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
-        ros_image = current_ros_image_;
+        ros_image      = current_ros_image_;
         obsrv_updated_ = false;
     }
-    tracking_callback(ros_image);
-    MEASURE("Object Tracker");
+    track(ros_image);
+
+    return true;
 }
 
 template <typename Tracker>
-auto TrackerNode<Tracker>::current_state() const -> const State &
+auto RosObjectTracker<Tracker>::current_state() const -> const State &
 {
     return current_state_;
+}
+
+template <typename Tracker>
+auto RosObjectTracker<Tracker>::current_pose() const
+    -> const geometry_msgs::PoseStamped &
+{
+    return current_pose_;
 }
 }
