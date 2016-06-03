@@ -12,7 +12,7 @@
  */
 
 /**
- * \file rbc_particle_filter_object_tracker_node.cpp
+ * \file rbc_particle_filter_object_ros_object_tracker.cpp
  * \date November 2015
  * \author Jan Issac (jan.issac@gmail.com)
  */
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     /* Roa-Blackwellized Coordinate Particle Filter Object Tracker            */
     /*                                                                        */
     /* Ingredients:                                                           */
-    /*   - TrackerNode                                                        */
+    /*   - RosObjectTracker                                                   */
     /*     - Tracker                                                          */
     /*       - Rbc Particle Filter Algorithm                                  */
     /*         - Objects tate transition model                                */
@@ -202,34 +202,21 @@ int main(int argc, char** argv)
         dbot::RbcParticleFilterTrackerBuilder<Tracker>(state_trans_builder,
                                                        obsrv_model_builder,
                                                        object_model,
-                                                       camera_data,
                                                        params_tracker);
     auto tracker = tracker_builder.build();
 
-    /* ------------------------------ */
-    /* - Tracker publisher          - */
-    /* ------------------------------ */
-    int object_color[3];
-    nh.getParam(pre + "object_color/R", object_color[0]);
-    nh.getParam(pre + "object_color/G", object_color[1]);
-    nh.getParam(pre + "object_color/B", object_color[2]);
-    auto tracker_publisher = std::shared_ptr<dbot::TrackerPublisher<State>>(
-        new dbot::ObjectTrackerPublisher<State>(
-            ori, object_color[0], object_color[1], object_color[2]));
-
-    /* ------------------------------ */
-    /* - Create tracker node        - */
-    /* ------------------------------ */
-
-    dbot::TrackerNode<Tracker> tracker_node(
-        tracker, camera_data, tracker_publisher);
+    dbot::RosObjectTracker<Tracker> ros_object_tracker(tracker, camera_data);
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
     opi::InteractiveMarkerInitializer object_initializer(
-        camera_data->frame_id(), ori.package(), ori.directory(), ori.meshes(),
-    {}, true);
+        camera_data->frame_id(),
+        ori.package(),
+        ori.directory(),
+        ori.meshes(),
+        {},
+        true);
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
@@ -248,15 +235,33 @@ int main(int argc, char** argv)
     tracker->initialize(initial_poses);
 
     /* ------------------------------ */
+    /* - Tracker publisher          - */
+    /* ------------------------------ */
+    int object_color[3];
+    nh.getParam(pre + "object_color/R", object_color[0]);
+    nh.getParam(pre + "object_color/G", object_color[1]);
+    nh.getParam(pre + "object_color/B", object_color[2]);
+    auto tracker_publisher = dbot::ObjectStatePublisher(
+        ori, object_color[0], object_color[1], object_color[2]);
+
+    /* ------------------------------ */
     /* - Run the tracker            - */
     /* ------------------------------ */
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
                      1,
-                     &dbot::TrackerNode<Tracker>::tracking_callback,
-                     &tracker_node);
+                     &dbot::RosObjectTracker<Tracker>::update_obsrv,
+                     &ros_object_tracker);
     (void)subscriber;
-    ros::spin();
+
+    while (ros::ok())
+    {
+        ros::spinOnce();
+        if (ros_object_tracker.run_once())
+        {
+            tracker_publisher.publish(ros_object_tracker.current_pose());
+        }
+    }
 
     return 0;
 }

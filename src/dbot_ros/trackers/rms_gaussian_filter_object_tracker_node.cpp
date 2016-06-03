@@ -35,90 +35,11 @@
 #include <dbot/tracker/builder/rms_gaussian_filter_tracker_builder.hpp>
 
 #include <dbot_ros_msgs/ObjectState.h>
+#include <dbot_ros/tracker_node.h>
 #include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/utils/ros_camera_data_provider.hpp>
 
 typedef dbot::RmsGaussianFilterObjectTracker Tracker;
-
-/**
- * \brief Represents the RBC PF tracker node
- */
-class TrackerNode
-{
-public:
-    typedef Tracker::State State;
-    typedef Tracker::Obsrv Obsrv;
-
-public:
-    /**
-     * \brief Creates a TrackerNode
-     */
-    TrackerNode(const std::shared_ptr<Tracker>& tracker,
-                const dbot::ObjectResourceIdentifier& ori)
-        : tracker_(tracker), node_handle_("~"), ori_(ori)
-    {
-        object_marker_publisher_ =
-            node_handle_.advertise<visualization_msgs::Marker>("object_model",
-                                                               0);
-        object_state_publisher_ =
-            node_handle_.advertise<dbot_ros_msgs::ObjectState>("object_state", 0);
-    }
-
-    /**
-     * \brief Tracking callback function which is invoked whenever a new image
-     *        is available
-     */
-    void tracking_callback(const sensor_msgs::Image& ros_image)
-    {
-        INIT_PROFILING
-        auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
-            ros_image, tracker_->camera_data()->downsampling_factor());
-
-        auto mean_state = tracker_->track(image);
-
-        publish(mean_state, ros_image.header);
-        MEASURE_FLUSH("Tracking rate ");
-    }
-
-private:
-    /**
-     * \brief Publishes the object markers and it's pose
-     */
-    void publish(const State& state, const std_msgs::Header& header) const
-    {
-        std::string frame_id = header.frame_id;
-        ros::Time stamp = header.stamp;
-
-        for (int i = 0; i < ori_.count_meshes(); i++)
-        {
-            ri::publish_marker(state.component(i).homogeneous(),
-                              frame_id,
-                              stamp,
-                              ori_.mesh_uri(i),
-                              object_marker_publisher_,
-                              i,
-                              1,
-                              0,
-                              0);
-
-            ri::publish_pose(
-                state.component(i).homogeneous(),
-                frame_id,
-                stamp,
-                ori_.mesh(i),
-                ori_.directory(),
-                ori_.package(),
-                object_state_publisher_);
-        }
-    }
-
-private:
-    std::shared_ptr<Tracker> tracker_;
-    ros::NodeHandle node_handle_;
-    ros::Publisher object_marker_publisher_;
-    ros::Publisher object_state_publisher_;
-    dbot::ObjectResourceIdentifier ori_;
-};
 
 int main(int argc, char** argv)
 {
@@ -158,15 +79,12 @@ int main(int argc, char** argv)
     params.ori.meshes(object_meshes);
 
     // get filter parameters
-    nh.getParam(pre + "unscented_transform/alpha",
-                params.ut_alpha);
-    nh.getParam(pre + "update_rate",
-                params.update_rate);
+    nh.getParam(pre + "unscented_transform/alpha", params.ut_alpha);
+    nh.getParam(pre + "update_rate", params.update_rate);
 
     nh.getParam(pre + "observation/tail_weight",
                 params.observation.tail_weight);
-    nh.getParam(pre + "observation/bg_depth",
-                params.observation.bg_depth);
+    nh.getParam(pre + "observation/bg_depth", params.observation.bg_depth);
     nh.getParam(pre + "observation/fg_noise_std",
                 params.observation.fg_noise_std);
     nh.getParam(pre + "observation/bg_noise_std",
@@ -203,7 +121,7 @@ int main(int argc, char** argv)
                                         resolution,
                                         downsampling_factor,
                                         2.0));
-   auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
+    auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
 
     // finally, set number of pixels
     params.observation.sensors = camera_data->pixels();
@@ -211,10 +129,13 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
-    opi::InteractiveMarkerInitializer object_initializer(camera_data->frame_id(),
-                                                         params.ori.package(),
-                                                         params.ori.directory(),
-                                                         params.ori.meshes(), {}, true);
+    opi::InteractiveMarkerInitializer object_initializer(
+        camera_data->frame_id(),
+        params.ori.package(),
+        params.ori.directory(),
+        params.ori.meshes(),
+        {},
+        true);
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
@@ -243,9 +164,13 @@ int main(int argc, char** argv)
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    TrackerNode tracker_node(tracker, params.ori);
+    dbot::RosObjectTracker<dbot::RmsGaussianFilterObjectTracker> tracker_node(
+        tracker, camera_data);
     ros::Subscriber subscriber = nh.subscribe(
-        depth_image_topic, 1, &TrackerNode::tracking_callback, &tracker_node);
+        depth_image_topic,
+        1,
+        &dbot::RosObjectTracker<dbot::RmsGaussianFilterObjectTracker>::track,
+        &tracker_node);
 
     ros::spin();
 
