@@ -23,9 +23,9 @@
 
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <dbot/util/camera_data.hpp>
-#include <dbot/util/object_model.hpp>
-#include <dbot/util/object_resource_identifier.hpp>
+#include <dbot/common/camera_data.hpp>
+#include <dbot/common/object_model.hpp>
+#include <dbot/common/object_resource_identifier.hpp>
 #include <dbot_ros/tracker_publisher.h>
 
 namespace dbot

@@ -32,10 +32,10 @@
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
 
-#include <dbot/util/camera_data.hpp>
-#include <dbot/util/simple_wavefront_object_loader.hpp>
+#include <dbot/common/camera_data.hpp>
+#include <dbot/common/simple_wavefront_object_loader.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/tracker/builder/rbc_particle_filter_tracker_builder.hpp>
+#include <dbot/builder/rbc_particle_filter_tracker_builder.hpp>
 
 #include <dbot_ros/tracker_node.h>
 #include <dbot_ros/object_tracker_publisher.h>

@@ -20,7 +20,7 @@
 #pragma once
 
 #include <sensor_msgs/Image.h>
-#include <dbot/util/camera_data.hpp>
+#include <dbot/common/camera_data.hpp>
 
 namespace dbot
 {

@@ -25,7 +25,7 @@
 
 #include <Eigen/Dense>
 
-#include <dbot/util/camera_data_provider.hpp>
+#include <dbot/common/camera_data_provider.hpp>
 
 #include <dbot_ros/utils/tracking_dataset.h>
 

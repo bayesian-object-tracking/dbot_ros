@@ -23,8 +23,8 @@
 #include <fl/util/profiling.hpp>
 #include <fl/model/observation/linear_cauchy_observation_model.hpp>
 
-#include <dbot/util/rigid_body_renderer.hpp>
-#include <dbot/util/helper_functions.hpp>
+#include <dbot/common/rigid_body_renderer.hpp>
+#include <dbot/common/helper_functions.hpp>
 
 #include <dbot_ros_pkg/utils/ros_interface.hpp>
 #include <dbot_ros_pkg/utils/object_file_reader.hpp>
