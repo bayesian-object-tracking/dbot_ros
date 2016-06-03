@@ -30,6 +30,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <geometry_msgs/PoseStamped.h>
 
 //#include <pcl/ros/conversions.h>
 //#include <pcl/point_cloud.h>
@@ -102,9 +103,9 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
     auto q = pose_vector.orientation().quaternion();
 
     geometry_msgs::Pose ros_pose;
-    ros_pose.position.x = p[0];
-    ros_pose.position.y = p[1];
-    ros_pose.position.z = p[2];
+    ros_pose.position.x    = p[0];
+    ros_pose.position.y    = p[1];
+    ros_pose.position.z    = p[2];
     ros_pose.orientation.w = q.w();
     ros_pose.orientation.x = q.x();
     ros_pose.orientation.y = q.y();
@@ -113,12 +114,12 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
     return ros_pose;
 }
 
-inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
-{
-    osr::PoseVector pose_vector;
-    pose_vector.homogeneous(H);
-    return to_ros_pose(pose_vector);
-}
+// inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
+// {
+//     osr::PoseVector pose_vector;
+//     pose_vector.homogeneous(H);
+//     return to_ros_pose(pose_vector);
+// }
 
 inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
                                        const Eigen::Vector3d& t)
@@ -131,8 +132,7 @@ inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
 
 template <typename Scalar>
 Eigen::Matrix<Scalar, -1, -1> to_eigen_matrix(
-    const sensor_msgs::Image& ros_image,
-    const size_t& n_downsampling = 1)
+    const sensor_msgs::Image& ros_image, const size_t& n_downsampling = 1)
 {
     cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
 
@@ -149,8 +149,7 @@ Eigen::Matrix<Scalar, -1, -1> to_eigen_matrix(
 
 template <typename Scalar>
 Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
-    const sensor_msgs::Image& ros_image,
-    const size_t& n_downsampling = 1)
+    const sensor_msgs::Image& ros_image, const size_t& n_downsampling = 1)
 {
     cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
 
@@ -167,25 +166,22 @@ Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
 }
 
 /// access ros data ************************************************************
-template<typename T>
+template <typename T>
 struct CastFromRos;
 
-template<typename T>
+template <typename T>
 T cast_from_ros(XmlRpc::XmlRpcValue ros_parameter)
 {
     return CastFromRos<T>::f(ros_parameter);
 }
 
-template<typename T>
+template <typename T>
 struct CastFromRos
 {
-  static T f(XmlRpc::XmlRpcValue ros_parameter)
-  {
-      return T(ros_parameter);
-  }
+    static T f(XmlRpc::XmlRpcValue ros_parameter) { return T(ros_parameter); }
 };
 
-template<typename T>
+template <typename T>
 struct CastFromRos<std::vector<T>>
 {
     static std::vector<T> f(XmlRpc::XmlRpcValue ros_parameter)
@@ -203,7 +199,7 @@ template <typename Parameter>
 Parameter read(const std::string& path, ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
-    if(!node_handle.getParam(path, ros_parameter))
+    if (!node_handle.getParam(path, ros_parameter))
     {
         ROS_ERROR("could not get parameter at %s", path.c_str());
         exit(-1);
@@ -266,24 +262,39 @@ std::string get_camera_frame(const std::string& camera_info_topic,
 }
 
 /// publish to ros *************************************************************
-void publish_marker(const Eigen::Matrix4d& H,
-                    const std::string& frame_id,
-                    const ros::Time& stamp,
+// void publish_marker(const Eigen::Matrix4d& H,
+//                     const std::string& frame_id,
+//                     const ros::Time& stamp,
+//                     const std::string& object_model_path,
+//                     const ros::Publisher& pub,
+//                     const int& marker_id  = 0,
+//                     const float& r        = 0,
+//                     const float& g        = 0,
+//                     const float& b        = 1,
+//                     const float& a        = 1.0,
+//                     const std::string& ns = "object");
+
+void publish_marker(const geometry_msgs::PoseStamped& pose_stamped,
                     const std::string& object_model_path,
                     const ros::Publisher& pub,
-                    const int& marker_id = 0,
-                    const float& r = 0,
-                    const float& g = 0,
-                    const float& b = 1,
-                    const float& a = 1.0,
+                    const int& marker_id  = 0,
+                    const float& r        = 0,
+                    const float& g        = 0,
+                    const float& b        = 1,
+                    const float& a        = 1.0,
                     const std::string& ns = "object");
 
-void publish_pose(const Eigen::Matrix4d H,
-                  const std::string& frame_id,
-                  const ros::Time& stamp,
+// void publish_pose(const Eigen::Matrix4d H,
+//                   const std::string& frame_id,
+//                   const ros::Time& stamp,
+//                   const std::string& object_name,
+//                   const std::string& object_directory,
+//                   const std::string& object_package,
+//                   const ros::Publisher& pub);
+
+void publish_pose(const geometry_msgs::PoseStamped& pose,
                   const std::string& object_name,
                   const std::string& object_directory,
                   const std::string& object_package,
                   const ros::Publisher& pub);
-
 }
