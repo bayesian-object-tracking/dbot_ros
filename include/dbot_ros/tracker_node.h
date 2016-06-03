@@ -12,7 +12,7 @@
  */
 
 /**
- * \file tracker_node.h
+ * \file ros_object_tracker.h
  * \date Januray 2016
  * \author Jan Issac (jan.issac@gmail.com)
  */
@@ -22,6 +22,7 @@
 #include <memory>
 #include <mutex>
 #include <dbot_ros/tracker_publisher.h>
+#include <geometry_msgs/PoseStamped.h>
 
 namespace dbot
 {
@@ -29,7 +30,7 @@ namespace dbot
  * \brief Represents a generic tracker node
  */
 template <typename Tracker>
-class TrackerNode
+class RosObjectTracker
 {
 public:
     typedef typename Tracker::State State;
@@ -37,28 +38,30 @@ public:
 
 public:
     /**
-     * \brief Creates a TrackerNode
+     * \brief Creates a RosObjectTracker
      */
-    TrackerNode(const std::shared_ptr<Tracker>& tracker,
-                const std::shared_ptr<dbot::CameraData>& camera_data,
-                const std::shared_ptr<TrackerPublisher<State>>& publisher);
+    RosObjectTracker(const std::shared_ptr<Tracker>& tracker,
+                const std::shared_ptr<dbot::CameraData>& camera_data);
 
     /**
      * \brief Tracking callback function which is invoked whenever a new image
      *        is available
      */
-    void tracking_callback(const sensor_msgs::Image& ros_image);
+    void track(const sensor_msgs::Image& ros_image);
+
+    void initialize(const std::vector<State>& initial_states);
 
     /**
      * \brief Incoming observation callback function
      * \param ros_image new observation
      */
-    void obsrv_callback(const sensor_msgs::Image& ros_image);
+    void update_obsrv(const sensor_msgs::Image& ros_image);
 
-//    void run();
-    void run_once();
+    void run();
+    bool run_once();
 
     const State& current_state() const;
+    const geometry_msgs::PoseStamped& current_pose() const;
 
     std::shared_ptr<Tracker> tracker() { return tracker_; }
     std::shared_ptr<dbot::CameraData>
@@ -74,11 +77,11 @@ protected:
     bool obsrv_updated_;
     bool running_;
     State current_state_;
+    geometry_msgs::PoseStamped current_pose_;
     sensor_msgs::Image current_ros_image_;
     std::mutex obsrv_mutex_;
     std::shared_ptr<Tracker> tracker_;
     std::shared_ptr<dbot::CameraData> camera_data_;
-    std::shared_ptr<TrackerPublisher<State>> publisher_;
 };
 
 

@@ -17,12 +17,55 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
-#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
+#include <Eigen/Dense>
+#include <Eigen/Core>
+#include <osr/euler_vector.hpp>
+#include <osr/pose_velocity_vector.hpp>
+#include <osr/pose_vector.hpp>
+#include <osr/free_floating_rigid_bodies_state.hpp>
+#include <dbot_ros/utils/ros_interface.hpp>
 #include <dbot_ros/object_tracker_publisher.h>
-#include <dbot_ros/object_tracker_publisher.hpp>
+
+/* ros messages */
+#include <dbot_ros_msgs/ObjectState.h>
+#include <visualization_msgs/Marker.h>
 
 namespace dbot
 {
-template class ObjectTrackerPublisher<osr::FreeFloatingRigidBodiesState<>>;
+ObjectStatePublisher::ObjectStatePublisher(
+    const dbot::ObjectResourceIdentifier& ori,
+    int object_color_red,
+    int object_color_green,
+    int object_color_blue)
+    : node_handle_("~"),
+      ori_(ori),
+      object_color_red_(object_color_red),
+      object_color_green_(object_color_green),
+      object_color_blue_(object_color_blue)
+{
+    object_marker_publisher_ =
+        node_handle_.advertise<visualization_msgs::Marker>("object_model", 0);
+    object_state_publisher_ =
+        node_handle_.advertise<dbot_ros_msgs::ObjectState>("object_state", 0);
 }
 
+void ObjectStatePublisher::publish(const geometry_msgs::PoseStamped pose)
+{
+    for (int i = 0; i < ori_.count_meshes(); i++)
+    {
+        ri::publish_marker(pose,
+                           ori_.mesh_uri(i),
+                           object_marker_publisher_,
+                           i,
+                           object_color_red_ / 255.,
+                           object_color_green_ / 255.,
+                           object_color_blue_ / 255.);
+
+        ri::publish_pose(pose,
+                         ori_.mesh(i),
+                         ori_.directory(),
+                         ori_.package(),
+                         object_state_publisher_);
+    }
+}
+}

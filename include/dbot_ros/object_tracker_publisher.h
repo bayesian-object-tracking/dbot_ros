@@ -22,6 +22,7 @@
 #include <ros/ros.h>
 
 #include <sensor_msgs/Image.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <dbot/util/camera_data.hpp>
 #include <dbot/util/object_model.hpp>
 #include <dbot/util/object_resource_identifier.hpp>
@@ -33,21 +34,15 @@ namespace dbot
  * \brief Represents the object tracker publisher. This publishes the object
  * estimated state and its marker.
  */
-template <typename State>
-class ObjectTrackerPublisher : public TrackerPublisher<State>
+class ObjectStatePublisher
 {
 public:
-    ObjectTrackerPublisher(const dbot::ObjectResourceIdentifier& ori,
+    ObjectStatePublisher(const dbot::ObjectResourceIdentifier& ori,
                            int object_color_red,
                            int object_color_green,
                            int object_color_blue);
 
-    void publish(const State& state,
-                 const sensor_msgs::Image& image,
-                 const std::shared_ptr<dbot::CameraData>& camera_data);
-
-    void publish(const sensor_msgs::Image& image,
-                 const std::shared_ptr<dbot::CameraData>& camera_data);
+    void publish(const geometry_msgs::PoseStamped pose);
 
 protected:
     ros::NodeHandle node_handle_;
