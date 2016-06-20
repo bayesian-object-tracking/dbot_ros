@@ -256,11 +256,11 @@ int main(int argc, char** argv)
 
     while (ros::ok())
     {
-        ros::spinOnce();
         if (ros_object_tracker.run_once())
         {
             tracker_publisher.publish(ros_object_tracker.current_pose());
         }
+        ros::spinOnce();
     }
 
     return 0;

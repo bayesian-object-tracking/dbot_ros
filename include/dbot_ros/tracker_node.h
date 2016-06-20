@@ -19,9 +19,11 @@
 
 #pragma once
 
+#include <vector>
 #include <memory>
 #include <mutex>
-#include <dbot_ros/tracker_publisher.h>
+#include <dbot/common/camera_data.hpp>
+#include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
 
 namespace dbot
@@ -63,13 +65,7 @@ public:
     const State& current_state() const;
     const geometry_msgs::PoseStamped& current_pose() const;
 
-    std::shared_ptr<Tracker> tracker() { return tracker_; }
-    std::shared_ptr<dbot::CameraData>
-
-    camera_data() const
-    {
-        return camera_data_;
-    }
+    const std::shared_ptr<Tracker>& tracker() { return tracker_; }
 
     void shutdown();
 
