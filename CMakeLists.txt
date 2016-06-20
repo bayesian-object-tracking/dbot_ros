@@ -26,6 +26,15 @@ add_definitions(-DPROFILING_ON=1 -fPIC) #print profiling output
 #  info_project("::bot::dbot_ros:: dbot Tracker ROS Pkg" ${PROJECT_VERSION})
 #info_end()
 
+############################
+# Setup                    #
+############################
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(dbot_ros_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
+
+############################
+# Dependencies             #
+############################
 find_package(catkin REQUIRED
   roscpp
   roslib
@@ -67,7 +76,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 ###################################
 catkin_package(
   INCLUDE_DIRS
-    include
+    src
+    ${dbot_ros_INCLUDE_DIRS}
   LIBRARIES
     ${PROJECT_NAME}
   CATKIN_DEPENDS
@@ -91,29 +101,30 @@ catkin_package(
 ## Build ##
 ###########
 
-include_directories(include ${catkin_INCLUDE_DIRS} )
+include_directories(${dbot_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-file(GLOB_RECURSE headers include/${PROJECT_NAME}/*.hpp
-              include/${PROJECT_NAME}/*.h)
+set(dbot_ros_SOURCE_DIR src/${PROJECT_NAME})
 
-set(sources
-  ${headers}
-  src/${PROJECT_NAME}/object_tracker_publisher.cpp
-  src/${PROJECT_NAME}/object_tracker_node.cpp
-  src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
-  src/${PROJECT_NAME}/utils/data_set_camera_data_provider.cpp
-  src/${PROJECT_NAME}/utils/ros_interface.cpp
-  src/${PROJECT_NAME}/utils/tracking_dataset.cpp
-)
+file(GLOB_RECURSE dbot_ros_HEADERS
+    ${dbot_SOURCE_DIR}/*.hpp
+    ${dbot_SOURCE_DIR}/*.h)
+
+set(dbot_ros_SOURCES
+    src/${PROJECT_NAME}/object_tracker_publisher.cpp 
+    src/${PROJECT_NAME}/object_tracker_node.cpp
+    src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
+    src/${PROJECT_NAME}/utils/data_set_camera_data_provider.cpp
+    src/${PROJECT_NAME}/utils/ros_interface.cpp
+    src/${PROJECT_NAME}/utils/tracking_dataset.cpp)
 
 add_library(${PROJECT_NAME}
-  ${dbot_headers}
-  ${headers}
-  ${sources})
+  ${dbot_ros_HEADERS}
+  ${dbot_ros_SOURCES})
+
 add_dependencies(${PROJECT_NAME}
   dbot_ros_generate_messages_cpp)
+
 target_link_libraries(${PROJECT_NAME}
-  ${PCL_LIBRARIES}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES})
 
