@@ -35,9 +35,9 @@
 #include <dbot/builder/rms_gaussian_filter_tracker_builder.hpp>
 
 #include <dbot_ros_msgs/ObjectState.h>
-#include <dbot_ros/tracker_node.h>
-#include <dbot_ros/utils/ros_interface.hpp>
-#include <dbot_ros/utils/ros_camera_data_provider.hpp>
+#include <dbot_ros/object_tracker_ros.h>
+#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros/util/ros_camera_data_provider.hpp>
 
 typedef dbot::RmsGaussianFilterObjectTracker Tracker;
 

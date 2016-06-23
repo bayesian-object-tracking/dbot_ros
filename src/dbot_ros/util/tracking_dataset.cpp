@@ -31,9 +31,9 @@
 
 #include <dbot/common/helper_functions.hpp>
 
-#include <dbot_ros/utils/ros_interface.hpp>
-//#include <dbot_ros/utils/pcl_interface.hpp>
-#include <dbot_ros/utils/tracking_dataset.h>
+#include <dbot_ros/util/ros_interface.hpp>
+//#include <dbot_ros/util/pcl_interface.hpp>
+#include <dbot_ros/util/tracking_dataset.h>
 
 DataFrame::DataFrame(const sensor_msgs::Image::ConstPtr& image,
                      const sensor_msgs::CameraInfo::ConstPtr& info,

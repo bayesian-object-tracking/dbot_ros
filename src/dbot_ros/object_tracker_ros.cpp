@@ -17,8 +17,8 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
-#include <dbot_ros/tracker_node.h>
-#include <dbot_ros/tracker_node.hpp>
+#include <dbot_ros/object_tracker_ros.h>
+#include <dbot_ros/object_tracker_ros.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
 #include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
 

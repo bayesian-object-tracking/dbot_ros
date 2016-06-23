@@ -26,7 +26,6 @@
 #include <dbot/common/camera_data.hpp>
 #include <dbot/common/object_model.hpp>
 #include <dbot/common/object_resource_identifier.hpp>
-#include <dbot_ros/tracker_publisher.h>
 
 namespace dbot
 {

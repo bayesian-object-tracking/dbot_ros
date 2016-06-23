@@ -18,7 +18,7 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
-#include <dbot_ros/utils/ros_interface.hpp>
+#include <dbot_ros/util/ros_interface.hpp>
 #include <dbot_ros_msgs/ObjectState.h>
 
 // void ri::publish_marker(const Eigen::Matrix4d &H,

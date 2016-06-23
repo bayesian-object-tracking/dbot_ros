@@ -110,12 +110,12 @@ file(GLOB_RECURSE dbot_ros_HEADERS
     ${dbot_SOURCE_DIR}/*.h)
 
 set(dbot_ros_SOURCES
+    src/${PROJECT_NAME}/object_tracker_ros.cpp
     src/${PROJECT_NAME}/object_tracker_publisher.cpp 
-    src/${PROJECT_NAME}/object_tracker_node.cpp
-    src/${PROJECT_NAME}/utils/ros_camera_data_provider.cpp
-    src/${PROJECT_NAME}/utils/data_set_camera_data_provider.cpp
-    src/${PROJECT_NAME}/utils/ros_interface.cpp
-    src/${PROJECT_NAME}/utils/tracking_dataset.cpp)
+    src/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
+    src/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
+    src/${PROJECT_NAME}/util/ros_interface.cpp
+    src/${PROJECT_NAME}/util/tracking_dataset.cpp)
 
 add_library(${PROJECT_NAME}
   ${dbot_ros_HEADERS}
@@ -129,7 +129,7 @@ target_link_libraries(${PROJECT_NAME}
   ${OpenCV_LIBRARIES})
 
 add_executable(rbc_particle_filter_object_tracker
-  src/${PROJECT_NAME}/trackers/rbc_particle_filter_object_tracker_node.cpp)
+  src/${PROJECT_NAME}/tracker/rbc_particle_filter_object_tracker_node.cpp)
 add_dependencies(rbc_particle_filter_object_tracker
   dbot_ros_generate_messages_cpp)
 target_link_libraries(rbc_particle_filter_object_tracker
@@ -140,7 +140,7 @@ target_link_libraries(rbc_particle_filter_object_tracker
   yaml-cpp)
 
 add_executable(rms_gaussian_filter_object_tracker
-  src/${PROJECT_NAME}/trackers/rms_gaussian_filter_object_tracker_node.cpp)
+  src/${PROJECT_NAME}/tracker/rms_gaussian_filter_object_tracker_node.cpp)
 add_dependencies(rms_gaussian_filter_object_tracker
   dbot_ros_generate_messages_cpp)
 target_link_libraries(rms_gaussian_filter_object_tracker
@@ -151,7 +151,7 @@ target_link_libraries(rms_gaussian_filter_object_tracker
   yaml-cpp)
 
 add_executable(object_tracker_service
-  src/${PROJECT_NAME}/trackers/object_tracker_service_node.cpp)
+  src/${PROJECT_NAME}/tracker/object_tracker_service_node.cpp)
 add_dependencies(object_tracker_service
   dbot_ros_generate_messages_cpp)
 target_link_libraries(object_tracker_service
