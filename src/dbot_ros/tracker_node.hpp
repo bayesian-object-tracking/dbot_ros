@@ -28,7 +28,7 @@
 namespace dbot
 {
 template <typename Tracker>
-RosObjectTracker<Tracker>::RosObjectTracker(
+ObjectTrackerRos<Tracker>::ObjectTrackerRos(
     const std::shared_ptr<Tracker>& tracker,
     const std::shared_ptr<dbot::CameraData>& camera_data)
     : tracker_(tracker),
@@ -39,7 +39,7 @@ RosObjectTracker<Tracker>::RosObjectTracker(
 }
 
 template <typename Tracker>
-void RosObjectTracker<Tracker>::track(const sensor_msgs::Image& ros_image)
+void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
 {
     auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
         ros_image, camera_data_->downsampling_factor());
@@ -52,7 +52,7 @@ void RosObjectTracker<Tracker>::track(const sensor_msgs::Image& ros_image)
 
 
 template <typename Tracker>
-void RosObjectTracker<Tracker>::update_obsrv(
+void ObjectTrackerRos<Tracker>::update_obsrv(
     const sensor_msgs::Image& ros_image)
 {
     std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
@@ -62,13 +62,13 @@ void RosObjectTracker<Tracker>::update_obsrv(
 
 
 template <typename Tracker>
-void RosObjectTracker<Tracker>::shutdown()
+void ObjectTrackerRos<Tracker>::shutdown()
 {
     running_ = false;
 }
 
 template <typename Tracker>
-void RosObjectTracker<Tracker>::run()
+void ObjectTrackerRos<Tracker>::run()
 {
     running_ = true;
 
@@ -85,7 +85,7 @@ void RosObjectTracker<Tracker>::run()
 }
 
 template <typename Tracker>
-bool RosObjectTracker<Tracker>::run_once()
+bool ObjectTrackerRos<Tracker>::run_once()
 {
     if (!obsrv_updated_) return false;
 
@@ -102,13 +102,13 @@ bool RosObjectTracker<Tracker>::run_once()
 }
 
 template <typename Tracker>
-auto RosObjectTracker<Tracker>::current_state() const -> const State &
+auto ObjectTrackerRos<Tracker>::current_state() const -> const State &
 {
     return current_state_;
 }
 
 template <typename Tracker>
-auto RosObjectTracker<Tracker>::current_pose() const
+auto ObjectTrackerRos<Tracker>::current_pose() const
     -> const geometry_msgs::PoseStamped &
 {
     return current_pose_;

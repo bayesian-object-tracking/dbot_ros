@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     /* Roa-Blackwellized Coordinate Particle Filter Object Tracker            */
     /*                                                                        */
     /* Ingredients:                                                           */
-    /*   - RosObjectTracker                                                   */
+    /*   - ObjectTrackerRos                                                   */
     /*     - Tracker                                                          */
     /*       - Rbc Particle Filter Algorithm                                  */
     /*         - Objects tate transition model                                */
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
                                                        params_tracker);
     auto tracker = tracker_builder.build();
 
-    dbot::RosObjectTracker<Tracker> ros_object_tracker(tracker, camera_data);
+    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(tracker, camera_data);
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
                      1,
-                     &dbot::RosObjectTracker<Tracker>::update_obsrv,
+                     &dbot::ObjectTrackerRos<Tracker>::update_obsrv,
                      &ros_object_tracker);
     (void)subscriber;
 

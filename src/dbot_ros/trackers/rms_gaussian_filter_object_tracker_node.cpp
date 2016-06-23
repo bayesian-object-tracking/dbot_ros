@@ -164,12 +164,12 @@ int main(int argc, char** argv)
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    dbot::RosObjectTracker<dbot::RmsGaussianFilterObjectTracker> tracker_node(
+    dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker> tracker_node(
         tracker, camera_data);
     ros::Subscriber subscriber = nh.subscribe(
         depth_image_topic,
         1,
-        &dbot::RosObjectTracker<dbot::RmsGaussianFilterObjectTracker>::track,
+        &dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker>::track,
         &tracker_node);
 
     ros::spin();

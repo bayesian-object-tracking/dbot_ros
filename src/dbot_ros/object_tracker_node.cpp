@@ -25,7 +25,7 @@
 namespace dbot
 {
 
-template class RosObjectTracker<RbcParticleFilterObjectTracker>;
-template class RosObjectTracker<RmsGaussianFilterObjectTracker>;
+template class ObjectTrackerRos<RbcParticleFilterObjectTracker>;
+template class ObjectTrackerRos<RmsGaussianFilterObjectTracker>;
 
 }

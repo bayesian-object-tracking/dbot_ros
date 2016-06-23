@@ -179,7 +179,7 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
                                                        params_tracker);
     auto tracker = tracker_builder.build();
 
-    dbot::RosObjectTracker<Tracker> ros_object_tracker(tracker, camera_data);
+    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(tracker, camera_data);
 
     ros_object_tracker.tracker()->initialize({pose});
 
@@ -200,7 +200,7 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
                      1,
-                     &dbot::RosObjectTracker<Tracker>::update_obsrv,
+                     &dbot::ObjectTrackerRos<Tracker>::update_obsrv,
                      &ros_object_tracker);
     (void)subscriber;
 

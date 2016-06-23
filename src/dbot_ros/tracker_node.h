@@ -32,7 +32,7 @@ namespace dbot
  * \brief Represents a generic tracker node
  */
 template <typename Tracker>
-class RosObjectTracker
+class ObjectTrackerRos
 {
 public:
     typedef typename Tracker::State State;
@@ -40,9 +40,9 @@ public:
 
 public:
     /**
-     * \brief Creates a RosObjectTracker
+     * \brief Creates a ObjectTrackerRos
      */
-    RosObjectTracker(const std::shared_ptr<Tracker>& tracker,
+    ObjectTrackerRos(const std::shared_ptr<Tracker>& tracker,
                 const std::shared_ptr<dbot::CameraData>& camera_data);
 
     /**
