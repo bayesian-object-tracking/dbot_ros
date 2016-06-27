@@ -23,9 +23,9 @@
 
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <dbot/common/camera_data.hpp>
-#include <dbot/common/object_model.hpp>
-#include <dbot/common/object_resource_identifier.hpp>
+#include <dbot/camera_data.hpp>
+#include <dbot/object_model.hpp>
+#include <dbot/object_resource_identifier.hpp>
 
 namespace dbot
 {

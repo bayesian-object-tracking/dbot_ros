@@ -22,6 +22,7 @@
 #include <fstream>
 #include <ctime>
 #include <memory>
+#include <thread>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -31,8 +32,8 @@
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
 
-#include <dbot/common/camera_data.hpp>
-#include <dbot/common/simple_wavefront_object_loader.hpp>
+#include <dbot/camera_data.hpp>
+#include <dbot/simple_wavefront_object_loader.hpp>
 #include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
 #include <dbot/builder/rbc_particle_filter_tracker_builder.hpp>
 
@@ -41,53 +42,25 @@
 #include <dbot_ros/util/ros_interface.hpp>
 #include <dbot_ros/util/ros_camera_data_provider.hpp>
 
-int main(int argc, char** argv)
+#include <dbot_ros_msgs/RunObjectTracker.h>
+
+static bool running = false;
+static std::thread tracker_thread;
+
+void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
 {
-    ros::init(argc, argv, "rbc_particle_filter_object_tracker");
     ros::NodeHandle nh("~");
-
-    /* ---------------------------------------------------------------------- */
-    /* Roa-Blackwellized Coordinate Particle Filter Object Tracker            */
-    /*                                                                        */
-    /* Ingredients:                                                           */
-    /*   - ObjectTrackerRos                                                   */
-    /*     - Tracker                                                          */
-    /*       - Rbc Particle Filter Algorithm                                  */
-    /*         - Objects tate transition model                                */
-    /*         - Observation model                                            */
-    /*       - Object model                                                   */
-    /*       - Camera data                                                    */
-    /*     - Tracker publisher to advertise the estimated state               */
-    /*                                                                        */
-    /*  Construnction of the tracker will utilize few builders and factories. */
-    /*  For that, we need the following builders/factories:                   */
-    /*    - Object state transition model builder                             */
-    /*    - Observation model builder to build GPU or CPU based models        */
-    /*    - Filter builder                                                    */
-    /* ---------------------------------------------------------------------- */
-
     /* ------------------------------ */
     /* - Create the object model    - */
     /* ------------------------------ */
-    // get object parameters
-    std::string object_package;
-    std::string object_directory;
-    std::vector<std::string> object_meshes;
-    nh.getParam("object/meshes", object_meshes);
-    nh.getParam("object/package", object_package);
-    nh.getParam("object/directory", object_directory);
 
     // Use the ORI to load the object model usign the
     // SimpleWavefrontObjectLoader
-    dbot::ObjectResourceIdentifier ori;
-    ori.package_path(ros::package::getPath(object_package));
-    ori.directory(object_directory);
-    ori.meshes(object_meshes);
-
     auto object_model_loader = std::shared_ptr<dbot::ObjectModelLoader>(
         new dbot::SimpleWavefrontObjectModelLoader(ori));
 
-    // Load the model usign the simple wavefront load and center the frames
+    // Load the model usign the simple wavefront load and center the
+    // frames
     // of all object part meshes
     auto object_model =
         std::make_shared<dbot::ObjectModel>(object_model_loader, true);
@@ -112,7 +85,8 @@ int main(int argc, char** argv)
                                         resolution,
                                         downsampling_factor,
                                         60.0));
-    // Create camera data from the RosCameraDataProvider which takes the data
+    // Create camera data from the RosCameraDataProvider which takes the
+    // data
     // from a ros camera topic
     auto camera_data = std::make_shared<dbot::CameraData>(camera_data_provider);
 
@@ -140,7 +114,7 @@ int main(int argc, char** argv)
                 params_state.angular_sigma);
     nh.getParam(pre + "object_transition/velocity_factor",
                 params_state.velocity_factor);
-    params_state.part_count = object_meshes.size();
+    params_state.part_count = 1;
 
     auto state_trans_builder = std::shared_ptr<StateTransitionBuilder>(
         new dbot::ObjectTransitionModelBuilder<State>(params_state));
@@ -207,32 +181,7 @@ int main(int argc, char** argv)
 
     dbot::ObjectTrackerRos<Tracker> ros_object_tracker(tracker, camera_data);
 
-    /* ------------------------------ */
-    /* - Initialize interactively   - */
-    /* ------------------------------ */
-    opi::InteractiveMarkerInitializer object_initializer(
-        camera_data->frame_id(),
-        ori.package(),
-        ori.directory(),
-        ori.meshes(),
-        {},
-        true);
-    if (!object_initializer.wait_for_object_poses())
-    {
-        ROS_INFO("Setting object poses was interrupted.");
-        return 0;
-    }
-
-    auto initial_ros_poses = object_initializer.poses();
-    std::vector<Tracker::State> initial_poses;
-    initial_poses.push_back(Tracker::State(ori.count_meshes()));
-    int i = 0;
-    for (auto& ros_pose : initial_ros_poses)
-    {
-        initial_poses[0].component(i++) = ri::to_pose_velocity_vector(ros_pose);
-    }
-
-    tracker->initialize(initial_poses);
+    ros_object_tracker.tracker()->initialize({pose});
 
     /* ------------------------------ */
     /* - Tracker publisher          - */
@@ -241,8 +190,9 @@ int main(int argc, char** argv)
     nh.getParam(pre + "object_color/R", object_color[0]);
     nh.getParam(pre + "object_color/G", object_color[1]);
     nh.getParam(pre + "object_color/B", object_color[2]);
-    auto tracker_publisher = dbot::ObjectStatePublisher(
-        ori, object_color[0], object_color[1], object_color[2]);
+    auto tracker_publisher = 
+        dbot::ObjectStatePublisher(
+            ori, object_color[0], object_color[1], object_color[2]);
 
     /* ------------------------------ */
     /* - Run the tracker            - */
@@ -254,14 +204,67 @@ int main(int argc, char** argv)
                      &ros_object_tracker);
     (void)subscriber;
 
-    while (ros::ok())
+    ROS_INFO_STREAM("Tracking object " << ori.mesh_without_extension(0));
+    auto pause_duration = ros::Duration(0.001);
+    while (ros::ok() && running)
     {
+        pause_duration.sleep();
         if (ros_object_tracker.run_once())
         {
             tracker_publisher.publish(ros_object_tracker.current_pose());
         }
-        ros::spinOnce();
     }
+    ROS_INFO("Tracking terminated.");
+}
+
+bool run_object_tracker_srv(dbot_ros_msgs::RunObjectTrackerRequest& req,
+                            dbot_ros_msgs::RunObjectTrackerResponse& res)
+{
+    if (running)
+    {
+        ROS_INFO("Preempting current tracker ...");
+        running = false;
+        if (tracker_thread.joinable()) tracker_thread.join();
+    }
+
+    ROS_INFO("Setup new object to track");
+    running = true;
+
+    tracker_thread = std::thread(
+        [          =]()
+        {
+            try
+            {
+                run(dbot::ObjectResourceIdentifier(
+                        ros::package::getPath(req.object_state.ori.package),
+                        req.object_state.ori.directory,
+                        {req.object_state.ori.name}),
+                    ri::to_pose_velocity_vector(req.object_state.pose.pose));
+            }
+            catch (std::exception& e)
+            {
+                ROS_ERROR("%s", e.what());
+            }
+        });
+
+    return true;
+}
+
+int main(int argc, char** argv)
+{
+    ros::init(argc, argv, "object_tracker_service");
+    ros::NodeHandle nh;
+    ros::NodeHandle nh_prv("~");
+
+    std::string service_name;
+    nh_prv.getParam("object_tracker_service_name", service_name);
+
+    auto srv = nh.advertiseService(service_name, run_object_tracker_srv);
+
+    ROS_INFO("Object tracker service up and running.");
+    ROS_INFO("Waiting for tracking requests...");
+
+    ros::spin();
 
     return 0;
 }

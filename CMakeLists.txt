@@ -30,7 +30,7 @@ add_definitions(-DPROFILING_ON=1 -fPIC) #print profiling output
 # Setup                    #
 ############################
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(dbot_ros_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
+set(dbot_ros_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/source)
 
 ############################
 # Dependencies             #
@@ -76,7 +76,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 ###################################
 catkin_package(
   INCLUDE_DIRS
-    src
+    source
     ${dbot_ros_INCLUDE_DIRS}
   LIBRARIES
     ${PROJECT_NAME}
@@ -103,19 +103,19 @@ catkin_package(
 
 include_directories(${dbot_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-set(dbot_ros_SOURCE_DIR src/${PROJECT_NAME})
+set(dbot_ros_SOURCE_DIR source/${PROJECT_NAME})
 
 file(GLOB_RECURSE dbot_ros_HEADERS
     ${dbot_SOURCE_DIR}/*.hpp
     ${dbot_SOURCE_DIR}/*.h)
 
 set(dbot_ros_SOURCES
-    src/${PROJECT_NAME}/object_tracker_ros.cpp
-    src/${PROJECT_NAME}/object_tracker_publisher.cpp 
-    src/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
-    src/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
-    src/${PROJECT_NAME}/util/ros_interface.cpp
-    src/${PROJECT_NAME}/util/tracking_dataset.cpp)
+    source/${PROJECT_NAME}/object_tracker_ros.cpp
+    source/${PROJECT_NAME}/object_tracker_publisher.cpp 
+    source/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
+    source/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
+    source/${PROJECT_NAME}/util/ros_interface.cpp
+    source/${PROJECT_NAME}/util/tracking_dataset.cpp)
 
 add_library(${PROJECT_NAME}
   ${dbot_ros_HEADERS}
@@ -129,7 +129,7 @@ target_link_libraries(${PROJECT_NAME}
   ${OpenCV_LIBRARIES})
 
 add_executable(rbc_particle_filter_object_tracker
-  src/${PROJECT_NAME}/tracker/rbc_particle_filter_object_tracker_node.cpp)
+  source/${PROJECT_NAME}/tracker/rbc_particle_filter_object_tracker_node.cpp)
 add_dependencies(rbc_particle_filter_object_tracker
   dbot_ros_generate_messages_cpp)
 target_link_libraries(rbc_particle_filter_object_tracker
@@ -140,7 +140,7 @@ target_link_libraries(rbc_particle_filter_object_tracker
   yaml-cpp)
 
 add_executable(rms_gaussian_filter_object_tracker
-  src/${PROJECT_NAME}/tracker/rms_gaussian_filter_object_tracker_node.cpp)
+  source/${PROJECT_NAME}/tracker/rms_gaussian_filter_object_tracker_node.cpp)
 add_dependencies(rms_gaussian_filter_object_tracker
   dbot_ros_generate_messages_cpp)
 target_link_libraries(rms_gaussian_filter_object_tracker
@@ -151,7 +151,7 @@ target_link_libraries(rms_gaussian_filter_object_tracker
   yaml-cpp)
 
 add_executable(object_tracker_service
-  src/${PROJECT_NAME}/tracker/object_tracker_service_node.cpp)
+  source/${PROJECT_NAME}/tracker/object_tracker_service_node.cpp)
 add_dependencies(object_tracker_service
   dbot_ros_generate_messages_cpp)
 target_link_libraries(object_tracker_service
@@ -162,7 +162,7 @@ target_link_libraries(object_tracker_service
   yaml-cpp)
 
 add_executable(object_tracker_controller_service
-  src/${PROJECT_NAME}/object_tracker_controller_service_node.cpp)
+  source/${PROJECT_NAME}/object_tracker_controller_service_node.cpp)
 add_dependencies(object_tracker_controller_service
   dbot_ros_generate_messages_cpp)
 target_link_libraries(object_tracker_controller_service

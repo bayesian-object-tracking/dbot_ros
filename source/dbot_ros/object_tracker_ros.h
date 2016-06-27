@@ -22,7 +22,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
-#include <dbot/common/camera_data.hpp>
+#include <dbot/camera_data.hpp>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
 

@@ -30,7 +30,7 @@
 
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
-#include <dbot/common/camera_data.hpp>
+#include <dbot/camera_data.hpp>
 #include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
 #include <dbot/builder/rms_gaussian_filter_tracker_builder.hpp>
 

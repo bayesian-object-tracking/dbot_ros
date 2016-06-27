@@ -29,7 +29,7 @@
 
 #include <boost/foreach.hpp>
 
-#include <dbot/common/helper_functions.hpp>
+#include <dbot/helper_functions.hpp>
 
 #include <dbot_ros/util/ros_interface.hpp>
 //#include <dbot_ros/util/pcl_interface.hpp>
