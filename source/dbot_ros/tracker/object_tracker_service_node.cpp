@@ -172,14 +172,12 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
                 params_tracker.moving_average_update_rate);
     nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
 
-    auto tracker_builder =
-        dbot::RbcParticleFilterTrackerBuilder<Tracker>(state_trans_builder,
-                                                       obsrv_model_builder,
-                                                       object_model,
-                                                       params_tracker);
+    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
+        state_trans_builder, obsrv_model_builder, object_model, params_tracker);
     auto tracker = tracker_builder.build();
 
-    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(tracker, camera_data);
+    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(
+        tracker, camera_data, ori.count_meshes());
 
     ros_object_tracker.tracker()->initialize({pose});
 
@@ -190,9 +188,8 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     nh.getParam(pre + "object_color/R", object_color[0]);
     nh.getParam(pre + "object_color/G", object_color[1]);
     nh.getParam(pre + "object_color/B", object_color[2]);
-    auto tracker_publisher = 
-        dbot::ObjectStatePublisher(
-            ori, object_color[0], object_color[1], object_color[2]);
+    auto tracker_publisher = dbot::ObjectStatePublisher(
+        ori, object_color[0], object_color[1], object_color[2]);
 
     /* ------------------------------ */
     /* - Run the tracker            - */

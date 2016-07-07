@@ -51,22 +51,19 @@ ObjectStatePublisher::ObjectStatePublisher(
 
 void ObjectStatePublisher::publish(const geometry_msgs::PoseStamped& pose)
 {
-    for (int i = 0; i < ori_.count_meshes(); i++)
-    {
-        ri::publish_marker(pose,
-                           ori_.mesh_uri(i),
-                           object_marker_publisher_,
-                           i,
-                           object_color_red_ / 255.,
-                           object_color_green_ / 255.,
-                           object_color_blue_ / 255.);
+    ri::publish_marker(pose,
+                       ori_.mesh_uri(0),
+                       object_marker_publisher_,
+                       0,
+                       object_color_red_ / 255.,
+                       object_color_green_ / 255.,
+                       object_color_blue_ / 255.);
 
-        ri::publish_pose(pose,
-                         ori_.mesh(i),
-                         ori_.directory(),
-                         ori_.package(),
-                         object_state_publisher_);
-    }
+    ri::publish_pose(pose,
+                     ori_.mesh(0),
+                     ori_.directory(),
+                     ori_.package(),
+                     object_state_publisher_);
 }
 
 void ObjectStatePublisher::publish(

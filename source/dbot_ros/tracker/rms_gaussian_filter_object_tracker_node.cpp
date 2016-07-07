@@ -177,7 +177,7 @@ int main(int argc, char** argv)
     /* - node                       - */
     /* ------------------------------ */
     dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker>
-        ros_object_tracker(tracker, camera_data);
+        ros_object_tracker(tracker, camera_data, params.ori.count_meshes());
 
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
         {
             ROS_INFO_STREAM("Current pose estimate: "
                             << ros_object_tracker.current_state().transpose());
-            tracker_publisher.publish(ros_object_tracker.current_pose());
+            tracker_publisher.publish(ros_object_tracker.current_poses());
         }
         else
         {
