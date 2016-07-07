@@ -43,7 +43,8 @@ public:
      * \brief Creates a ObjectTrackerRos
      */
     ObjectTrackerRos(const std::shared_ptr<Tracker>& tracker,
-                const std::shared_ptr<dbot::CameraData>& camera_data);
+                     const std::shared_ptr<dbot::CameraData>& camera_data,
+                     int object_count);
 
     /**
      * \brief Tracking callback function which is invoked whenever a new image
@@ -62,8 +63,9 @@ public:
     void run();
     bool run_once();
 
-    const State& current_state() const;
-    const geometry_msgs::PoseStamped& current_pose() const;
+    State current_state() const;
+    geometry_msgs::PoseStamped current_pose() const;
+    std::vector<geometry_msgs::PoseStamped> current_poses() const;
 
     const std::shared_ptr<Tracker>& tracker() { return tracker_; }
 
@@ -73,7 +75,8 @@ protected:
     bool obsrv_updated_;
     bool running_;
     State current_state_;
-    geometry_msgs::PoseStamped current_pose_;
+    int object_count_;
+    std::vector<geometry_msgs::PoseStamped> current_poses_;
     sensor_msgs::Image current_ros_image_;
     std::mutex obsrv_mutex_;
     std::shared_ptr<Tracker> tracker_;

@@ -30,9 +30,11 @@ namespace dbot
 template <typename Tracker>
 ObjectTrackerRos<Tracker>::ObjectTrackerRos(
     const std::shared_ptr<Tracker>& tracker,
-    const std::shared_ptr<dbot::CameraData>& camera_data)
+    const std::shared_ptr<dbot::CameraData>& camera_data,
+    int object_count)
     : tracker_(tracker),
       camera_data_(camera_data),
+      object_count_(object_count),
       obsrv_updated_(false),
       running_(false)
 {
@@ -44,10 +46,19 @@ void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
     auto image = ri::to_eigen_vector<typename Obsrv::Scalar>(
         ros_image, camera_data_->downsampling_factor());
 
+    current_poses_.clear();
     current_state_ = tracker_->track(image);
-    current_pose_.pose = ri::to_ros_pose(current_state_);
-    current_pose_.header.stamp = ros_image.header.stamp; 
-    current_pose_.header.frame_id= ros_image.header.frame_id;
+    geometry_msgs::PoseStamped current_pose;
+    int dim = current_state_.size() / object_count_;
+    for (int i = 0; i < object_count_; ++i)
+    {
+        current_pose.pose =
+            ri::to_ros_pose(current_state_.middleRows(i * dim, dim));
+        current_pose.header.stamp    = ros_image.header.stamp;
+        current_pose.header.frame_id = ros_image.header.frame_id;
+
+        current_poses_.push_back(current_pose);
+    }
 }
 
 
@@ -102,15 +113,22 @@ bool ObjectTrackerRos<Tracker>::run_once()
 }
 
 template <typename Tracker>
-auto ObjectTrackerRos<Tracker>::current_state() const -> const State &
+auto ObjectTrackerRos<Tracker>::current_state() const -> State
 {
     return current_state_;
 }
 
 template <typename Tracker>
 auto ObjectTrackerRos<Tracker>::current_pose() const
-    -> const geometry_msgs::PoseStamped &
+    -> geometry_msgs::PoseStamped
 {
-    return current_pose_;
+    return current_poses_[0];
+}
+
+template <typename Tracker>
+auto ObjectTrackerRos<Tracker>::current_poses() const
+    -> std::vector<geometry_msgs::PoseStamped>
+{
+    return current_poses_;
 }
 }

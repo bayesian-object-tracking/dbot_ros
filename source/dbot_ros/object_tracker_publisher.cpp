@@ -49,7 +49,7 @@ ObjectStatePublisher::ObjectStatePublisher(
         node_handle_.advertise<dbot_ros_msgs::ObjectState>("object_state", 0);
 }
 
-void ObjectStatePublisher::publish(const geometry_msgs::PoseStamped pose)
+void ObjectStatePublisher::publish(const geometry_msgs::PoseStamped& pose)
 {
     for (int i = 0; i < ori_.count_meshes(); i++)
     {
@@ -62,6 +62,27 @@ void ObjectStatePublisher::publish(const geometry_msgs::PoseStamped pose)
                            object_color_blue_ / 255.);
 
         ri::publish_pose(pose,
+                         ori_.mesh(i),
+                         ori_.directory(),
+                         ori_.package(),
+                         object_state_publisher_);
+    }
+}
+
+void ObjectStatePublisher::publish(
+    const std::vector<geometry_msgs::PoseStamped>& poses)
+{
+    for (int i = 0; i < ori_.count_meshes(); i++)
+    {
+        ri::publish_marker(poses[i],
+                           ori_.mesh_uri(i),
+                           object_marker_publisher_,
+                           i,
+                           object_color_red_ / 255.,
+                           object_color_green_ / 255.,
+                           object_color_blue_ / 255.);
+
+        ri::publish_pose(poses[i],
                          ori_.mesh(i),
                          ori_.directory(),
                          ori_.package(),

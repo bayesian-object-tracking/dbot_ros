@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <ros/ros.h>
 
 #include <sensor_msgs/Image.h>
@@ -41,7 +43,8 @@ public:
                            int object_color_green,
                            int object_color_blue);
 
-    void publish(const geometry_msgs::PoseStamped pose);
+    void publish(const geometry_msgs::PoseStamped& pose);
+    void publish(const std::vector<geometry_msgs::PoseStamped>& poses);
 
 protected:
     ros::NodeHandle node_handle_;

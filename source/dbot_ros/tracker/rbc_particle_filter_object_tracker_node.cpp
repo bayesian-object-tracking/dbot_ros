@@ -198,14 +198,12 @@ int main(int argc, char** argv)
                 params_tracker.moving_average_update_rate);
     nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
 
-    auto tracker_builder =
-        dbot::RbcParticleFilterTrackerBuilder<Tracker>(state_trans_builder,
-                                                       obsrv_model_builder,
-                                                       object_model,
-                                                       params_tracker);
+    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
+        state_trans_builder, obsrv_model_builder, object_model, params_tracker);
     auto tracker = tracker_builder.build();
 
-    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(tracker, camera_data);
+    dbot::ObjectTrackerRos<Tracker> ros_object_tracker(
+        tracker, camera_data, ori.count_meshes());
 
     /* ------------------------------ */
     /* - Initialize interactively   - */
@@ -258,7 +256,11 @@ int main(int argc, char** argv)
     {
         if (ros_object_tracker.run_once())
         {
-            tracker_publisher.publish(ros_object_tracker.current_pose());
+            ROS_INFO_STREAM("Current pose:"
+                            <<
+                            ros_object_tracker.current_state().transpose());
+
+            tracker_publisher.publish(ros_object_tracker.current_poses());
         }
         ros::spinOnce();
     }
