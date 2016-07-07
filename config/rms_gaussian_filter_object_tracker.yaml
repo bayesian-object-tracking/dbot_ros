@@ -6,12 +6,12 @@ gaussian_filter:
     alpha: 1.0
 
   object_transition:
-    linear_sigma: 0.002
-    angular_sigma: 0.01
+    linear_sigma: 0.002 #0.002
+    angular_sigma: 0.01 #0.01
     velocity_factor: 0.8
 
   observation:
-    fg_noise_std: 0.001
+    fg_noise_std: 0.001 #0.001
 
     # uniform tail arguments
     tail_weight: 0.1

@@ -35,7 +35,9 @@
 #include <dbot/builder/rms_gaussian_filter_tracker_builder.hpp>
 
 #include <dbot_ros_msgs/ObjectState.h>
+
 #include <dbot_ros/object_tracker_ros.h>
+#include <dbot_ros/object_tracker_publisher.h>
 #include <dbot_ros/util/ros_interface.hpp>
 #include <dbot_ros/util/ros_camera_data_provider.hpp>
 
@@ -161,16 +163,43 @@ int main(int argc, char** argv)
     tracker->initialize(initial_poses);
 
     /* ------------------------------ */
+    /* - Tracker publisher          - */
+    /* ------------------------------ */
+    int object_color[3];
+    nh.getParam(pre + "object_color/R", object_color[0]);
+    nh.getParam(pre + "object_color/G", object_color[1]);
+    nh.getParam(pre + "object_color/B", object_color[2]);
+    auto tracker_publisher = dbot::ObjectStatePublisher(
+        params.ori, object_color[0], object_color[1], object_color[2]);
+
+    /* ------------------------------ */
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker> tracker_node(
-        tracker, camera_data);
-    ros::Subscriber subscriber = nh.subscribe(
-        depth_image_topic,
-        1,
-        &dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker>::track,
-        &tracker_node);
+    dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker>
+        ros_object_tracker(tracker, camera_data);
+
+    ros::Subscriber subscriber =
+        nh.subscribe(depth_image_topic,
+                     1,
+                     &dbot::ObjectTrackerRos<
+                         dbot::RmsGaussianFilterObjectTracker>::update_obsrv,
+                     &ros_object_tracker);
+
+    while (ros::ok())
+    {
+        if (ros_object_tracker.run_once())
+        {
+            ROS_INFO_STREAM("Current pose estimate: "
+                            << ros_object_tracker.current_state().transpose());
+            tracker_publisher.publish(ros_object_tracker.current_pose());
+        }
+        else
+        {
+            ROS_INFO("Waiting for image ...");
+        }
+        ros::spinOnce();
+    }
 
     ros::spin();
 
