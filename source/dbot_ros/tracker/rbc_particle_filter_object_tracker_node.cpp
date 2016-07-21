@@ -122,8 +122,8 @@ int main(int argc, char** argv)
     typedef osr::FreeFloatingRigidBodiesState<> State;
     typedef dbot::RbcParticleFilterObjectTracker Tracker;
     typedef dbot::RbcParticleFilterTrackerBuilder<Tracker> TrackerBuilder;
-    typedef TrackerBuilder::StateTransitionBuilder StateTransitionBuilder;
-    typedef TrackerBuilder::ObservationModelBuilder ObservationModelBuilder;
+    typedef TrackerBuilder::TransitionBuilder TransitionBuilder;
+    typedef TrackerBuilder::SensorBuilder SensorBuilder;
 
     // parameter shorthand prefix
     std::string pre = "particle_filter/";
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     // We will use a linear observation model built by the object transition
     // model builder. The linear model will generate a random walk.
-    dbot::ObjectTransitionModelBuilder<State>::Parameters params_state;
+    dbot::ObjectTransitionBuilder<State>::Parameters params_state;
     nh.getParam(pre + "object_transition/linear_sigma",
                 params_state.linear_sigma);
     nh.getParam(pre + "object_transition/angular_sigma",
@@ -142,13 +142,13 @@ int main(int argc, char** argv)
                 params_state.velocity_factor);
     params_state.part_count = object_meshes.size();
 
-    auto state_trans_builder = std::shared_ptr<StateTransitionBuilder>(
-        new dbot::ObjectTransitionModelBuilder<State>(params_state));
+    auto state_trans_builder = std::shared_ptr<TransitionBuilder>(
+        new dbot::ObjectTransitionBuilder<State>(params_state));
 
     /* ------------------------------ */
     /* - Observation model          - */
     /* ------------------------------ */
-    dbot::RbObservationModelBuilder<State>::Parameters params_obsrv;
+    dbot::RbSensorBuilder<State>::Parameters params_obsrv;
     nh.getParam(pre + "use_gpu", params_obsrv.use_gpu);
 
     if (params_obsrv.use_gpu)
@@ -185,8 +185,8 @@ int main(int argc, char** argv)
     nh.getParam(pre + "gpu/geometry_shader_file",
                 params_obsrv.geometry_shader_file);
 
-    auto obsrv_model_builder = std::shared_ptr<ObservationModelBuilder>(
-        new dbot::RbObservationModelBuilder<State>(
+    auto obsrv_model_builder = std::shared_ptr<SensorBuilder>(
+        new dbot::RbSensorBuilder<State>(
             object_model, camera_data, params_obsrv));
 
     /* ------------------------------ */
