@@ -21,7 +21,7 @@
 #include <fl/util/types.hpp>
 #include <fl/util/meta.hpp>
 #include <fl/util/profiling.hpp>
-#include <fl/model/observation/linear_cauchy_observation_model.hpp>
+#include <fl/model/sensor/linear_cauchy_sensor.hpp>
 
 #include <dbot/rigid_body_renderer.hpp>
 #include <dbot/helper_functions.hpp>

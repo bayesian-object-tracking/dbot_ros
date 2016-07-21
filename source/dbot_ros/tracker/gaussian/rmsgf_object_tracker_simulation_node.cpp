@@ -29,7 +29,7 @@
 #include <state_filtering/utils/ros_interface.hpp>
 #include <state_filtering/utils/pcl_interface.hpp>
 
-#include <fl/model/observation/linear_cauchy_observation_model.hpp>
+#include <fl/model/sensor/linear_cauchy_sensor.hpp>
 
 #include "rmsgf_tracking_ros_pkg/util/virtual_object.hpp"
 #include "rmsgf_tracking_ros_pkg/tracker/rmsgf_object_tracker.hpp"
@@ -146,7 +146,7 @@ int main (int argc, char **argv)
     /* - Create the tracker         - */
     /* ------------------------------ */
     auto tracker = Tracker(object.pose, object.renderer, param.tracker_param);
-    auto& obsrv_model = tracker.filter().obsrv_model();
+    auto& sensor = tracker.filter().sensor();
 
 
     /* ------------------------------ */
@@ -170,7 +170,7 @@ int main (int argc, char **argv)
     /* - Simulation                 - */
     /* ------------------------------ */
     fl::StandardGaussian<typename Tracker::ObsrvNoise>
-        obsrv_noise_normal(obsrv_model.noise_dimension());
+        obsrv_noise_normal(sensor.noise_dimension());
     Eigen::VectorXd ground_truth;
     Eigen::VectorXd y;
     auto zero_pose = State();
@@ -239,7 +239,7 @@ int main (int argc, char **argv)
 
             case 1: // simulated error
                 Tracker::Builder::set_nominal_pose(tracker.filter(), zero_pose);
-                y = obsrv_model.observation(
+                y = sensor.observation(
                         object.pose, obsrv_noise_normal.sample());
                 for (int i = 0; i < y.size(); ++i)
                 {
@@ -273,7 +273,7 @@ int main (int argc, char **argv)
                 break;
             case 3: // manual + simulated error
                 Tracker::Builder::set_nominal_pose(tracker.filter(), zero_pose);
-                y = obsrv_model.observation(
+                y = sensor.observation(
                         object.pose, obsrv_noise_normal.sample());
                 for (int i = 0; i < y.size(); ++i)
                 {

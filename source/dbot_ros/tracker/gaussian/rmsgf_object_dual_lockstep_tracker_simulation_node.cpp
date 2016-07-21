@@ -23,7 +23,7 @@
 #include <state_filtering/utils/image_publisher.hpp>
 #include <state_filtering/utils/ros_interface.hpp>
 
-#include <fl/model/observation/linear_cauchy_observation_model.hpp>
+#include <fl/model/sensor/linear_cauchy_sensor.hpp>
 
 #include "rmsgf_tracking_ros_pkg/util/virtual_object.hpp"
 #include "rmsgf_tracking_ros_pkg/tracker/rmsgf_object_tracker.hpp"

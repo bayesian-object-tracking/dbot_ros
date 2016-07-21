@@ -185,7 +185,7 @@ int main(int argc, char** argv)
     nh.getParam(pre + "gpu/geometry_shader_file",
                 params_obsrv.geometry_shader_file);
 
-    auto obsrv_model_builder = std::shared_ptr<SensorBuilder>(
+    auto sensor_builder = std::shared_ptr<SensorBuilder>(
         new dbot::RbSensorBuilder<State>(
             object_model, camera_data, params_obsrv));
 
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
     nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
 
     auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
-        state_trans_builder, obsrv_model_builder, object_model, params_tracker);
+        state_trans_builder, sensor_builder, object_model, params_tracker);
     auto tracker = tracker_builder.build();
 
     dbot::ObjectTrackerRos<Tracker> ros_object_tracker(
