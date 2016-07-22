@@ -66,6 +66,10 @@ int main(int argc, char** argv)
     /*    - Filter builder                                                    */
     /* ---------------------------------------------------------------------- */
 
+    // parameter shorthand prefix
+    std::string pre = "particle_filter/";
+
+
     /* ------------------------------ */
     /* - Create the object model    - */
     /* ------------------------------ */
@@ -89,8 +93,10 @@ int main(int argc, char** argv)
 
     // Load the model usign the simple wavefront load and center the frames
     // of all object part meshes
-    auto object_model =
-        std::make_shared<dbot::ObjectModel>(object_model_loader, true);
+    bool center_object_frame;
+    nh.getParam(pre + "center_object_frame", center_object_frame);
+    auto object_model = std::make_shared<dbot::ObjectModel>(
+        object_model_loader, center_object_frame);
 
     /* ------------------------------ */
     /* - Setup camera data          - */
@@ -125,8 +131,6 @@ int main(int argc, char** argv)
     typedef TrackerBuilder::TransitionBuilder TransitionBuilder;
     typedef TrackerBuilder::SensorBuilder SensorBuilder;
 
-    // parameter shorthand prefix
-    std::string pre = "particle_filter/";
 
     /* ------------------------------ */
     /* - State transition function  - */
@@ -185,8 +189,8 @@ int main(int argc, char** argv)
     nh.getParam(pre + "gpu/geometry_shader_file",
                 params_obsrv.geometry_shader_file);
 
-    auto sensor_builder = std::shared_ptr<SensorBuilder>(
-        new dbot::RbSensorBuilder<State>(
+    auto sensor_builder =
+        std::shared_ptr<SensorBuilder>(new dbot::RbSensorBuilder<State>(
             object_model, camera_data, params_obsrv));
 
     /* ------------------------------ */
@@ -197,6 +201,7 @@ int main(int argc, char** argv)
     nh.getParam(pre + "moving_average_update_rate",
                 params_tracker.moving_average_update_rate);
     nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
+    nh.getParam(pre + "center_object_frame", params_tracker.center_object_frame);
 
     auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
         state_trans_builder, sensor_builder, object_model, params_tracker);

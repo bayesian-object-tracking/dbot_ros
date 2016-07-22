@@ -1,6 +1,12 @@
 
 gaussian_filter:
-  update_rate: 1.0
+  # State moving average update rate in [0.0; 1.0]
+  #   1: unfiltered wiggly estimates.
+  #   0: constant
+  moving_average_update_rate: 1.0
+
+  # Specify whether to center the frame of the object
+  center_object_frame:  true 
 
   unscented_transform:
     alpha: 1.0

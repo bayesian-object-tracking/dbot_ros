@@ -82,7 +82,9 @@ int main(int argc, char** argv)
 
     // get filter parameters
     nh.getParam(pre + "unscented_transform/alpha", params.ut_alpha);
-    nh.getParam(pre + "update_rate", params.update_rate);
+    nh.getParam(pre + "moving_average_update_rate",
+                params.moving_average_update_rate);
+    nh.getParam(pre + "center_object_frame", params.center_object_frame);
 
     nh.getParam(pre + "observation/tail_weight",
                 params.observation.tail_weight);
