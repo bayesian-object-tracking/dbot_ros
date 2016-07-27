@@ -163,7 +163,10 @@ Here `/object_tracker_service` is the tracker service topic name. What follows i
      orientation = [qx, qy, qz, qw]
  
 ### Tracker Service via rospy 
-Here is a simple listing to trigger the object tracker service 
+Here is a simple listing to trigger the object tracker service which is available at `dbot_ros/scripts/track_object_service_call_example.py`.
+
+
+
 ```python
 #!/usr/bin/env python
 
@@ -210,4 +213,7 @@ def track_object(object_name):
 if __name__ == "__main__":
   track_object(sys.argv[1])
 ```
-
+You can run the script as follows:
+```bash
+$ rosrun dbot_ros track_object_service_call_example.py MyDuck
+```
