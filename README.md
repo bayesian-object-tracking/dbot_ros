@@ -150,6 +150,7 @@ rosservice expects
      $ rosservice <command> <service-topic> "service message value"
 
 Here `/object_tracker_service` is the tracker service topic name. What follows is the value of `RunObjectTracker.srv` service definition:
+
      [ObjectState]
      ObjectState = [name, ObjectOri, geometry_msgs/PoseStamped]
      ObjectOri = [package, directory, object_mesh.obj]
