@@ -1,7 +1,7 @@
 # ROS Depth Based Object Tracking Library (dbot_ros)
 
 This package extends the [dbot](https://github.com/bayesian-object-tracking/dbot) library by ros node applications which run the trackers within the ros eco-system. The main content of this package are two tracker nodes for the trackers provided in dbot. Additionally, the package contains a tracker service which is based on the particle filter based tracker.
-All trackers require mesh models in Wavefront (.obj) format.
+All trackers require object mesh models in Wavefront (.obj) format.
 
 # Requirements
  * Kinect or XTION depth sensor
