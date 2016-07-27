@@ -64,7 +64,7 @@ The trackers assume that the tracked object models exist somewhere as a catkin p
 object:
   package:    my_object_model_package
   directory:  model
-  meshes:[ duck.obj ]
+  meshes:     [ duck.obj ]
 ```
 ## Particle filter config (rbc_particle_filter_tracker.yaml)
 
@@ -100,17 +100,17 @@ Once launched, you will have to add an `Interactive Marker` in rviz to initializ
 
 ## Running and Initializing the Gaussian Filter Based Tracker
  The procedure is the same as for the particle filter tracker described above.
- 
-     roslaunch dbot_ros rms_gaussian_filter_tracker.launch
-
+ ```bash
+$ roslaunch dbot_ros rms_gaussian_filter_tracker.launch
+```
 The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object.
 
 ## Running the Particle Filter via ROS Service
 
 Again the setup is the same as above except the initialization is different. 
-
-     roslaunch dbot_ros object_tracker_service.launch
-
+```bash
+$ roslaunch dbot_ros object_tracker_service.launch
+```
 The service expects a call with the ros message type `ObjectState.msg` located in `dbot_ros_msgs` package
 
      # name of the object
@@ -132,25 +132,25 @@ or using the `roservice call` command.
 ### Run Tracker service via `rosservice call `
 Here is an example on how to trigger the tracker service using the `rosservice call` command
 ```bash
-     $ rosservice call /object_tracker_service \
-     $ [
-     $   my_mug_box,
-     $   [sab_data, object_models, mugbox.obj],
-     $   [
-     $     [0, 0, /XTOIN],
-     $     [
-     $       [0, 0, 0.7],
-     $       [0, 0, 0, 0]
-     $     ]
-     $   ]
-     $ ]"
+$ rosservice call /object_tracker_service \
+$ [
+$   my_mug_box,
+$   [sab_data, object_models, mugbox.obj],
+$   [
+$     [0, 0, /XTOIN],
+$     [
+$       [0, 0, 0.7],
+$       [0, 0, 0, 0]
+$     ]
+$   ]
+$ ]"
 ```
 
 Breaking down the above command line:
 rosservice expects 
-
-     $ rosservice <command> <service-topic> "service message value"
-
+```bash
+$ rosservice <command> <service-topic> "service message value"
+```
 Here `/object_tracker_service` is the tracker service topic name. What follows is the value of `RunObjectTracker.srv` service definition:
 
      [ObjectState]
