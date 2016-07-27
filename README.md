@@ -59,4 +59,12 @@ The camera configuration file camera.yaml contains the ros depth image topic and
 Adjust the topic names if needed.
 
 # Object configuration (object.yaml)
-The trackers assume that the tracked object models exist somewhere as a catkin package in your workspace `$HOME/projects/tracking`. 
+The trackers assume that the tracked object models exist somewhere as a catkin package in your workspace `$HOME/projects/tracking`. The object.yaml file specifies where to find the mesh.obj file of the object you want to track
+
+     object:
+       package:    my_object_model_package
+       directory:  model
+       meshes:     [ duck.obj ]
+
+
+
