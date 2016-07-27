@@ -144,3 +144,18 @@ Here is an example on how to trigger the tracker service using the `rosservice c
      $   ]
      $ ]"
 
+Breaking down the above command line:
+rosservice expects 
+
+     $ rosservice <command> <service-topic> "service message value"
+
+Here `/object_tracker_service` is the tracker service topic name. What follows is the value of `RunObjectTracker.srv` service definition:
+     [ObjectState]
+     ObjectState = [name, ObjectOri, geometry_msgs/PoseStamped]
+     ObjectOri = [package, directory, object_mesh.obj]
+     geometry_msgs/PoseStamped = [header, geometry_msgs/Pose]
+     header = [seq, stamp, frame_id]
+     geometry_msgs/Pose = [position, orientation]
+     position = [x, y, z]
+     orientation = [qx, qy, qz, qw]
+ 
