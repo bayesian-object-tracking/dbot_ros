@@ -87,3 +87,19 @@ The Gaussian filter is a CPU only tracker. You may adjust the filter sensitivity
 
 The provided values are determined for models with time discretized of 33ms given that the depth camera provides images in 30 frames per second.
 
+# Running the trackers
+
+For all trackers launch the ROS OpenNI camera node to publish the depth camera and run ROS `rviz` visualization tool. Add a point cloud display in rviz. This step is required to initialize the trackers.
+
+# Running and Initializing the Particle Filter Based Tracker
+
+     roslaunch dbot_ros rbc_particle_filter_tracker.launch
+
+Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object.
+
+# Running and Initializing the Gaussian Filter Based Tracker
+ The procedure is the same as for the particle filter tracker described above.
+ 
+     roslaunch dbot_ros rms_gaussian_filter_tracker.launch
+
+The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object.
