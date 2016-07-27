@@ -128,4 +128,19 @@ The `ObjectOri.msg` message content is the same as the object.yaml config file
 Once the service is running, you can use ros service call with the `RunObjectTracker.srv` (located in dbot_ros_msgs) to trigger the service to track the desired object. You can call the service either for your own c++ ros node, a python node
 or using the `roservice call` command.
 
+### rosservice call 
+Here is an example on how to trigger the tracker service using the `rosservice call` command
+
+     $ rosservice call /object_tracker_service \
+     $ [
+     $   my_mug_box,
+     $   [sab_data, object_models, mugbox.obj],
+     $   [
+     $     [0, 0, /XTOIN],
+     $     [
+     $       [0, 0, 0.7],
+     $       [0, 0, 0, 0]
+     $     ]
+     $   ]
+     $ ]"
 
