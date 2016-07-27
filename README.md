@@ -1,9 +1,10 @@
 # ROS Depth Based Object Tracking Library (dbot_ros)
 
-This package extends the dbot library by ros node applications which run the trackers within the ros eco-system.
-
+This package extends the [dbot](https://github.com/bayesian-object-tracking/dbot) library by ros node applications which run the trackers within the ros eco-system. The main content of this package are two tracker nodes for the trackers provided in dbot. Additionally, the package contains a tracker service which is based on the particle filter based tracker.
+All trackers require mesh models in Wavefront (.obj) format.
 
 # Requirements
+ * Kinect or XTION depth sensor
  * Ubuntu 12.04
  * C++0x or C++11 Compiler (gcc-4.6 or later)
  * [CUDA](https://developer.nvidia.com/cuda-downloads) 6.5 or later (optional)
@@ -35,3 +36,27 @@ If no CUDA enabled device is available, you can deactivate the GPU implementatio
 
      $ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=Off
 
+# Configuration
+The configuration files are located in
+
+     $ cd $HOME/projects/tracking
+     $ source devel/setup.bash
+     $ roscd dbot_ros
+     $ cd config
+     $ ls
+     $ ... camera.yaml  
+     $ ... object_tracker_services.yaml  
+     $ ... object.yaml  
+     $ ... rbc_particle_filter_tracker.yaml  
+     $ ... rms_gaussian_filter_object_tracker.yaml
+
+# Camera configuration (camera.yaml)
+The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
+
+     depth_image_topic: /XTION/depth/image
+     camera_info_topic: /XTION/depth/camera_info 
+
+Adjust the topic names if needed.
+
+# Object configuration (object.yaml)
+The trackers assume that the tracked object models exist somewhere as a catkin package in your workspace `$HOME/projects/tracking`. 
