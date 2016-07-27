@@ -19,72 +19,73 @@ All trackers require object mesh models in Wavefront (.obj) format.
  
  
 # Compiling
-
-     $ cd $HOME
-     $ mkdir -p projects/tracking/src  
-     $ cd projects/tracking/src
-     $ git clone git@github.com:filtering-library/fl.git
-     $ git clone git@github.com:bayesian-object-tracking/dbot.git
-     $ git clone git@github.com:bayesian-object-tracking/dbot_ros_msgs.git
-     $ git clone git@github.com:bayesian-object-tracking/opi.git
-     $ git clone git@github.com:bayesian-object-tracking/osr.git
-     $ git clone git@github.com:bayesian-object-tracking/dbot_ros.git
-     $ cd ..
-     $ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=On
-
+```bash
+$ cd $HOME
+$ mkdir -p projects/tracking/src  
+$ cd projects/tracking/src
+$ git clone git@github.com:filtering-library/fl.git
+$ git clone git@github.com:bayesian-object-tracking/dbot.git
+$ git clone git@github.com:bayesian-object-tracking/dbot_ros_msgs.git
+$ git clone git@github.com:bayesian-object-tracking/opi.git
+$ git clone git@github.com:bayesian-object-tracking/osr.git
+$ git clone git@github.com:bayesian-object-tracking/dbot_ros.git
+$ cd ..
+$ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=On
+```
 If no CUDA enabled device is available, you can deactivate the GPU implementation via 
-
-     $ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=Off
-
+```bash
+$ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=Off
+```
 # Configuration
 The configuration files are located in
-
-     $ cd $HOME/projects/tracking
-     $ source devel/setup.bash
-     $ roscd dbot_ros
-     $ cd config
-     $ ls
-     $ ... camera.yaml  
-     $ ... object_tracker_services.yaml  
-     $ ... object.yaml  
-     $ ... rbc_particle_filter_tracker.yaml  
-     $ ... rms_gaussian_filter_object_tracker.yaml
-
+```bash
+$ cd $HOME/projects/tracking
+$ source devel/setup.bash
+$ roscd dbot_ros
+$ cd config
+$ ls
+$ ... camera.yaml  
+$ ... object_tracker_services.yaml  
+$ ... object.yaml  
+$ ... rbc_particle_filter_tracker.yaml  
+$ ... rms_gaussian_filter_object_tracker.yaml
+```
 ## Camera configuration (camera.yaml)
 The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
-
-     depth_image_topic: /XTION/depth/image
-     camera_info_topic: /XTION/depth/camera_info 
-
+```yaml
+depth_image_topic: /XTION/depth/image
+camera_info_topic: /XTION/depth/camera_info 
+```
 Adjust the topic names if needed.
 
 #### Object configuration (object.yaml)
 The trackers assume that the tracked object models exist somewhere as a catkin package in your workspace `$HOME/projects/tracking`. The object.yaml file specifies where to find the mesh.obj file of the object you want to track
-
-     object:
-       package:    my_object_model_package
-       directory:  model
-       meshes:     [ duck.obj ]
-
+```yaml
+object:
+  package:    my_object_model_package
+  directory:  model
+  meshes:[ duck.obj ]
+```
 ## Particle filter config (rbc_particle_filter_tracker.yaml)
 
 Here you won't need to adjust most of the variables. An important one is whether you want to utilize the GPU or not
-     particle_filter:
-       use_gpu: true 
-
+```yaml
+particle_filter:
+  use_gpu: true 
+```
 If GPU support is not availabe, `set use_gpu: false` to run the tracker on the CPU.
 
 ## Gaussian filter config (rms_gaussian_filter_tracker.yaml)
 The Gaussian filter is a CPU only tracker. You may adjust the filter sensitivity or accuracy by adjusting the noise parameters of the object state transition and observation models. However, the provided default are resonable values. 
+```yaml
+object_transition:
+  linear_sigma: 0.002 
+  angular_sigma: 0.01 
+  velocity_factor: 0.8
 
-    object_transition:
-      linear_sigma: 0.002 
-      angular_sigma: 0.01 
-      velocity_factor: 0.8
-
-    observation:
-      fg_noise_std: 0.001 
-
+observation:
+  fg_noise_std: 0.001 
+```
 The provided values are determined for models with time discretized of 33ms given that the depth camera provides images in 30 frames per second.
 
 # Running the trackers
@@ -92,9 +93,9 @@ The provided values are determined for models with time discretized of 33ms give
 For all trackers launch the ROS OpenNI camera node to publish the depth camera and run ROS `rviz` visualization tool. Add a point cloud display in rviz. This step is required to initialize the trackers.
 
 ## Running and Initializing the Particle Filter Based Tracker
-
-     roslaunch dbot_ros rbc_particle_filter_tracker.launch
-
+```bash
+$ roslaunch dbot_ros rbc_particle_filter_tracker.launch
+```
 Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object.
 
 ## Running and Initializing the Gaussian Filter Based Tracker
@@ -128,9 +129,9 @@ The `ObjectOri.msg` message content is the same as the object.yaml config file
 Once the service is running, you can use ros service call with the `RunObjectTracker.srv` (located in dbot_ros_msgs) to trigger the service to track the desired object. You can call the service either for your own c++ ros node, a python node
 or using the `roservice call` command.
 
-### rosservice call 
+### Run Tracker service via `rosservice call `
 Here is an example on how to trigger the tracker service using the `rosservice call` command
-
+```bash
      $ rosservice call /object_tracker_service \
      $ [
      $   my_mug_box,
@@ -143,6 +144,7 @@ Here is an example on how to trigger the tracker service using the `rosservice c
      $     ]
      $   ]
      $ ]"
+```
 
 Breaking down the above command line:
 rosservice expects 
@@ -160,3 +162,52 @@ Here `/object_tracker_service` is the tracker service topic name. What follows i
      position = [x, y, z]
      orientation = [qx, qy, qz, qw]
  
+### Tracker Service via rospy 
+Here is a simple listing to trigger the object tracker service 
+```python
+#!/usr/bin/env python
+
+import sys
+import rospy
+from std_msgs.msg import Header
+from dbot_ros_msgs.srv import RunObjectTracker
+from dbot_ros_msgs.msg import ObjectState
+from dbot_ros_msgs.msg import ObjectOri
+from geometry_msgs.msg import Point
+from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseStamped
+
+def track_object(object_name):
+  print "Waiting for service..."
+  rospy.wait_for_service("/object_tracker_service")
+
+  try:
+    run_object_tracker = rospy.ServiceProxy('/object_tracker_service', RunObjectTracker)
+
+    # set initial pose
+    pose = Pose(position=Point(0, 0, 0.7),
+                orientation=Quaternion(0, 0, 0, 0))
+
+    # set Object resource identifier to find the model
+    ori = ObjectOri(package = "sab_data",
+                    directory="object_models",
+                    name=object_name + ".obj")
+
+    # construct the ObjectState message for the service call
+    object_state = ObjectState(
+            name=object_name,
+            ori=ori,
+            pose=PoseStamped(
+                   pose=pose,
+                   header=Header(seq=0, stamp=rospy.Time(0), frame_id='')))
+
+    print "Calling tracker service to track the %s object" % object_name
+    run_object_tracker(object_state)
+  except rospy.ServiceException, e:
+      print "Calling object tracker service failed: %s" % e
+
+if __name__ == "__main__":
+  track_object(sys.argv[1])
+```
+
