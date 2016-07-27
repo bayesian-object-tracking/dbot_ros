@@ -9,7 +9,7 @@ All trackers require object mesh models in Wavefront (.obj) format.
  * C++0x or C++11 Compiler (gcc-4.6 or later)
  * [CUDA](https://developer.nvidia.com/cuda-downloads) 6.5 or later (optional)
  
-#### Dependecies
+## Dependecies
  * [dbot](https://github.com/bayesian-object-tracking/dbot)
  * [dbot_ros_msgs](https://github.com/bayesian-object-tracking/dbot_ros_msgs)
  * [opi](https://github.com/bayesian-object-tracking/opi)
@@ -50,7 +50,7 @@ The configuration files are located in
      $ ... rbc_particle_filter_tracker.yaml  
      $ ... rms_gaussian_filter_object_tracker.yaml
 
-### Camera configuration (camera.yaml)
+## Camera configuration (camera.yaml)
 The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
 
      depth_image_topic: /XTION/depth/image
@@ -66,7 +66,7 @@ The trackers assume that the tracked object models exist somewhere as a catkin p
        directory:  model
        meshes:     [ duck.obj ]
 
-#### Particle filter config (rbc_particle_filter_tracker.yaml)
+## Particle filter config (rbc_particle_filter_tracker.yaml)
 
 Here you won't need to adjust most of the variables. An important one is whether you want to utilize the GPU or not
      particle_filter:
@@ -74,7 +74,7 @@ Here you won't need to adjust most of the variables. An important one is whether
 
 If GPU support is not availabe, `set use_gpu: false` to run the tracker on the CPU.
 
-### Gaussian filter config (rms_gaussian_filter_tracker.yaml)
+## Gaussian filter config (rms_gaussian_filter_tracker.yaml)
 The Gaussian filter is a CPU only tracker. You may adjust the filter sensitivity or accuracy by adjusting the noise parameters of the object state transition and observation models. However, the provided default are resonable values. 
 
     object_transition:
@@ -91,20 +91,20 @@ The provided values are determined for models with time discretized of 33ms give
 
 For all trackers launch the ROS OpenNI camera node to publish the depth camera and run ROS `rviz` visualization tool. Add a point cloud display in rviz. This step is required to initialize the trackers.
 
-#### Running and Initializing the Particle Filter Based Tracker
+## Running and Initializing the Particle Filter Based Tracker
 
      roslaunch dbot_ros rbc_particle_filter_tracker.launch
 
 Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object.
 
-#### Running and Initializing the Gaussian Filter Based Tracker
+## Running and Initializing the Gaussian Filter Based Tracker
  The procedure is the same as for the particle filter tracker described above.
  
      roslaunch dbot_ros rms_gaussian_filter_tracker.launch
 
 The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object.
 
-#### Running the Particle Filter via ROS Service
+## Running the Particle Filter via ROS Service
 
 Again the setup is the same as above except the initialization is different. 
 
