@@ -50,7 +50,7 @@ The configuration files are located in
      $ ... rbc_particle_filter_tracker.yaml  
      $ ... rms_gaussian_filter_object_tracker.yaml
 
-# Camera configuration (camera.yaml)
+## Camera configuration (camera.yaml)
 The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
 
      depth_image_topic: /XTION/depth/image
@@ -58,7 +58,7 @@ The camera configuration file camera.yaml contains the ros depth image topic and
 
 Adjust the topic names if needed.
 
-# Object configuration (object.yaml)
+## Object configuration (object.yaml)
 The trackers assume that the tracked object models exist somewhere as a catkin package in your workspace `$HOME/projects/tracking`. The object.yaml file specifies where to find the mesh.obj file of the object you want to track
 
      object:
@@ -66,5 +66,24 @@ The trackers assume that the tracked object models exist somewhere as a catkin p
        directory:  model
        meshes:     [ duck.obj ]
 
+## Particle filter config (rbc_particle_filter_tracker.yaml)
 
+Here you won't need to adjust most of the variables. An important one is whether you want to utilize the GPU or not
+     particle_filter:
+       use_gpu: true 
+
+If GPU support is not availabe, `set use_gpu: false` to run the tracker on the CPU.
+
+## Gaussian filter config (rms_gaussian_filter_tracker.yaml)
+The Gaussian filter is a CPU only tracker. You may adjust the filter sensitivity or accuracy by adjusting the noise parameters of the object state transition and observation models. However, the provided default are resonable values. 
+
+    object_transition:
+      linear_sigma: 0.002 
+      angular_sigma: 0.01 
+      velocity_factor: 0.8
+
+    observation:
+      fg_noise_std: 0.001 
+
+The provided values are determined for models with time discretized of 33ms given that the depth camera provides images in 30 frames per second.
 
