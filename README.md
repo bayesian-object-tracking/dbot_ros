@@ -96,14 +96,14 @@ For all trackers launch the ROS OpenNI camera node to publish the depth camera a
 ```bash
 $ roslaunch dbot_ros rbc_particle_filter_tracker.launch
 ```
-Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object.
+Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object. The tracking estimate is published under the topic `/rbc_particle_filter_tracker/object_state`.
 
 ## Running and Initializing the Gaussian Filter Based Tracker
  The procedure is the same as for the particle filter tracker described above.
  ```bash
 $ roslaunch dbot_ros rms_gaussian_filter_tracker.launch
 ```
-The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object.
+The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object. The tracking estimate is published under the topic `/rms_gaussian_filter_tracker/object_state`.
 
 ## Running the Particle Filter via ROS Service
 
@@ -162,6 +162,8 @@ Here `/object_tracker_service` is the tracker service topic name. What follows i
      position = [x, y, z]
      orientation = [qx, qy, qz, qw]
  
+The tracking estimate is published under the topic `/object_tracker_service/object_state`.
+ 
 ### Tracker Service via rospy 
 Here is a simple listing to trigger the object tracker service which is available at `dbot_ros/scripts/track_object_service_call_example.py`.
 
@@ -217,3 +219,4 @@ You can run the script as follows:
 ```bash
 $ rosrun dbot_ros track_object_service_call_example.py MyDuck
 ```
+Again, the tracking estimate is published under the topic `/object_tracker_service/object_state`.
