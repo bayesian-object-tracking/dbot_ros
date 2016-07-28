@@ -194,7 +194,9 @@ int main(int argc, char** argv)
         {
             ROS_INFO_STREAM("Current pose estimate: "
                             << ros_object_tracker.current_state().transpose());
-            tracker_publisher.publish(ros_object_tracker.current_poses());
+            // tracker_publisher.publish(ros_object_tracker.current_poses());
+            tracker_publisher.publish(
+                ros_object_tracker.current_state_messages());
         }
         else
         {

@@ -47,8 +47,10 @@ void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
         ros_image, camera_data_->downsampling_factor());
 
     current_poses_.clear();
+    current_velocities_.clear();
     current_state_ = tracker_->track(image);
     geometry_msgs::PoseStamped current_pose;
+    geometry_msgs::PoseStamped current_velocity;
     int dim = current_state_.size() / object_count_;
     for (int i = 0; i < object_count_; ++i)
     {
@@ -58,6 +60,13 @@ void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
         current_pose.header.frame_id = ros_image.header.frame_id;
 
         current_poses_.push_back(current_pose);
+
+        current_velocity.pose =
+            ri::to_ros_velocity(current_state_.middleRows(i * dim, dim));
+        current_velocity.header.stamp    = ros_image.header.stamp;
+        current_velocity.header.frame_id = ros_image.header.frame_id;
+
+        current_velocities_.push_back(current_velocity);
     }
 }
 
@@ -123,6 +132,24 @@ auto ObjectTrackerRos<Tracker>::current_pose() const
     -> geometry_msgs::PoseStamped
 {
     return current_poses_[0];
+}
+
+
+template <typename Tracker>
+auto ObjectTrackerRos<Tracker>::current_state_messages() const
+    -> std::vector<dbot_ros_msgs::ObjectState>
+{
+    std::vector<dbot_ros_msgs::ObjectState> state_messages;
+
+    for (int i = 0; i < current_poses_.size(); ++i)
+    {
+        dbot_ros_msgs::ObjectState object_state_message;
+        object_state_message.pose = current_poses_[i];
+        object_state_message.velocity = current_velocities_[i];
+        state_messages.push_back(object_state_message);
+    }
+
+    return state_messages;
 }
 
 template <typename Tracker>

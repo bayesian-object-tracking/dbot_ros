@@ -97,7 +97,7 @@ inline osr::PoseVelocityVector to_pose_velocity_vector(
     return pose;
 }
 
-inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
+inline geometry_msgs::Pose to_ros_pose(const osr::PoseVelocityVector& pose_vector)
 {
     auto p = pose_vector.position();
     auto q = pose_vector.orientation().quaternion();
@@ -114,6 +114,24 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
     return ros_pose;
 }
 
+inline geometry_msgs::Pose to_ros_velocity(const osr::PoseVelocityVector& pose_vector)
+{
+    auto p = pose_vector.linear_velocity();
+    osr::EulerVector euler_vector = pose_vector.angular_velocity();
+    auto q = euler_vector.quaternion();
+
+    geometry_msgs::Pose ros_velocity;
+    ros_velocity.position.x    = p[0];
+    ros_velocity.position.y    = p[1];
+    ros_velocity.position.z    = p[2];
+    ros_velocity.orientation.w = q.w();
+    ros_velocity.orientation.x = q.x();
+    ros_velocity.orientation.y = q.y();
+    ros_velocity.orientation.z = q.z();
+
+    return ros_velocity;
+}
+
 // inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
 // {
 //     osr::PoseVector pose_vector;
@@ -124,7 +142,7 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVector& pose_vector)
 inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
                                        const Eigen::Vector3d& t)
 {
-    osr::PoseVector pose_vector;
+    osr::PoseVelocityVector pose_vector;
     pose_vector.orientation().rotation_matrix(R);
     pose_vector.position() = t;
     return to_ros_pose(pose_vector);

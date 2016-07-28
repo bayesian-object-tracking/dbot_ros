@@ -25,6 +25,7 @@
 
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <dbot_ros_msgs/ObjectState.h>
 #include <dbot/camera_data.hpp>
 #include <dbot/object_model.hpp>
 #include <dbot/object_resource_identifier.hpp>
@@ -44,6 +45,7 @@ public:
                            int object_color_blue);
 
     void publish(const geometry_msgs::PoseStamped& pose);
+    void publish(const std::vector<dbot_ros_msgs::ObjectState>& state);
     void publish(const std::vector<geometry_msgs::PoseStamped>& poses);
 
 protected:

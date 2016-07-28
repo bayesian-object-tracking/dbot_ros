@@ -25,6 +25,7 @@
 #include <dbot/camera_data.hpp>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <dbot_ros_msgs/ObjectState.h>
 
 namespace dbot
 {
@@ -65,6 +66,7 @@ public:
 
     State current_state() const;
     geometry_msgs::PoseStamped current_pose() const;
+    std::vector<dbot_ros_msgs::ObjectState> current_state_messages() const;
     std::vector<geometry_msgs::PoseStamped> current_poses() const;
 
     const std::shared_ptr<Tracker>& tracker() { return tracker_; }
@@ -77,6 +79,7 @@ protected:
     State current_state_;
     int object_count_;
     std::vector<geometry_msgs::PoseStamped> current_poses_;
+    std::vector<geometry_msgs::PoseStamped> current_velocities_;
     sensor_msgs::Image current_ros_image_;
     std::mutex obsrv_mutex_;
     std::shared_ptr<Tracker> tracker_;

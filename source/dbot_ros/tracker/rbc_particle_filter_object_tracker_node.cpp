@@ -201,7 +201,8 @@ int main(int argc, char** argv)
     nh.getParam(pre + "moving_average_update_rate",
                 params_tracker.moving_average_update_rate);
     nh.getParam(pre + "max_kl_divergence", params_tracker.max_kl_divergence);
-    nh.getParam(pre + "center_object_frame", params_tracker.center_object_frame);
+    nh.getParam(pre + "center_object_frame",
+                params_tracker.center_object_frame);
 
     auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
         state_trans_builder, sensor_builder, object_model, params_tracker);
@@ -264,7 +265,9 @@ int main(int argc, char** argv)
             ROS_INFO_STREAM("Current pose estimate: "
                             << ros_object_tracker.current_state().transpose());
 
-            tracker_publisher.publish(ros_object_tracker.current_poses());
+            // tracker_publisher.publish(ros_object_tracker.current_poses());
+            tracker_publisher.publish(
+                ros_object_tracker.current_state_messages());
         }
         else
         {

@@ -86,4 +86,27 @@ void ObjectStatePublisher::publish(
                          object_state_publisher_);
     }
 }
+
+void ObjectStatePublisher::publish(
+    const std::vector<dbot_ros_msgs::ObjectState>& states)
+
+{
+    for (int i = 0; i < ori_.count_meshes(); i++)
+    {
+        ri::publish_marker(states[i].pose,
+                           ori_.mesh_uri(i),
+                           object_marker_publisher_,
+                           0,
+                           object_color_red_ / 255.,
+                           object_color_green_ / 255.,
+                           object_color_blue_ / 255.);
+
+
+        dbot_ros_msgs::ObjectState object_state_message = states[i];
+        object_state_message.ori.name      = ori_.mesh_uri(i);
+        object_state_message.ori.directory = ori_.directory();
+        object_state_message.ori.package   = ori_.package();
+        object_state_publisher_.publish(states[i]);
+    }
+}
 }
