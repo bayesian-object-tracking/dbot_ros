@@ -67,6 +67,9 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     // frames
     // of all object part meshes
     bool center_object_frame;
+
+    /// \todo nh.getParam does not check whether the parameter exists in the
+    /// config file. this is dangerous, we should use ri::read instead
     nh.getParam(pre + "center_object_frame", center_object_frame);
     auto object_model = std::make_shared<dbot::ObjectModel>(
         object_model_loader, center_object_frame);
@@ -101,7 +104,7 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     /* ------------------------------ */
     typedef osr::FreeFloatingRigidBodiesState<> State;
     typedef dbot::ParticleTracker Tracker;
-    typedef dbot::RbcParticleFilterTrackerBuilder<Tracker> TrackerBuilder;
+    typedef dbot::ParticleTrackerBuilder<Tracker> TrackerBuilder;
     typedef TrackerBuilder::TransitionBuilder TransitionBuilder;
     typedef TrackerBuilder::SensorBuilder SensorBuilder;
 
@@ -178,7 +181,7 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     nh.getParam(pre + "center_object_frame",
                 params_tracker.center_object_frame);
 
-    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
+    auto tracker_builder = dbot::ParticleTrackerBuilder<Tracker>(
         state_trans_builder, sensor_builder, object_model, params_tracker);
     auto tracker = tracker_builder.build();
 

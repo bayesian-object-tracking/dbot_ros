@@ -77,6 +77,10 @@ int main(int argc, char** argv)
     std::string object_package;
     std::string object_directory;
     std::vector<std::string> object_meshes;
+
+    /// \todo nh.getParam does not check whether the parameter exists in the
+    /// config file. this is dangerous, we should use ri::read instead
+
     nh.getParam("object/meshes", object_meshes);
     nh.getParam("object/package", object_package);
     nh.getParam("object/directory", object_directory);
@@ -127,7 +131,7 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     typedef osr::FreeFloatingRigidBodiesState<> State;
     typedef dbot::ParticleTracker Tracker;
-    typedef dbot::RbcParticleFilterTrackerBuilder<Tracker> TrackerBuilder;
+    typedef dbot::ParticleTrackerBuilder<Tracker> TrackerBuilder;
     typedef TrackerBuilder::TransitionBuilder TransitionBuilder;
     typedef TrackerBuilder::SensorBuilder SensorBuilder;
 
@@ -204,7 +208,7 @@ int main(int argc, char** argv)
     nh.getParam(pre + "center_object_frame",
                 params_tracker.center_object_frame);
 
-    auto tracker_builder = dbot::RbcParticleFilterTrackerBuilder<Tracker>(
+    auto tracker_builder = dbot::ParticleTrackerBuilder<Tracker>(
         state_trans_builder, sensor_builder, object_model, params_tracker);
     auto tracker = tracker_builder.build();
 

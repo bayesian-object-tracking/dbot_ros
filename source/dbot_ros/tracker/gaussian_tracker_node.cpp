@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     /* - Parameters                 - */
     /* ------------------------------ */
     // tracker's main parameter container
-    dbot::RmsGaussianFilterTrackerBuilder::Parameters params;
+    dbot::GaussianTrackerBuilder::Parameters params;
 
     // camera data
     dbot::CameraData::Resolution resolution;
@@ -72,6 +72,9 @@ int main(int argc, char** argv)
     /* - Read out parameters        - */
     /* ------------------------------ */
     // get object parameters
+    /// \todo nh.getParam does not check whether the parameter exists in the
+    /// config file. this is dangerous, we should use ri::read instead
+
     nh.getParam("object/meshes", object_meshes);
     nh.getParam("object/package", object_package);
     nh.getParam("object/directory", object_directory);
@@ -159,7 +162,7 @@ int main(int argc, char** argv)
     /* - Create the tracker         - */
     /* ------------------------------ */
     auto tracker_builder =
-        dbot::RmsGaussianFilterTrackerBuilder(params, camera_data);
+        dbot::GaussianTrackerBuilder(params, camera_data);
 
     auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses);
