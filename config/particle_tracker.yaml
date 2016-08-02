@@ -24,7 +24,7 @@ particle_filter:
   moving_average_update_rate: 0.8
 
   # Specify whether to center the frame of the object
-  center_object_frame: false 
+  center_object_frame: true 
 
   max_kl_divergence: 2.0
 

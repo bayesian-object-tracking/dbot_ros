@@ -51,18 +51,15 @@ void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
     current_state_ = tracker_->track(image);
     geometry_msgs::PoseStamped current_pose;
     geometry_msgs::PoseStamped current_velocity;
-    int dim = current_state_.size() / object_count_;
     for (int i = 0; i < object_count_; ++i)
     {
-        current_pose.pose =
-            ri::to_ros_pose(current_state_.middleRows(i * dim, dim));
+        current_pose.pose = ri::to_ros_pose(current_state_.component(i));
         current_pose.header.stamp    = ros_image.header.stamp;
         current_pose.header.frame_id = ros_image.header.frame_id;
 
         current_poses_.push_back(current_pose);
 
-        current_velocity.pose =
-            ri::to_ros_velocity(current_state_.middleRows(i * dim, dim));
+        current_velocity.pose = ri::to_ros_velocity(current_state_.component(i));
         current_velocity.header.stamp    = ros_image.header.stamp;
         current_velocity.header.frame_id = ros_image.header.frame_id;
 

@@ -116,6 +116,11 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVelocityVector& pose_vecto
 
 inline geometry_msgs::Pose to_ros_velocity(const osr::PoseVelocityVector& pose_vector)
 {
+    /// \todo this format is not appropriate for velocities, it should be a
+    /// type called twist. using a pose to represent a velocity is error prone
+    std::cout << "you should not be using the function to_ros_velocity, " <<
+                 "young padawan" << std::endl;
+
     auto p = pose_vector.linear_velocity();
     osr::EulerVector euler_vector = pose_vector.angular_velocity();
     auto q = euler_vector.quaternion();
