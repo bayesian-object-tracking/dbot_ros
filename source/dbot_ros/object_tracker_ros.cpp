@@ -19,13 +19,13 @@
 
 #include <dbot_ros/object_tracker_ros.h>
 #include <dbot_ros/object_tracker_ros.hpp>
-#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
+#include <dbot/tracker/particle_tracker.hpp>
+#include <dbot/tracker/gaussian_tracker.hpp>
 
 namespace dbot
 {
 
-template class ObjectTrackerRos<RbcParticleFilterObjectTracker>;
-template class ObjectTrackerRos<RmsGaussianFilterObjectTracker>;
+template class ObjectTrackerRos<ParticleTracker>;
+template class ObjectTrackerRos<GaussianTracker>;
 
 }

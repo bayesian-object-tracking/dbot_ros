@@ -47,8 +47,8 @@ $ ls
 $ ... camera.yaml  
 $ ... object_tracker_services.yaml  
 $ ... object.yaml  
-$ ... rbc_particle_filter_tracker.yaml  
-$ ... rms_gaussian_filter_object_tracker.yaml
+$ ... particle_tracker.yaml  
+$ ... gaussian_tracker.yaml
 ```
 ## Camera configuration (camera.yaml)
 The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
@@ -66,7 +66,7 @@ object:
   directory:  model
   meshes:     [ duck.obj ]
 ```
-## Particle filter config (rbc_particle_filter_tracker.yaml)
+## Particle filter config (particle_tracker.yaml)
 
 Here you won't need to adjust most of the variables. An important one is whether you want to utilize the GPU or not
 ```yaml
@@ -75,7 +75,7 @@ particle_filter:
 ```
 If GPU support is not availabe, `set use_gpu: false` to run the tracker on the CPU.
 
-## Gaussian filter config (rms_gaussian_filter_tracker.yaml)
+## Gaussian filter config (gaussian_tracker.yaml)
 The Gaussian filter is a CPU only tracker. You may adjust the filter sensitivity or accuracy by adjusting the noise parameters of the object state transition and observation models. However, the provided default are resonable values. 
 ```yaml
 object_transition:
@@ -94,16 +94,16 @@ For all trackers launch the ROS OpenNI camera node to publish the depth camera a
 
 ## Running and Initializing the Particle Filter Based Tracker
 ```bash
-$ roslaunch dbot_ros rbc_particle_filter_tracker.launch
+$ roslaunch dbot_ros particle_tracker.launch
 ```
-Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/rbc_particle_filter_tracker/object_model` topic to display the tracked object. The tracking estimate is published under the topic `/rbc_particle_filter_tracker/object_state`.
+Once launched, you will have to add an `Interactive Marker` in rviz to initialize the tracker. For that, align the displayed interactive marker with the object's point cloud and click on the object to start the tracker. Finally, add a `Marker` and select the `/particle_tracker/object_model` topic to display the tracked object. The tracking estimate is published under the topic `/particle_tracker/object_state`.
 
 ## Running and Initializing the Gaussian Filter Based Tracker
  The procedure is the same as for the particle filter tracker described above.
  ```bash
-$ roslaunch dbot_ros rms_gaussian_filter_tracker.launch
+$ roslaunch dbot_ros gaussian_tracker.launch
 ```
-The object Marker topic has to be changed to `/rms_gaussian_filter_tracker/object_model` in order to display the tracked object. The tracking estimate is published under the topic `/rms_gaussian_filter_tracker/object_state`.
+The object Marker topic has to be changed to `/gaussian_tracker/object_model` in order to display the tracked object. The tracking estimate is published under the topic `/gaussian_tracker/object_state`.
 
 ## Running the Particle Filter via ROS Service
 

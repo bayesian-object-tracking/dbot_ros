@@ -12,7 +12,7 @@
  */
 
 /**
- * \file rbc_particle_filter_object_ros_object_tracker.cpp
+ * \file particle_ros_object_tracker.cpp
  * \date November 2015
  * \author Jan Issac (jan.issac@gmail.com)
  */
@@ -33,8 +33,8 @@
 
 #include <dbot/camera_data.hpp>
 #include <dbot/simple_wavefront_object_loader.hpp>
-#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/builder/rbc_particle_filter_tracker_builder.hpp>
+#include <dbot/tracker/particle_tracker.hpp>
+#include <dbot/builder/particle_tracker_builder.hpp>
 
 #include <dbot_ros/object_tracker_ros.h>
 #include <dbot_ros/object_tracker_publisher.h>
@@ -43,7 +43,7 @@
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "rbc_particle_filter_object_tracker");
+    ros::init(argc, argv, "particle_tracker");
     ros::NodeHandle nh("~");
 
     /* ---------------------------------------------------------------------- */
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
     /* - Few types we will be using - */
     /* ------------------------------ */
     typedef osr::FreeFloatingRigidBodiesState<> State;
-    typedef dbot::RbcParticleFilterObjectTracker Tracker;
+    typedef dbot::ParticleTracker Tracker;
     typedef dbot::RbcParticleFilterTrackerBuilder<Tracker> TrackerBuilder;
     typedef TrackerBuilder::TransitionBuilder TransitionBuilder;
     typedef TrackerBuilder::SensorBuilder SensorBuilder;

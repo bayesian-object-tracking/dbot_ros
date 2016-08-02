@@ -1,6 +1,6 @@
 <launch>
   <arg name="camera_config" default="$(find dbot_ros)/config/camera.yaml"/>
-  <arg name="filter_config" default="$(find dbot_ros)/config/rbc_particle_filter_tracker.yaml"/>
+  <arg name="filter_config" default="$(find dbot_ros)/config/particle_tracker.yaml"/>
   <arg name="service_config" default="$(find dbot_ros)/config/object_tracker_services.yaml"/>
 
   <node

@@ -34,8 +34,8 @@
 
 #include <dbot/camera_data.hpp>
 #include <dbot/simple_wavefront_object_loader.hpp>
-#include <dbot/tracker/rbc_particle_filter_object_tracker.hpp>
-#include <dbot/builder/rbc_particle_filter_tracker_builder.hpp>
+#include <dbot/tracker/particle_tracker.hpp>
+#include <dbot/builder/particle_tracker_builder.hpp>
 
 #include <dbot_ros/object_tracker_ros.h>
 #include <dbot_ros/object_tracker_publisher.h>

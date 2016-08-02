@@ -1,11 +1,11 @@
 <launch>
-  <arg name="filter_config" default="$(find dbot_ros)/config/rms_gaussian_filter_object_tracker.yaml"/>
+  <arg name="filter_config" default="$(find dbot_ros)/config/particle_tracker.yaml"/>
   <arg name="camera_config" default="$(find dbot_ros)/config/camera.yaml"/>
   <arg name="object_config" default="$(find dbot_ros)/config/object.yaml"/>
 
   <node 
-    name="rms_gaussian_filter_object_tracker" 
-    type="rms_gaussian_filter_object_tracker"
+    name="particle_tracker" 
+    type="particle_tracker"
     pkg="dbot_ros" 
     output="screen" 
     respawn="false"

@@ -12,7 +12,7 @@
  */
 
 /**
- * \file rms_gaussian_filter_object_tracker_node.cpp
+ * \file gaussian_tracker_node.cpp
  * \date December 2015
  * \author Jan Issac (jan.issac@gmail.com)
  */
@@ -31,8 +31,8 @@
 #include <opi/interactive_marker_initializer.hpp>
 #include <osr/free_floating_rigid_bodies_state.hpp>
 #include <dbot/camera_data.hpp>
-#include <dbot/tracker/rms_gaussian_filter_object_tracker.hpp>
-#include <dbot/builder/rms_gaussian_filter_tracker_builder.hpp>
+#include <dbot/tracker/gaussian_tracker.hpp>
+#include <dbot/builder/gaussian_tracker_builder.hpp>
 
 #include <dbot_ros_msgs/ObjectState.h>
 
@@ -41,11 +41,11 @@
 #include <dbot_ros/util/ros_interface.hpp>
 #include <dbot_ros/util/ros_camera_data_provider.hpp>
 
-typedef dbot::RmsGaussianFilterObjectTracker Tracker;
+typedef dbot::GaussianTracker Tracker;
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "rms_gaussian_filter_object_tracker");
+    ros::init(argc, argv, "gaussian_tracker");
     ros::NodeHandle nh("~");
 
     /* ------------------------------ */
@@ -178,14 +178,14 @@ int main(int argc, char** argv)
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    dbot::ObjectTrackerRos<dbot::RmsGaussianFilterObjectTracker>
+    dbot::ObjectTrackerRos<dbot::GaussianTracker>
         ros_object_tracker(tracker, camera_data, params.ori.count_meshes());
 
     ros::Subscriber subscriber =
         nh.subscribe(depth_image_topic,
                      1,
                      &dbot::ObjectTrackerRos<
-                         dbot::RmsGaussianFilterObjectTracker>::update_obsrv,
+                         dbot::GaussianTracker>::update_obsrv,
                      &ros_object_tracker);
 
     while (ros::ok())
