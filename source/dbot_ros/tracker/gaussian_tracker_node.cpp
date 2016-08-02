@@ -195,15 +195,8 @@ int main(int argc, char** argv)
     {
         if (ros_object_tracker.run_once())
         {
-            ROS_INFO_STREAM("Current pose estimate: "
-                            << ros_object_tracker.current_state().transpose());
-            // tracker_publisher.publish(ros_object_tracker.current_poses());
             tracker_publisher.publish(
                 ros_object_tracker.current_state_messages());
-        }
-        else
-        {
-            ROS_INFO("Waiting for image ...");
         }
         ros::spinOnce();
     }

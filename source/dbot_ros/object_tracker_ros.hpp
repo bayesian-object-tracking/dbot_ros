@@ -73,6 +73,14 @@ void ObjectTrackerRos<Tracker>::update_obsrv(
     const sensor_msgs::Image& ros_image)
 {
     std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
+
+    if(obsrv_updated_)
+    {
+        ROS_INFO("An Image has been skipped because update was too slow!"
+                 " Consider reducing cost of update, e.g. by reducing number"
+                 " of particles");
+    }
+
     current_ros_image_ = ros_image;
     obsrv_updated_     = true;
 }
