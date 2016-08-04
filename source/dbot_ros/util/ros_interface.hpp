@@ -48,6 +48,8 @@
 #include <osr/pose_vector.hpp>
 #include <osr/pose_velocity_vector.hpp>
 
+#include <XmlRpcException.h>
+
 namespace ri
 {
 /// conversions between ros and internal types *********************************
@@ -216,16 +218,39 @@ struct CastFromRos<std::vector<T>>
     }
 };
 
+
+template <typename T>
+struct CastFromRos<std::map<std::string, T>>
+{
+    static std::map<std::string, T> f(XmlRpc::XmlRpcValue ros_parameter)
+    {
+        std::map<std::string, T> parameter;
+
+        for (auto entry : ros_parameter)
+        {
+            parameter[entry.first] = cast_from_ros<T>(entry.second);
+        }
+
+        return parameter;
+    }
+};
+
 template <typename Parameter>
 Parameter read(const std::string& path, ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
-    if (!node_handle.getParam(path, ros_parameter))
-    {
-        ROS_ERROR("could not get parameter at %s", path.c_str());
-        exit(-1);
+    try
+     {
+        node_handle.getParam(path, ros_parameter);        
+
+        return cast_from_ros<Parameter>(ros_parameter);
     }
-    return cast_from_ros<Parameter>(ros_parameter);
+    catch (XmlRpc::XmlRpcException e)
+    {
+        ROS_ERROR("Could not get parameter at %s because: %s", path.c_str(),
+                  e.getMessage().c_str());
+        throw;
+    }    
 }
 
 
