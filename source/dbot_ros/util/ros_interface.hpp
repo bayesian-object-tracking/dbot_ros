@@ -239,18 +239,14 @@ template <typename Parameter>
 Parameter read(const std::string& path, ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
-    try
-     {
-        node_handle.getParam(path, ros_parameter);        
 
-        return cast_from_ros<Parameter>(ros_parameter);
-    }
-    catch (XmlRpc::XmlRpcException e)
+    if(!node_handle.getParam(path, ros_parameter))
     {
-        ROS_ERROR("Could not get parameter at %s because: %s", path.c_str(),
-                  e.getMessage().c_str());
+        ROS_ERROR_STREAM("Could not read parameter at " << path );
         throw;
-    }    
+    }
+
+    return cast_from_ros<Parameter>(ros_parameter);
 }
 
 
