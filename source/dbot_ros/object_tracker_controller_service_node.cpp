@@ -127,18 +127,18 @@ void marker_callback(const geometry_msgs::PoseArray& poses)
 bool track_object_srv(dbot_ros_msgs::TrackObjectRequest& req,
                       dbot_ros_msgs::TrackObjectResponse& res)
 {
-    if (req.object_name == "stop")
-    {
-        return stop_object_tracker();
-    }
+//    if (req.object_name == "stop")
+//    {
+//       return stop_object_tracker();
+//    }
 
     object_initializer->delete_poses_update_callback();
 
-    // stop tracker first
-    if (!stop_object_tracker())
-    {
-        return false;
-    }
+//    // stop tracker first
+//    if (!stop_object_tracker())
+//    {
+//        return false;
+ //   }
 
     // find new pose
     ros::NodeHandle nh_prv("~");

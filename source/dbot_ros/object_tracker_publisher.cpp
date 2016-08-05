@@ -103,10 +103,11 @@ void ObjectStatePublisher::publish(
 
 
         dbot_ros_msgs::ObjectState object_state_message = states[i];
-        object_state_message.ori.name      = ori_.mesh_uri(i);
+        object_state_message.name = ori_.mesh_without_extension(i);
+        object_state_message.ori.name      = ori_.mesh(i);
         object_state_message.ori.directory = ori_.directory();
         object_state_message.ori.package   = ori_.package();
-        object_state_publisher_.publish(states[i]);
+        object_state_publisher_.publish(object_state_message);
     }
 }
 }
