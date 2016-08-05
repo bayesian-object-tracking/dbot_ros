@@ -115,10 +115,20 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     // We will use a linear observation model built by the object transition
     // model builder. The linear model will generate a random walk.
     dbot::ObjectTransitionBuilder<State>::Parameters params_state;
-    nh.getParam(pre + "object_transition/linear_sigma",
-                params_state.linear_sigma);
-    nh.getParam(pre + "object_transition/angular_sigma",
-                params_state.angular_sigma);
+    // state transition parameters
+    nh.getParam(pre + "object_transition/linear_sigma_x",
+                params_state.linear_sigma_x);
+    nh.getParam(pre + "object_transition/linear_sigma_y",
+                params_state.linear_sigma_y);
+    nh.getParam(pre + "object_transition/linear_sigma_z",
+                params_state.linear_sigma_z);
+
+    nh.getParam(pre + "object_transition/angular_sigma_x",
+                params_state.angular_sigma_x);
+    nh.getParam(pre + "object_transition/angular_sigma_y",
+                params_state.angular_sigma_y);
+    nh.getParam(pre + "object_transition/angular_sigma_z",
+                params_state.angular_sigma_z);
     nh.getParam(pre + "object_transition/velocity_factor",
                 params_state.velocity_factor);
     params_state.part_count = 1;
