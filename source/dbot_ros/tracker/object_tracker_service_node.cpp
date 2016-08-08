@@ -217,10 +217,8 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
         pause_duration.sleep();
         if (ros_object_tracker.run_once())
         {
-            // tracker_publisher.publish(ros_object_tracker.current_pose());
-
             tracker_publisher.publish(
-                                      ros_object_tracker.current_state_messages());
+                ros_object_tracker.current_state_messages());
         }
     }
     ROS_INFO("Tracking terminated.");

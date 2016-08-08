@@ -77,6 +77,7 @@ protected:
     bool obsrv_updated_;
     bool running_;
     State current_state_;
+    double current_time_;
     int object_count_;
     std::vector<geometry_msgs::PoseStamped> current_poses_;
     std::vector<geometry_msgs::PoseStamped> current_velocities_;
