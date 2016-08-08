@@ -2,6 +2,6 @@
 object:
   package:    sab_data
   directory:  object_models
-  meshes:     [ mugbox.obj ]
+  meshes:     [ impact_battery.obj ]
 
 

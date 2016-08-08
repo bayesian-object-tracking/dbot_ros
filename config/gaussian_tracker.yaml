@@ -12,8 +12,12 @@ gaussian_filter:
     alpha: 1.0
 
   object_transition:
-    linear_sigma: 0.002 #0.002
-    angular_sigma: 0.01 #0.01
+    linear_sigma_x: 0.002
+    linear_sigma_y: 0.002
+    linear_sigma_z: 0.002
+    angular_sigma_x: 0.01
+    angular_sigma_y: 0.01
+    angular_sigma_z: 0.01
     velocity_factor: 0.8
 
   observation:

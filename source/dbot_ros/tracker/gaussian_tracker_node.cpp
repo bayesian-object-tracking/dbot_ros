@@ -101,11 +101,21 @@ int main(int argc, char** argv)
     nh.getParam(pre + "observation/uniform_tail_min",
                 params.observation.uniform_tail_min);
 
-    // linear state transition parameters
-    nh.getParam(pre + "object_transition/linear_sigma",
-                params.object_transition.linear_sigma);
-    nh.getParam(pre + "object_transition/angular_sigma",
-                params.object_transition.angular_sigma);
+    // state transition parameters
+    nh.getParam(pre + "object_transition/linear_sigma_x",
+                params.object_transition.linear_sigma_x);
+    nh.getParam(pre + "object_transition/linear_sigma_y",
+                params.object_transition.linear_sigma_y);
+    nh.getParam(pre + "object_transition/linear_sigma_z",
+                params.object_transition.linear_sigma_z);
+
+    nh.getParam(pre + "object_transition/angular_sigma_x",
+                params.object_transition.angular_sigma_x);
+    nh.getParam(pre + "object_transition/angular_sigma_y",
+                params.object_transition.angular_sigma_y);
+    nh.getParam(pre + "object_transition/angular_sigma_z",
+                params.object_transition.angular_sigma_z);
+
     nh.getParam(pre + "object_transition/velocity_factor",
                 params.object_transition.velocity_factor);
     params.object_transition.part_count = object_meshes.size();
