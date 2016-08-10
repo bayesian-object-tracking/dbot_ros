@@ -221,10 +221,9 @@ void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
     (void)subscriber;
 
     ROS_INFO_STREAM("Tracking object " << ori.mesh_without_extension(0));
-    auto pause_duration = ros::Duration(0.001);
     while (ros::ok() && running)
     {
-        pause_duration.sleep();
+        usleep(1000);
         if (ros_object_tracker.run_once())
         {
             tracker_publisher.publish(

@@ -70,8 +70,6 @@ Eigen::Matrix3d RosCameraDataProvider::camera_matrix() const
         camera_matrix_ =
             ri::get_camera_matrix<double>(camera_info_topic_, nh_, timeout_);
         camera_matrix_.topLeftCorner(2, 3) /= downsampling_factor_;
-
-        ros::Duration(0.1).sleep();
     }
 
     return camera_matrix_;
