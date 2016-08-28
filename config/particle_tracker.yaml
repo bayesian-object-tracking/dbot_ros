@@ -21,7 +21,7 @@ particle_filter:
   # State moving average update rate in [0.0; 1.0]
   #   1: unfiltered wiggly estimates.
   #   0: constant
-  moving_average_update_rate: 0.8
+  moving_average_update_rate: 1.0
 
   # Specify whether to center the frame of the object
   center_object_frame: true 
