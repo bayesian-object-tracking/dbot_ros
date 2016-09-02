@@ -30,7 +30,7 @@ particle_filter:
 
   observation:
     occlusion:
-      initial_occlusion_prob: 0.1 #0.1
+      initial_occlusion_prob: 0.25 #0.1
       p_occluded_visible: 0.1 #0.1
       p_occluded_occluded: 0.7 #0.7
     kinect:
