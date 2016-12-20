@@ -1,5 +1,5 @@
-depth_image_topic: /XTION/depth/image 
-camera_info_topic: /XTION/depth/camera_info 
+depth_image_topic: /camera/depth/image
+camera_info_topic: /camera/depth/camera_info
 downsampling_factor: 8
 
 resolution:
