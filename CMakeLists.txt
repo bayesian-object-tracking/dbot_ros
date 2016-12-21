@@ -122,7 +122,7 @@ add_library(${PROJECT_NAME}
   ${dbot_ros_SOURCES})
 
 add_dependencies(${PROJECT_NAME}
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -131,7 +131,7 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(particle_tracker
   source/${PROJECT_NAME}/tracker/particle_tracker_node.cpp)
 add_dependencies(particle_tracker
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(particle_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -142,7 +142,7 @@ target_link_libraries(particle_tracker
 add_executable(gaussian_tracker
   source/${PROJECT_NAME}/tracker/gaussian_tracker_node.cpp)
 add_dependencies(gaussian_tracker
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(gaussian_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -153,7 +153,7 @@ target_link_libraries(gaussian_tracker
 add_executable(object_tracker_service
   source/${PROJECT_NAME}/tracker/object_tracker_service_node.cpp)
 add_dependencies(object_tracker_service
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(object_tracker_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -164,7 +164,7 @@ target_link_libraries(object_tracker_service
 add_executable(object_tracker_controller_service
   source/${PROJECT_NAME}/object_tracker_controller_service_node.cpp)
 add_dependencies(object_tracker_controller_service
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(object_tracker_controller_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
