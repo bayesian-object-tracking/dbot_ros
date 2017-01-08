@@ -238,8 +238,10 @@ int main(int argc, char** argv)
     auto object_finder_service_name = ri::read<std::string>(
                 "object_finder_service_name", nh_prv);
 
+    auto camera_info_topic = ri::read<std::string>("camera_info_topic", nh_prv);
+
     auto camera_frame =
-        ri::get_camera_frame("/XTION/depth/camera_info", nh, 5.);
+        ri::get_camera_frame(camera_info_topic, nh, 5.);
 
     if (camera_frame.empty())
     {
