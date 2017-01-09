@@ -1,6 +1,6 @@
 
 particle_filter:
-  use_gpu: true 
+  use_gpu: false
 
   cpu:
     sample_count: 100
