@@ -45,9 +45,9 @@ find_package(catkin REQUIRED
   rosbag
   image_transport
   fl
-  opi
   dbot
   dbot_ros_msgs
+  interactive_markers
   )
 
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -89,10 +89,9 @@ catkin_package(
     message_filters
     image_transport
     fl
-    opi
-    osr
     dbot
     dbot_ros_msgs
+    interactive_markers
   DEPENDS
     OpenCV
     eigen)
@@ -115,7 +114,8 @@ set(dbot_ros_SOURCES
     source/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
     source/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
     source/${PROJECT_NAME}/util/ros_interface.cpp
-    source/${PROJECT_NAME}/util/tracking_dataset.cpp)
+    source/${PROJECT_NAME}/util/tracking_dataset.cpp
+    source/${PROJECT_NAME}/util/interactive_marker_initializer.cpp)
 
 add_library(${PROJECT_NAME}
   ${dbot_ros_HEADERS}
@@ -171,4 +171,12 @@ target_link_libraries(object_tracker_controller_service
   ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
+
+add_executable(
+  interactive_markers_initializer_node
+  source/${PROJECT_NAME}/interactive_markers_initializer_node_main.cpp)
+target_link_libraries(
+  interactive_markers_initializer_node
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES})
 
