@@ -18,15 +18,11 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
-#include <fstream>
-
 #include <boost/filesystem.hpp>
-
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
+#include <fstream>
 #include <ros/assert.h>
-
-#include <opi/interactive_marker_initializer.hpp>
-
-#include <osr/free_floating_rigid_bodies_state.hpp>
 
 namespace opi
 {
@@ -75,7 +71,7 @@ void InteractiveMarkerInitializer::set_objects(
     bool load_from_cache,
     bool make_active)
 {
-    poses_ = poses;
+    poses_           = poses;
     load_from_cache_ = load_from_cache;
 
     server_.clear();
@@ -178,8 +174,8 @@ const geometry_msgs::PoseArray InteractiveMarkerInitializer::pose_array()
 {
     geometry_msgs::PoseArray pose_array_msg;
     pose_array_msg.header.frame_id = camera_frame_id_;
-    pose_array_msg.header.stamp = ros::Time::now();
-    pose_array_msg.poses = poses();
+    pose_array_msg.header.stamp    = ros::Time::now();
+    pose_array_msg.poses           = poses();
 
     return pose_array_msg;
 }
@@ -191,10 +187,10 @@ void InteractiveMarkerInitializer::create_interactive_marker(
     visualization_msgs::InteractiveMarker& int_marker)
 {
     int_marker.header.frame_id = frame_id;
-    int_marker.header.stamp = ros::Time::now();
-    int_marker.name = name;
-    int_marker.description = description;
-    int_marker.scale = 0.2;
+    int_marker.header.stamp    = ros::Time::now();
+    int_marker.name            = name;
+    int_marker.description     = description;
+    int_marker.scale           = 0.2;
     // position interactive marker by default 1 m in font
     // of camera in viewing condition
     int_marker.pose.position.x = 0.0;
@@ -223,21 +219,21 @@ void InteractiveMarkerInitializer::add_object_controller(
 
     // create a grey box marker
     visualization_msgs::Marker object_marker;
-    object_marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+    object_marker.type          = visualization_msgs::Marker::MESH_RESOURCE;
     object_marker.mesh_resource = object_model_path.string();
-    object_marker.scale.x = 1.0;
-    object_marker.scale.y = 1.0;
-    object_marker.scale.z = 1.0;
-    object_marker.color.r = 0.5;
-    object_marker.color.g = 0.5;
-    object_marker.color.b = 0.5;
-    object_marker.color.a = 1.0;
+    object_marker.scale.x       = 1.0;
+    object_marker.scale.y       = 1.0;
+    object_marker.scale.z       = 1.0;
+    object_marker.color.r       = 0.5;
+    object_marker.color.g       = 0.5;
+    object_marker.color.b       = 0.5;
+    object_marker.color.a       = 1.0;
 
     // create a non-interactive control which contains the object
     visualization_msgs::InteractiveMarkerControl object_control;
     object_control.interaction_mode =
         visualization_msgs::InteractiveMarkerControl::BUTTON;
-    object_control.name = "button_control";
+    object_control.name           = "button_control";
     object_control.always_visible = true;
     object_control.markers.push_back(object_marker);
 
@@ -253,7 +249,7 @@ void InteractiveMarkerInitializer::add_controllers(
     control.orientation.x = 1;
     control.orientation.y = 0;
     control.orientation.z = 0;
-    control.name = "rotate_x";
+    control.name          = "rotate_x";
     control.interaction_mode =
         visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -266,7 +262,7 @@ void InteractiveMarkerInitializer::add_controllers(
     control.orientation.x = 0;
     control.orientation.y = 1;
     control.orientation.z = 0;
-    control.name = "rotate_z";
+    control.name          = "rotate_z";
     control.interaction_mode =
         visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -279,7 +275,7 @@ void InteractiveMarkerInitializer::add_controllers(
     control.orientation.x = 0;
     control.orientation.y = 0;
     control.orientation.z = 1;
-    control.name = "rotate_y";
+    control.name          = "rotate_y";
     control.interaction_mode =
         visualization_msgs::InteractiveMarkerControl::ROTATE_AXIS;
     int_marker.controls.push_back(control);
@@ -305,7 +301,7 @@ void InteractiveMarkerInitializer::process_feedback(
     {
         geometry_msgs::PoseStamped pose_in;
         pose_in.header = feedback->header;
-        pose_in.pose = feedback->pose;
+        pose_in.pose   = feedback->pose;
         geometry_msgs::PoseStamped pose_out;
         try
         {
@@ -354,8 +350,7 @@ void InteractiveMarkerInitializer::process_feedback(
 }
 
 void InteractiveMarkerInitializer::switch_marker(
-    visualization_msgs::InteractiveMarker& int_marker,
-    bool active)
+    visualization_msgs::InteractiveMarker& int_marker, bool active)
 {
     if (active)
     {
@@ -374,8 +369,7 @@ void InteractiveMarkerInitializer::switch_marker(
 }
 
 void InteractiveMarkerInitializer::load_pose_from_cache(
-    const std::string& object_name,
-    geometry_msgs::Pose& pose) const
+    const std::string& object_name, geometry_msgs::Pose& pose) const
 {
     std::ifstream pose_tmp_file;
     std::string cache_file = "/tmp/pose_cache_";
@@ -398,8 +392,7 @@ void InteractiveMarkerInitializer::load_pose_from_cache(
 }
 
 void InteractiveMarkerInitializer::cache_pose(
-    const std::string& object_name,
-    const geometry_msgs::Pose& pose) const
+    const std::string& object_name, const geometry_msgs::Pose& pose) const
 {
     std::ofstream pose_tmp_file;
     std::string cache_file = "/tmp/pose_cache_";

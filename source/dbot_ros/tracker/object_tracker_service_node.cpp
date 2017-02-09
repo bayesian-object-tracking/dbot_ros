@@ -18,29 +18,23 @@
  */
 
 #include <Eigen/Dense>
-
-#include <fstream>
 #include <ctime>
-#include <memory>
-#include <thread>
-
-#include <ros/ros.h>
-#include <ros/package.h>
-
-#include <fl/util/profiling.hpp>
-
-#include <opi/interactive_marker_initializer.hpp>
-#include <osr/free_floating_rigid_bodies_state.hpp>
-
+#include <dbot/builder/particle_tracker_builder.hpp>
 #include <dbot/camera_data.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
 #include <dbot/simple_wavefront_object_loader.hpp>
 #include <dbot/tracker/particle_tracker.hpp>
-#include <dbot/builder/particle_tracker_builder.hpp>
-
-#include <dbot_ros/object_tracker_ros.h>
 #include <dbot_ros/object_tracker_publisher.h>
-#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros/object_tracker_ros.h>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
 #include <dbot_ros/util/ros_camera_data_provider.hpp>
+#include <dbot_ros/util/ros_interface.hpp>
+#include <fl/util/profiling.hpp>
+#include <fstream>
+#include <memory>
+#include <ros/package.h>
+#include <ros/ros.h>
+#include <thread>
 
 #include <dbot_ros_msgs/RunObjectTracker.h>
 
@@ -49,7 +43,7 @@ static std::thread tracker_thread;
 
 void run(dbot::ObjectResourceIdentifier ori, osr::PoseVelocityVector pose)
 {
-    ros::NodeHandle nh("~");
+  ros::NodeHandle nh("~");
 
     // parameter shorthand prefix
     std::string pre = "particle_filter/";
@@ -246,22 +240,20 @@ bool run_object_tracker_srv(dbot_ros_msgs::RunObjectTrackerRequest& req,
     ROS_INFO("Setup new object to track");
     running = true;
 
-    tracker_thread = std::thread(
-        [          =]()
+    tracker_thread = std::thread([=]() {
+        try
         {
-            try
-            {
-                run(dbot::ObjectResourceIdentifier(
-                        ros::package::getPath(req.object_state.ori.package),
-                        req.object_state.ori.directory,
-                        {req.object_state.ori.name}),
-                    ri::to_pose_velocity_vector(req.object_state.pose.pose));
-            }
-            catch (std::exception& e)
-            {
-                ROS_ERROR("%s", e.what());
-            }
-        });
+            run(dbot::ObjectResourceIdentifier(
+                    ros::package::getPath(req.object_state.ori.package),
+                    req.object_state.ori.directory,
+                    {req.object_state.ori.name}),
+                ri::to_pose_velocity_vector(req.object_state.pose.pose));
+        }
+        catch (std::exception& e)
+        {
+            ROS_ERROR("%s", e.what());
+        }
+    });
 
     return true;
 }

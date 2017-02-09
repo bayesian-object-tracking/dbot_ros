@@ -28,7 +28,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 
-#include <opi/interactive_marker_initializer.hpp>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
 
 static ros::Publisher pose_publisher;
 
