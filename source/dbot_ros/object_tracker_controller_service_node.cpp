@@ -29,8 +29,8 @@
 
 #include <fl/util/profiling.hpp>
 
-#include <opi/interactive_marker_initializer.hpp>
-#include <osr/free_floating_rigid_bodies_state.hpp>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
 
 #include <dbot/camera_data.hpp>
 #include <dbot/simple_wavefront_object_loader.hpp>

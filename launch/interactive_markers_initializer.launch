@@ -1,0 +1,30 @@
+<launch>
+  <arg name="topic_name" default="object_initial_poses" />
+  <arg name="camera_frame_id" default="/XTION_IR" />
+  <arg name="object_name" default="sphere130_smaller" />
+  <arg name="object_directory" default="object" />
+  <arg name="object_package" default="rmsgf_tracking_ros_pkg" />
+
+  <node pkg="opi" 
+        type="interactive_markers_initializer_node" 
+        name="interactive_markers_initializer"         
+        output="screen" 
+        respawn="false">
+
+    <param name="topic_name" type="string" value="$(arg topic_name)" />
+    <param name="camera_frame_id" type="string" value="$(arg camera_frame_id)" />
+    <rosparam param="object_names" subst_value="True">
+      [
+        $(arg object_name),
+        $(arg object_name),
+        $(arg object_name),
+        $(arg object_name),
+        $(arg object_name)
+      ]
+    </rosparam>
+    <param name="object_directory" type="string" value="$(arg object_directory)" />
+    <param name="object_package" type="string" value="$(arg object_package)" />
+
+  </node>
+</launch>
+

@@ -18,28 +18,22 @@
  */
 
 #include <Eigen/Dense>
-
-#include <fstream>
 #include <ctime>
-#include <memory>
-
-#include <ros/ros.h>
-#include <ros/package.h>
-
-#include <fl/util/profiling.hpp>
-
-#include <opi/interactive_marker_initializer.hpp>
-#include <osr/free_floating_rigid_bodies_state.hpp>
-#include <dbot/camera_data.hpp>
-#include <dbot/tracker/gaussian_tracker.hpp>
 #include <dbot/builder/gaussian_tracker_builder.hpp>
-
-#include <dbot_ros_msgs/ObjectState.h>
-
-#include <dbot_ros/object_tracker_ros.h>
+#include <dbot/camera_data.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
+#include <dbot/tracker/gaussian_tracker.hpp>
 #include <dbot_ros/object_tracker_publisher.h>
-#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros/object_tracker_ros.h>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
 #include <dbot_ros/util/ros_camera_data_provider.hpp>
+#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros_msgs/ObjectState.h>
+#include <fl/util/profiling.hpp>
+#include <fstream>
+#include <memory>
+#include <ros/package.h>
+#include <ros/ros.h>
 
 typedef dbot::GaussianTracker Tracker;
 
@@ -171,8 +165,7 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     /* - Create the tracker         - */
     /* ------------------------------ */
-    auto tracker_builder =
-        dbot::GaussianTrackerBuilder(params, camera_data);
+    auto tracker_builder = dbot::GaussianTrackerBuilder(params, camera_data);
 
     auto tracker = tracker_builder.build();
     tracker->initialize(initial_poses);
@@ -191,15 +184,14 @@ int main(int argc, char** argv)
     /* - Create and run tracker     - */
     /* - node                       - */
     /* ------------------------------ */
-    dbot::ObjectTrackerRos<dbot::GaussianTracker>
-        ros_object_tracker(tracker, camera_data, params.ori.count_meshes());
+    dbot::ObjectTrackerRos<dbot::GaussianTracker> ros_object_tracker(
+        tracker, camera_data, params.ori.count_meshes());
 
-    ros::Subscriber subscriber =
-        nh.subscribe(depth_image_topic,
-                     1,
-                     &dbot::ObjectTrackerRos<
-                         dbot::GaussianTracker>::update_obsrv,
-                     &ros_object_tracker);
+    ros::Subscriber subscriber = nh.subscribe(
+        depth_image_topic,
+        1,
+        &dbot::ObjectTrackerRos<dbot::GaussianTracker>::update_obsrv,
+        &ros_object_tracker);
 
     while (ros::ok())
     {

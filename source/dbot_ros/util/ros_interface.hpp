@@ -45,8 +45,8 @@
 
 #include <sensor_msgs/Image.h>
 
-#include <osr/pose_vector.hpp>
-#include <osr/pose_velocity_vector.hpp>
+#include <dbot/pose/pose_vector.hpp>
+#include <dbot/pose/pose_velocity_vector.hpp>
 
 #include <XmlRpcException.h>
 
