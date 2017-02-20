@@ -45,9 +45,9 @@ find_package(catkin REQUIRED
   rosbag
   image_transport
   fl
-  opi
   dbot
   dbot_ros_msgs
+  interactive_markers
   )
 
 set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -89,10 +89,9 @@ catkin_package(
     message_filters
     image_transport
     fl
-    opi
-    osr
     dbot
     dbot_ros_msgs
+    interactive_markers
   DEPENDS
     OpenCV
     eigen)
@@ -115,14 +114,15 @@ set(dbot_ros_SOURCES
     source/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
     source/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
     source/${PROJECT_NAME}/util/ros_interface.cpp
-    source/${PROJECT_NAME}/util/tracking_dataset.cpp)
+    source/${PROJECT_NAME}/util/tracking_dataset.cpp
+    source/${PROJECT_NAME}/util/interactive_marker_initializer.cpp)
 
 add_library(${PROJECT_NAME}
   ${dbot_ros_HEADERS}
   ${dbot_ros_SOURCES})
 
 add_dependencies(${PROJECT_NAME}
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -131,7 +131,7 @@ target_link_libraries(${PROJECT_NAME}
 add_executable(particle_tracker
   source/${PROJECT_NAME}/tracker/particle_tracker_node.cpp)
 add_dependencies(particle_tracker
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(particle_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -142,7 +142,7 @@ target_link_libraries(particle_tracker
 add_executable(gaussian_tracker
   source/${PROJECT_NAME}/tracker/gaussian_tracker_node.cpp)
 add_dependencies(gaussian_tracker
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(gaussian_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -153,7 +153,7 @@ target_link_libraries(gaussian_tracker
 add_executable(object_tracker_service
   source/${PROJECT_NAME}/tracker/object_tracker_service_node.cpp)
 add_dependencies(object_tracker_service
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(object_tracker_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
@@ -164,11 +164,19 @@ target_link_libraries(object_tracker_service
 add_executable(object_tracker_controller_service
   source/${PROJECT_NAME}/object_tracker_controller_service_node.cpp)
 add_dependencies(object_tracker_controller_service
-  dbot_ros_generate_messages_cpp)
+  dbot_ros_msgs_generate_messages_cpp)
 target_link_libraries(object_tracker_controller_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
+
+add_executable(
+  interactive_markers_initializer_node
+  source/${PROJECT_NAME}/interactive_markers_initializer_node_main.cpp)
+target_link_libraries(
+  interactive_markers_initializer_node
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES})
 

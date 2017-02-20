@@ -19,10 +19,10 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
-#include <osr/euler_vector.hpp>
-#include <osr/pose_velocity_vector.hpp>
-#include <osr/pose_vector.hpp>
-#include <osr/free_floating_rigid_bodies_state.hpp>
+#include <dbot/pose/euler_vector.hpp>
+#include <dbot/pose/pose_velocity_vector.hpp>
+#include <dbot/pose/pose_vector.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
 #include <dbot_ros/util/ros_interface.hpp>
 #include <dbot_ros/object_tracker_publisher.h>
 

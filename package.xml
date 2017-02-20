@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <package>
   <name>dbot_ros</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>The dbot_ros package</description>
 
   <maintainer email="jan.issac@gmail.com">Jan Issac</maintainer>
 
-  <license>BSD</license>
+  <license>GNU GPL</license>
 
-  <url type="website">http://github.com/jan-issac/dbot_ros</url>
+  <url type="website">https://github.com/bayesian-object-tracking/dbot_ros</url>
 
   <author email="jan.issac@gmail.com">Jan Issac</author>
   <author email="manuel.wuthrich@gmail.com">Manuel Wuthrich</author>
@@ -25,11 +25,9 @@
   <build_depend>message_filters</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>fl</build_depend>
-  <build_depend>opi</build_depend>
-  <build_depend>osr</build_depend>
   <build_depend>dbot</build_depend>
   <build_depend>dbot_ros_msgs</build_depend>
-
+  <build_depend>interactive_markers</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>roslib</run_depend>
@@ -40,10 +38,9 @@
   <run_depend>message_filters</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>fl</run_depend>
-  <run_depend>opi</run_depend>
-  <run_depend>osr</run_depend>
   <run_depend>dbot</run_depend>
   <run_depend>dbot_ros_msgs</run_depend>
+  <run_depend>interactive_markers</run_depend>
 
   <export>
     <!-- <metapackage/> -->

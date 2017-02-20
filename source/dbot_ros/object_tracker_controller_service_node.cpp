@@ -29,8 +29,8 @@
 
 #include <fl/util/profiling.hpp>
 
-#include <opi/interactive_marker_initializer.hpp>
-#include <osr/free_floating_rigid_bodies_state.hpp>
+#include <dbot_ros/util/interactive_marker_initializer.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
 
 #include <dbot/camera_data.hpp>
 #include <dbot/simple_wavefront_object_loader.hpp>
@@ -238,8 +238,10 @@ int main(int argc, char** argv)
     auto object_finder_service_name = ri::read<std::string>(
                 "object_finder_service_name", nh_prv);
 
+    auto camera_info_topic = ri::read<std::string>("camera_info_topic", nh_prv);
+
     auto camera_frame =
-        ri::get_camera_frame("/XTION/depth/camera_info", nh, 5.);
+        ri::get_camera_frame(camera_info_topic, nh, 5.);
 
     if (camera_frame.empty())
     {
