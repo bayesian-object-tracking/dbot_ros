@@ -7,8 +7,7 @@ All trackers require object mesh models in Wavefront (.obj) format.
  * MS Kinect or Asus XTION depth sensor
  * Ubuntu 14.04
  * Tested with [ROS Indigo](http://wiki.ros.org/indigo)
- * C++0x Compiler (gcc-4.6 or later)
- * C++11 Compiler (gcc-4.7 or later)
+ * c++11 Compiler (gcc-4.7 or later)
  * [CUDA](https://developer.nvidia.com/cuda-downloads) 6.5 or later (optional)
  
 ## Dependecies
