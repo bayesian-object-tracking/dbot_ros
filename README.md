@@ -4,16 +4,15 @@ This package extends the [dbot](https://github.com/bayesian-object-tracking/dbot
 All trackers require object mesh models in Wavefront (.obj) format.
 
 # Requirements
- * Kinect or XTION depth sensor
- * Ubuntu 12.04
- * C++0x or C++11 Compiler (gcc-4.6 or later)
+ * MS Kinect or Asus XTION depth sensor
+ * Ubuntu 14.04
+ * Tested with [ROS Indigo](http://wiki.ros.org/indigo)
+ * c++11 Compiler (gcc-4.7 or later)
  * [CUDA](https://developer.nvidia.com/cuda-downloads) 6.5 or later (optional)
  
 ## Dependecies
  * [dbot](https://github.com/bayesian-object-tracking/dbot)
  * [dbot_ros_msgs](https://github.com/bayesian-object-tracking/dbot_ros_msgs)
- * [opi](https://github.com/bayesian-object-tracking/opi)
- * [osr](https://github.com/bayesian-object-tracking/osr)
  * [Filtering library](https://github.com/filtering-library/fl) (fl)
  * [Eigen](http://eigen.tuxfamily.org/) 3.2.1 or later
  
@@ -26,8 +25,6 @@ $ cd projects/tracking/src
 $ git clone git@github.com:filtering-library/fl.git
 $ git clone git@github.com:bayesian-object-tracking/dbot.git
 $ git clone git@github.com:bayesian-object-tracking/dbot_ros_msgs.git
-$ git clone git@github.com:bayesian-object-tracking/opi.git
-$ git clone git@github.com:bayesian-object-tracking/osr.git
 $ git clone git@github.com:bayesian-object-tracking/dbot_ros.git
 $ cd ..
 $ catkin_make -DCMAKE_BUILD_TYPE=Release -DDBOT_BUILD_GPU=On
@@ -53,8 +50,8 @@ $ ... gaussian_tracker.yaml
 ## Camera configuration (camera.yaml)
 The camera configuration file camera.yaml contains the ros depth image topic and camera info topic names
 ```yaml
-depth_image_topic: /XTION/depth/image
-camera_info_topic: /XTION/depth/camera_info 
+depth_image_topic: /camera/depth/image
+camera_info_topic: /camera/depth/camera_info 
 ```
 Adjust the topic names if needed.
 
