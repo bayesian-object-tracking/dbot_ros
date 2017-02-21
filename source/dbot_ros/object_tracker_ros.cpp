@@ -17,15 +17,13 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
+#include <dbot/tracker/gaussian_tracker.h>
+#include <dbot/tracker/particle_tracker.h>
 #include <dbot_ros/object_tracker_ros.h>
 #include <dbot_ros/object_tracker_ros.hpp>
-#include <dbot/tracker/particle_tracker.hpp>
-#include <dbot/tracker/gaussian_tracker.hpp>
 
 namespace dbot
 {
-
 template class ObjectTrackerRos<ParticleTracker>;
 template class ObjectTrackerRos<GaussianTracker>;
-
 }

@@ -19,16 +19,14 @@
 
 #pragma once
 
-#include <vector>
-
-#include <ros/ros.h>
-
-#include <sensor_msgs/Image.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <dbot/camera_data.h>
+#include <dbot/object_model.h>
+#include <dbot/object_resource_identifier.h>
 #include <dbot_ros_msgs/ObjectState.h>
-#include <dbot/camera_data.hpp>
-#include <dbot/object_model.hpp>
-#include <dbot/object_resource_identifier.hpp>
+#include <geometry_msgs/PoseStamped.h>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <vector>
 
 namespace dbot
 {
@@ -40,13 +38,11 @@ class ObjectStatePublisher
 {
 public:
     ObjectStatePublisher(const dbot::ObjectResourceIdentifier& ori,
-                           int object_color_red,
-                           int object_color_green,
-                           int object_color_blue);
+                         int object_color_red,
+                         int object_color_green,
+                         int object_color_blue);
 
-    void publish(const geometry_msgs::PoseStamped& pose);
     void publish(const std::vector<dbot_ros_msgs::ObjectState>& state);
-    void publish(const std::vector<geometry_msgs::PoseStamped>& poses);
 
 protected:
     ros::NodeHandle node_handle_;

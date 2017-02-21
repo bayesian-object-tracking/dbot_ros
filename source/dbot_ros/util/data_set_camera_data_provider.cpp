@@ -12,26 +12,25 @@
  */
 
 /**
- * \file data_set_camera_data_provider.hpp
+ * \file data_set_camera_data_provider.h
  * \author Jan Issc (jan.issac@gmail.com)
  * \date January 2016
  */
 
-#include <sensor_msgs/Image.h>
+#include <dbot_ros/util/data_set_camera_data_provider.h>
+#include <dbot_ros/util/ros_interface.h>
 #include <fl/util/profiling.hpp>
-#include <dbot_ros/util/ros_interface.hpp>
-#include <dbot_ros/util/data_set_camera_data_provider.hpp>
+#include <sensor_msgs/Image.h>
 
 namespace dbot
 {
 DataSetCameraDataProvider::DataSetCameraDataProvider(
-    const std::shared_ptr<TrackingDataset> data_set,
-    int downsampling_factor)
+    const std::shared_ptr<TrackingDataset> data_set, int downsampling_factor)
     : data_set_(data_set), downsampling_factor_(downsampling_factor)
 {
-    auto ros_image = data_set_->GetImage(0);
+    auto ros_image            = data_set_->GetImage(0);
     native_resolution_.height = ros_image->height;
-    native_resolution_.width = ros_image->width;
+    native_resolution_.width  = ros_image->width;
 }
 
 Eigen::MatrixXd DataSetCameraDataProvider::depth_image() const

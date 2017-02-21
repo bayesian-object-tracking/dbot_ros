@@ -19,11 +19,9 @@
 
 #pragma once
 
-#include <fl/util/profiling.hpp>
-
 #include <dbot_ros/object_tracker_ros.h>
-
-#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros/util/ros_interface.h>
+#include <fl/util/profiling.hpp>
 
 namespace dbot
 {
@@ -50,19 +48,18 @@ void ObjectTrackerRos<Tracker>::track(const sensor_msgs::Image& ros_image)
     current_velocities_.clear();
     current_state_ = tracker_->track(image);
     geometry_msgs::PoseStamped current_pose;
-    geometry_msgs::PoseStamped current_velocity;
+    geometry_msgs::TwistStamped current_velocity;
     for (int i = 0; i < object_count_; ++i)
     {
         current_pose.pose = ri::to_ros_pose(current_state_.component(i));
         current_pose.header.stamp    = ros_image.header.stamp;
         current_pose.header.frame_id = ros_image.header.frame_id;
-
         current_poses_.push_back(current_pose);
 
-        current_velocity.pose = ri::to_ros_velocity(current_state_.component(i));
+        current_velocity.twist =
+            ri::to_ros_velocity(current_state_.component(i));
         current_velocity.header.stamp    = ros_image.header.stamp;
         current_velocity.header.frame_id = ros_image.header.frame_id;
-
         current_velocities_.push_back(current_velocity);
     }
 }
@@ -74,11 +71,12 @@ void ObjectTrackerRos<Tracker>::update_obsrv(
 {
     std::lock_guard<std::mutex> lock_obsrv(obsrv_mutex_);
 
-    if(obsrv_updated_)
+    if (obsrv_updated_)
     {
-        ROS_INFO("An Image has been skipped because update was too slow!"
-                 " Consider reducing cost of update, e.g. by reducing number"
-                 " of particles");
+        ROS_INFO(
+            "An Image has been skipped because update was too slow!"
+            " Consider reducing cost of update, e.g. by reducing number"
+            " of particles");
     }
 
     current_ros_image_ = ros_image;
@@ -149,7 +147,7 @@ auto ObjectTrackerRos<Tracker>::current_state_messages() const
     for (int i = 0; i < current_poses_.size(); ++i)
     {
         dbot_ros_msgs::ObjectState object_state_message;
-        object_state_message.pose = current_poses_[i];
+        object_state_message.pose     = current_poses_[i];
         object_state_message.velocity = current_velocities_[i];
         state_messages.push_back(object_state_message);
     }

@@ -19,15 +19,15 @@
 
 #include <Eigen/Dense>
 #include <ctime>
-#include <dbot/builder/gaussian_tracker_builder.hpp>
-#include <dbot/camera_data.hpp>
-#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
-#include <dbot/tracker/gaussian_tracker.hpp>
+#include <dbot/builder/gaussian_tracker_builder.h>
+#include <dbot/camera_data.h>
+#include <dbot/pose/free_floating_rigid_bodies_state.h>
+#include <dbot/tracker/gaussian_tracker.h>
 #include <dbot_ros/object_tracker_publisher.h>
 #include <dbot_ros/object_tracker_ros.h>
-#include <dbot_ros/util/interactive_marker_initializer.hpp>
-#include <dbot_ros/util/ros_camera_data_provider.hpp>
-#include <dbot_ros/util/ros_interface.hpp>
+#include <dbot_ros/util/interactive_marker_initializer.h>
+#include <dbot_ros/util/ros_camera_data_provider.h>
+#include <dbot_ros/util/ros_interface.h>
 #include <dbot_ros_msgs/ObjectState.h>
 #include <fl/util/profiling.hpp>
 #include <fstream>

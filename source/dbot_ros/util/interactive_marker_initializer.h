@@ -12,7 +12,7 @@
  */
 
 /**
- * \file interactive_markers_initializer.hpp
+ * \file interactive_markers_initializer.h
  * \date October 2015
  * \author Jeannette Bohg (bohg.jeannette@googlemail.com)
  * \author Jan Issac (jan.issac@gmail.com)
@@ -20,16 +20,13 @@
 
 #pragma once
 
-#include <mutex>
-
 #include <Eigen/Dense>
-
-#include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
-#include <tf/transform_listener.h>
-
 #include <interactive_markers/interactive_marker_server.h>
+#include <mutex>
+#include <ros/ros.h>
+#include <tf/transform_listener.h>
 
 namespace opi
 {
@@ -111,7 +108,8 @@ public:
      */
     void poses_update_callback(Callback callback);
 
-    void switch_marker(visualization_msgs::InteractiveMarker &int_marker, bool active);
+    void switch_marker(visualization_msgs::InteractiveMarker& int_marker,
+                       bool active);
 
     void delete_poses_update_callback();
 
