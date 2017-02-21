@@ -12,64 +12,53 @@
  */
 
 /**
- * \file ros_interface.hpp
+ * \file ros_interface.h
  * \author Manuel Wuthrich (manuel.wuthrich@gmail.com)
  */
 
 #pragma once
 
-#include <string>
-#include <limits>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-
-#include <ros/ros.h>
-#include <std_msgs/Header.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <visualization_msgs/Marker.h>
-#include <sensor_msgs/CameraInfo.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/TwistStamped.h>
+#include <limits>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <std_msgs/Header.h>
+#include <string>
+#include <visualization_msgs/Marker.h>
 
-//#include <pcl/ros/conversions.h>
-//#include <pcl/point_cloud.h>
-//#include <pcl/point_types.h>
-
-//#include <cv.h>
-
-// to avoid stupid typedef conflict
+// to avoid typedef conflict
 #define uint64 enchiladisima
 #include <cv_bridge/cv_bridge.h>
 #undef uint64
 
-#include <sensor_msgs/Image.h>
-
-#include <dbot/pose/pose_vector.hpp>
-#include <dbot/pose/pose_velocity_vector.hpp>
-
 #include <XmlRpcException.h>
+#include <dbot/pose/pose_vector.h>
+#include <dbot/pose/pose_velocity_vector.h>
+#include <sensor_msgs/Image.h>
 
 namespace ri
 {
-/// conversions between ros and internal types *********************************
-
 /**
- * \brief Converts a ros pose message to osr::PoseVector
+ * \brief Converts a ros pose message to dbot::PoseVector
  */
-inline osr::PoseVector to_pose_vector(const geometry_msgs::Pose& ros_pose)
+inline dbot::PoseVector to_pose_vector(const geometry_msgs::Pose& ros_pose)
 {
     Eigen::Vector3d p;
     Eigen::Quaternion<double> q;
-    p[0] = ros_pose.position.x;
-    p[1] = ros_pose.position.y;
-    p[2] = ros_pose.position.z;
+    p[0]  = ros_pose.position.x;
+    p[1]  = ros_pose.position.y;
+    p[2]  = ros_pose.position.z;
     q.w() = ros_pose.orientation.w;
     q.x() = ros_pose.orientation.x;
     q.y() = ros_pose.orientation.y;
     q.z() = ros_pose.orientation.z;
 
-    osr::PoseVector pose;
+    dbot::PoseVector pose;
     pose.position() = p;
     pose.orientation().quaternion(q);
 
@@ -77,29 +66,30 @@ inline osr::PoseVector to_pose_vector(const geometry_msgs::Pose& ros_pose)
 }
 
 /**
- * \brief Converts a ros pose message to osr::PoseVelocityVector
+ * \brief Converts a ros pose message to dbot::PoseVelocityVector
  */
-inline osr::PoseVelocityVector to_pose_velocity_vector(
+inline dbot::PoseVelocityVector to_pose_velocity_vector(
     const geometry_msgs::Pose& ros_pose)
 {
     Eigen::Vector3d p;
     Eigen::Quaternion<double> q;
-    p[0] = ros_pose.position.x;
-    p[1] = ros_pose.position.y;
-    p[2] = ros_pose.position.z;
+    p[0]  = ros_pose.position.x;
+    p[1]  = ros_pose.position.y;
+    p[2]  = ros_pose.position.z;
     q.w() = ros_pose.orientation.w;
     q.x() = ros_pose.orientation.x;
     q.y() = ros_pose.orientation.y;
     q.z() = ros_pose.orientation.z;
 
-    osr::PoseVelocityVector pose;
+    dbot::PoseVelocityVector pose;
     pose.position() = p;
     pose.orientation().quaternion(q);
 
     return pose;
 }
 
-inline geometry_msgs::Pose to_ros_pose(const osr::PoseVelocityVector& pose_vector)
+inline geometry_msgs::Pose to_ros_pose(
+    const dbot::PoseVelocityVector& pose_vector)
 {
     auto p = pose_vector.position();
     auto q = pose_vector.orientation().quaternion();
@@ -116,38 +106,27 @@ inline geometry_msgs::Pose to_ros_pose(const osr::PoseVelocityVector& pose_vecto
     return ros_pose;
 }
 
-inline geometry_msgs::Pose to_ros_velocity(const osr::PoseVelocityVector& pose_vector)
+inline geometry_msgs::Twist to_ros_velocity(
+    const dbot::PoseVelocityVector& pose_vector)
 {
-    /// \todo this format is not appropriate for velocities, it should be a
-    /// type called twist. using a pose to represent a velocity is error prone
+    auto v = pose_vector.linear_velocity();
+    auto w = pose_vector.angular_velocity();
 
-    auto p = pose_vector.linear_velocity();
-    osr::EulerVector euler_vector = pose_vector.angular_velocity();
-    auto q = euler_vector.quaternion();
-
-    geometry_msgs::Pose ros_velocity;
-    ros_velocity.position.x    = p[0];
-    ros_velocity.position.y    = p[1];
-    ros_velocity.position.z    = p[2];
-    ros_velocity.orientation.w = q.w();
-    ros_velocity.orientation.x = q.x();
-    ros_velocity.orientation.y = q.y();
-    ros_velocity.orientation.z = q.z();
+    geometry_msgs::Twist ros_velocity;
+    ros_velocity.linear.x  = v[0];
+    ros_velocity.linear.y  = v[1];
+    ros_velocity.linear.z  = v[2];
+    ros_velocity.angular.x = w[0];
+    ros_velocity.angular.y = w[1];
+    ros_velocity.angular.z = w[2];
 
     return ros_velocity;
 }
 
-// inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix4d& H)
-// {
-//     osr::PoseVector pose_vector;
-//     pose_vector.homogeneous(H);
-//     return to_ros_pose(pose_vector);
-// }
-
 inline geometry_msgs::Pose to_ros_pose(const Eigen::Matrix3d& R,
                                        const Eigen::Vector3d& t)
 {
-    osr::PoseVelocityVector pose_vector;
+    dbot::PoseVelocityVector pose_vector;
     pose_vector.orientation().rotation_matrix(R);
     pose_vector.position() = t;
     return to_ros_pose(pose_vector);
@@ -240,9 +219,9 @@ Parameter read(const std::string& path, ros::NodeHandle node_handle)
 {
     XmlRpc::XmlRpcValue ros_parameter;
 
-    if(!node_handle.getParam(path, ros_parameter))
+    if (!node_handle.getParam(path, ros_parameter))
     {
-        ROS_ERROR_STREAM("Could not read parameter at " << path );
+        ROS_ERROR_STREAM("Could not read parameter at " << path);
         throw;
     }
 
@@ -303,19 +282,6 @@ std::string get_camera_frame(const std::string& camera_info_topic,
     return camera_info->header.frame_id;
 }
 
-/// publish to ros *************************************************************
-// void publish_marker(const Eigen::Matrix4d& H,
-//                     const std::string& frame_id,
-//                     const ros::Time& stamp,
-//                     const std::string& object_model_path,
-//                     const ros::Publisher& pub,
-//                     const int& marker_id  = 0,
-//                     const float& r        = 0,
-//                     const float& g        = 0,
-//                     const float& b        = 1,
-//                     const float& a        = 1.0,
-//                     const std::string& ns = "object");
-
 void publish_marker(const geometry_msgs::PoseStamped& pose_stamped,
                     const std::string& object_model_path,
                     const ros::Publisher& pub,
@@ -325,18 +291,4 @@ void publish_marker(const geometry_msgs::PoseStamped& pose_stamped,
                     const float& b        = 1,
                     const float& a        = 1.0,
                     const std::string& ns = "object");
-
-// void publish_pose(const Eigen::Matrix4d H,
-//                   const std::string& frame_id,
-//                   const ros::Time& stamp,
-//                   const std::string& object_name,
-//                   const std::string& object_directory,
-//                   const std::string& object_package,
-//                   const ros::Publisher& pub);
-
-void publish_pose(const geometry_msgs::PoseStamped& pose,
-                  const std::string& object_name,
-                  const std::string& object_directory,
-                  const std::string& object_package,
-                  const ros::Publisher& pub);
 }

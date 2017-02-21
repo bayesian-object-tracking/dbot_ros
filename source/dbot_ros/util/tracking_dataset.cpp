@@ -17,23 +17,17 @@
  * \author Manuel Wuthrich (manuel.wuthrich@gmail.com)
  */
 
+#include <boost/foreach.hpp>
+#include <dbot/helper_functions.h>
+#include <dbot_ros/util/ros_interface.h>
+#include <dbot_ros/util/tracking_dataset.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 #include <ros/ros.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
-
 #include <tf/message_filter.h>
 #include <tf/tf.h>
-
-#include <message_filters/subscriber.h>
-#include <message_filters/time_synchronizer.h>
-
-#include <boost/foreach.hpp>
-
-#include <dbot/helper_functions.hpp>
-
-#include <dbot_ros/util/ros_interface.hpp>
-//#include <dbot_ros/util/pcl_interface.hpp>
-#include <dbot_ros/util/tracking_dataset.h>
 
 DataFrame::DataFrame(const sensor_msgs::Image::ConstPtr& image,
                      const sensor_msgs::CameraInfo::ConstPtr& info,
@@ -110,7 +104,7 @@ TrackingDataset::~TrackingDataset()
 {
 }
 
-//void TrackingDataset::AddFrame(const sensor_msgs::Image::ConstPtr& image,
+// void TrackingDataset::AddFrame(const sensor_msgs::Image::ConstPtr& image,
 //                               const sensor_msgs::CameraInfo::ConstPtr& info,
 //                               const Eigen::VectorXd& ground_truth,
 //                               const Eigen::VectorXd& deviation)
@@ -119,7 +113,7 @@ TrackingDataset::~TrackingDataset()
 //    data_.push_back(data);
 //}
 
- void TrackingDataset::AddFrame(const sensor_msgs::Image::ConstPtr& image,
+void TrackingDataset::AddFrame(const sensor_msgs::Image::ConstPtr& image,
                                const sensor_msgs::CameraInfo::ConstPtr& info)
 {
     DataFrame data(image, info);
@@ -144,7 +138,7 @@ sensor_msgs::CameraInfo::ConstPtr TrackingDataset::GetInfo(const size_t& index)
 {
     return data_[index].info_;
 }
-//pcl::PointCloud<pcl::PointXYZ>::ConstPtr TrackingDataset::GetPointCloud(
+// pcl::PointCloud<pcl::PointXYZ>::ConstPtr TrackingDataset::GetPointCloud(
 //    const size_t& index)
 //{
 //    Eigen::MatrixXd image = ri::Ros2Eigen<double>(*data_[index].image_);
@@ -202,9 +196,7 @@ void TrackingDataset::Load()
     // Use time synchronizer to make sure we get properly synchronized images
     message_filters::TimeSynchronizer<sensor_msgs::Image,
                                       sensor_msgs::CameraInfo>
-        sync(image_subscriber,
-             info_subscriber,
-             25);
+        sync(image_subscriber, info_subscriber, 25);
     sync.registerCallback(
         boost::bind(&TrackingDataset::AddFrame, this, _1, _2));
 
@@ -225,7 +217,6 @@ void TrackingDataset::Load()
                 m.instantiate<sensor_msgs::CameraInfo>();
             if (info != NULL) info_subscriber.newMessage(info);
         }
-
     }
     bag.close();
 
@@ -254,8 +245,8 @@ bool TrackingDataset::LoadTextFile(const char* filename, DataType type)
         {
             Eigen::VectorXd temp(state.rows() + 1);
             temp.topRows(state.rows()) = state;
-            temp(temp.rows() - 1) = scalar;
-            state = temp;
+            temp(temp.rows() - 1)      = scalar;
+            state                      = temp;
         }
 
         std::cout << "read state " << state.transpose() << std::endl;

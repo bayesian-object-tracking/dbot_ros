@@ -19,8 +19,8 @@
  */
 
 #include <boost/filesystem.hpp>
-#include <dbot/pose/free_floating_rigid_bodies_state.hpp>
-#include <dbot_ros/util/interactive_marker_initializer.hpp>
+#include <dbot/pose/free_floating_rigid_bodies_state.h>
+#include <dbot_ros/util/interactive_marker_initializer.h>
 #include <fstream>
 #include <ros/assert.h>
 

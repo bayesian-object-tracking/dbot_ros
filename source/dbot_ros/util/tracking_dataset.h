@@ -19,22 +19,14 @@
 #pragma once
 
 #include <Eigen/Dense>
-
+#include <boost/filesystem.hpp>
+#include <fstream>
+#include <message_filters/simple_filter.h>
 #include <ros/ros.h>
-
-#include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/Image.h>
 #include <sensor_msgs/JointState.h>
 #include <tf/tfMessage.h>
-
-#include <message_filters/simple_filter.h>
-
-#include <fstream>
-
-#include <boost/filesystem.hpp>
-
-//#include <pcl/point_types.h>
-//#include <pcl/point_cloud.h>
 
 class DataFrame
 {
@@ -51,20 +43,20 @@ public:
     DataFrame(const sensor_msgs::Image::ConstPtr& image,
               const sensor_msgs::CameraInfo::ConstPtr& info,
               const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-              const Eigen::VectorXd& deviation = Eigen::VectorXd());
+              const Eigen::VectorXd& deviation    = Eigen::VectorXd());
 
     DataFrame(const sensor_msgs::Image::ConstPtr& image,
               const sensor_msgs::CameraInfo::ConstPtr& info,
               const tf::tfMessage::ConstPtr gt_tf,
               const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-              const Eigen::VectorXd& deviation = Eigen::VectorXd());
+              const Eigen::VectorXd& deviation    = Eigen::VectorXd());
 
     DataFrame(const sensor_msgs::Image::ConstPtr& image,
               const sensor_msgs::CameraInfo::ConstPtr& info,
               const sensor_msgs::JointState::ConstPtr& ground_truth_joints,
               const sensor_msgs::JointState::ConstPtr& noisy_joints,
               const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-              const Eigen::VectorXd& deviation = Eigen::VectorXd());
+              const Eigen::VectorXd& deviation    = Eigen::VectorXd());
 
     DataFrame(const sensor_msgs::Image::ConstPtr& image,
               const sensor_msgs::CameraInfo::ConstPtr& info,
@@ -73,7 +65,7 @@ public:
               const tf::tfMessage::ConstPtr& tf,
               const tf::tfMessage::ConstPtr& fixed_tf,
               const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-              const Eigen::VectorXd& deviation = Eigen::VectorXd());
+              const Eigen::VectorXd& deviation    = Eigen::VectorXd());
 };
 
 template <class M>
@@ -98,10 +90,10 @@ public:
     TrackingDataset(const std::string& path);
     ~TrackingDataset();
 
-//    void AddFrame(const sensor_msgs::Image::ConstPtr& image,
-//                  const sensor_msgs::CameraInfo::ConstPtr& info,
-//                  const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
-//                  const Eigen::VectorXd& deviation = Eigen::VectorXd());
+    //    void AddFrame(const sensor_msgs::Image::ConstPtr& image,
+    //                  const sensor_msgs::CameraInfo::ConstPtr& info,
+    //                  const Eigen::VectorXd& ground_truth = Eigen::VectorXd(),
+    //                  const Eigen::VectorXd& deviation = Eigen::VectorXd());
 
     void AddFrame(const sensor_msgs::Image::ConstPtr& image,
                   const sensor_msgs::CameraInfo::ConstPtr& info);
@@ -114,7 +106,8 @@ public:
 
     sensor_msgs::CameraInfo::ConstPtr GetInfo(const size_t& index);
 
-//    pcl::PointCloud<pcl::PointXYZ>::ConstPtr GetPointCloud(const size_t& index);
+    //    pcl::PointCloud<pcl::PointXYZ>::ConstPtr GetPointCloud(const size_t&
+    //    index);
 
     Eigen::Matrix3d GetCameraMatrix(const size_t& index);
 

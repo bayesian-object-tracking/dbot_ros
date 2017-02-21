@@ -12,26 +12,21 @@
  */
 
 /**
- * \file data_set_camera_data_provider.hpp
+ * \file ros_camera_data_provider.h
  * \author Jan Issc (jan.issac@gmail.com)
- * \date January 2016
+ * \date December 2015
  */
 
 #pragma once
 
-#include <ros/ros.h>
-
-#include <string>
-
 #include <Eigen/Dense>
-
-#include <dbot/camera_data_provider.hpp>
-
-#include <dbot_ros/util/tracking_dataset.h>
+#include <dbot/camera_data_provider.h>
+#include <ros/ros.h>
+#include <string>
 
 namespace dbot
 {
-class DataSetCameraDataProvider : public CameraDataProvider
+class RosCameraDataProvider : public CameraDataProvider
 {
 public:
     /**
@@ -45,8 +40,12 @@ public:
      * \param timeout
      * 			Timeout in seconds applied on topic requests
      */
-    DataSetCameraDataProvider(const std::shared_ptr<TrackingDataset> data_set,
-                              int downsampling_factor);
+    RosCameraDataProvider(const ros::NodeHandle& nh,
+                          const std::string& camera_info_topic,
+                          const std::string& depth_image_topic,
+                          const CameraData::Resolution& native_res,
+                          int downsampling_factor,
+                          double timeout);
 
 public:
     /**
@@ -83,8 +82,13 @@ public:
     CameraData::Resolution native_resolution() const;
 
 private:
-    std::shared_ptr<TrackingDataset> data_set_;
+    mutable ros::NodeHandle nh_;
+    std::string camera_info_topic_;
+    std::string depth_image_topic_;
+    mutable std::string frame_id_;
+    mutable Eigen::MatrixXd camera_matrix_;
     CameraData::Resolution native_resolution_;
     int downsampling_factor_;
+    double timeout_;
 };
 }

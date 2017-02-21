@@ -17,18 +17,14 @@
  * \author Jan Issac (jan.issac@gmail.com)
  */
 
-#include <functional>
-#include <string>
-
 #include <boost/filesystem.hpp>
-
-#include <ros/package.h>
-#include <ros/publisher.h>
-
+#include <dbot_ros/util/interactive_marker_initializer.h>
+#include <functional>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
-
-#include <dbot_ros/util/interactive_marker_initializer.hpp>
+#include <ros/package.h>
+#include <ros/publisher.h>
+#include <string>
 
 static ros::Publisher pose_publisher;
 

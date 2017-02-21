@@ -19,13 +19,14 @@
 
 #pragma once
 
-#include <vector>
+#include <dbot/camera_data.h>
+#include <dbot_ros_msgs/ObjectState.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <memory>
 #include <mutex>
-#include <dbot/camera_data.hpp>
 #include <sensor_msgs/Image.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <dbot_ros_msgs/ObjectState.h>
+#include <vector>
 
 namespace dbot
 {
@@ -70,7 +71,6 @@ public:
     std::vector<geometry_msgs::PoseStamped> current_poses() const;
 
     const std::shared_ptr<Tracker>& tracker() { return tracker_; }
-
     void shutdown();
 
 protected:
@@ -80,12 +80,10 @@ protected:
     double current_time_;
     int object_count_;
     std::vector<geometry_msgs::PoseStamped> current_poses_;
-    std::vector<geometry_msgs::PoseStamped> current_velocities_;
+    std::vector<geometry_msgs::TwistStamped> current_velocities_;
     sensor_msgs::Image current_ros_image_;
     std::mutex obsrv_mutex_;
     std::shared_ptr<Tracker> tracker_;
     std::shared_ptr<dbot::CameraData> camera_data_;
 };
-
-
 }
