@@ -4,9 +4,10 @@ This package extends the [dbot](https://github.com/bayesian-object-tracking/dbot
 All trackers require object mesh models in Wavefront (.obj) format.
 
 # Requirements
- * Kinect or XTION depth sensor
- * Ubuntu 12.04
- * C++0x or C++11 Compiler (gcc-4.6 or later)
+ * MS Kinect or Asus XTION depth sensor
+ * Ubuntu 14.04
+ * Tested with [ROS Indigo](http://wiki.ros.org/indigo)
+ * c++11 Compiler (gcc-4.7 or later)
  * [CUDA](https://developer.nvidia.com/cuda-downloads) 6.5 or later (optional)
  
 ## Dependecies
