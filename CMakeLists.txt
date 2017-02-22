@@ -9,7 +9,7 @@ project(dbot_ros)
 # Flags                    #
 ############################
 # Enable c++11 GCC 4.6 or greater required
-add_definitions(-std=c++0x)
+add_definitions(-std=c++11)
 add_definitions(-DPROFILING_ON=1 -fPIC) #print profiling output
 
 ############################
