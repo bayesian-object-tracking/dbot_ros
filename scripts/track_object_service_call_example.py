@@ -23,7 +23,7 @@ def track_object(object_name):
                 orientation=Quaternion(0, 0, 0, 0))
 
     # set Object resource identifier to find the model
-    ori = ObjectOri(package = "sab_data",
+    ori = ObjectOri(package = "object_meshes",
                     directory="object_models",
                     name=object_name + ".obj")
 

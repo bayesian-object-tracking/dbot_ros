@@ -1,6 +1,6 @@
 
 object:
-  package:    sab_data
+  package:    object_meshes
   directory:  object_models
   meshes:     [ impact_battery.obj ]
 

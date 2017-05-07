@@ -5,7 +5,7 @@ object_finder_service_name: object_finder_service
 
 objects:
   # ros package name which contains the object models
-  package: sab_data
+  package: object_meshes
 
   # directory to the object models within the package
   directory: object_models
