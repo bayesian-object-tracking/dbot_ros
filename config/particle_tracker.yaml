@@ -3,9 +3,11 @@ particle_filter:
   use_gpu: true
 
   cpu:
+    # the number of particles if using cpu
     sample_count: 100
 
   gpu:
+    # the number of particles if using gpu
     sample_count: 2000
 
     # set true to use custom shader definitions file defined below
@@ -18,37 +20,53 @@ particle_filter:
     # optional (values: none | /path/to/shader)
     geometry_shader_file: none
 
-  # State moving average update rate in [0.0; 1.0]
-  #   1: unfiltered wiggly estimates.
-  #   0: constant
+  # if desired, exponential smoothing can be performed on the output
+  # of the particle filter. [1.0: no smoothing, 0.0: maximal smoothing]
   moving_average_update_rate: 1.0
 
-  # Specify whether to center the frame of the object
+  # this affects the center of rotation of the object.
+  # false: rotate around origin of the mesh model
+  # true: rotate around the mean of the vertices of the mesh model
   center_object_frame: true 
 
+  # particles will only be resampled if their weights are very concentrated.
+  # this parameter is a measure of this concentration. 
+  # 0.0: particles will be resampled at each step
+  # inf: particles will never be resampled
   max_kl_divergence: 2.0
 
   observation:
     occlusion:
-      initial_occlusion_prob: 0.25 #0.1
-      p_occluded_visible: 0.1 #0.1
-      p_occluded_occluded: 0.7 #0.7
+      # these parameters define the time evolution of the occlusion variables
+      initial_occlusion_prob: 0.1
+      p_occluded_visible: 0.1
+      p_occluded_occluded: 0.7
     kinect:
-      tail_weight: 0.01 #0.01, 0.998
-      model_sigma: 0.003 #0.003, 0.005
-      sigma_factor: 0.0014247 #0.0014247
+      # these parameters specify the observation model for a single pixel,
+      # for details please check [1]  
+      tail_weight: 0.01
+      model_sigma: 0.003
+      sigma_factor: 0.0014247
 
+  # the state transition model is a random motion,
+  # where Gaussian noise is injected into the velocities
   object_transition:
+    # the parameters below define the noise magnitue (standard deviation)
     linear_sigma_x: 0.0025
     linear_sigma_y: 0.0025
     linear_sigma_z: 0.0025
     angular_sigma_x: 0.02
     angular_sigma_y: 0.02
     angular_sigma_z: 0.02
+    # this parameter specifies how fast the velocity tends to zero, 
+    # 0.0: velocity is set to 0 at each time step, 1.0: velocity remains constant
     velocity_factor: 0.8
 
   object_color:
    R: 10
    G: 200
    B: 50
+
+
+# [1] Wuthrich et al., Probabilistic Object Tracking Using a Range Camera, IROS 2013
 
