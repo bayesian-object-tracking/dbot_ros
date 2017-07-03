@@ -246,12 +246,10 @@ Eigen::Matrix<Scalar, 3, 3> get_camera_matrix(
     if (!camera_info)
     {
         // if not topic was received within <seconds>
-        ROS_WARN(
-            "CameraInfo wasn't received within %f seconds. Returning default "
-            "Zero message.",
-            seconds);
+        ROS_INFO("Waiting for camera info ...");
         return camera_matrix;
     }
+    ROS_INFO("Camera info ... received");
 
     for (size_t col = 0; col < 3; col++)
         for (size_t row = 0; row < 3; row++)
