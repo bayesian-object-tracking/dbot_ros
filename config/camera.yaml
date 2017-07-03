@@ -1,7 +1,7 @@
 # although openni is started with registered:=true  there is no data arriving at
 # /camera/depth_registered/image. Therefore, we use /camera/depth
-depth_image_topic: /camera/depth/image
-camera_info_topic: /camera/depth/camera_info 
+depth_image_topic: /XTION/depth/image
+camera_info_topic: /XTION/depth/camera_info 
 downsampling_factor: 8
 
 resolution:
