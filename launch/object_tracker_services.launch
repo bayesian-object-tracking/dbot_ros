@@ -1,12 +1,15 @@
 <launch>
   <arg name="finder_config" />
   <arg name="filter_config" />
+  <arg name="camera_config" />
   <include file="$(find table_object_finder)/launch/object_finder_service.launch">
     <arg name="finder_config" value="$(arg finder_config)"/>
+    <arg name="camera_config" value="$(arg camera_config)"/>
   </include>
   
   <include file="$(find dbot_ros)/launch/object_tracker_service.launch">
     <arg name="filter_config" value="$(arg filter_config)" />
+    <arg name="camera_config" value="$(arg camera_config)"/>
   </include>
 
   <include file="$(find dbot_ros)/launch/object_tracker_controller_service.launch" />
