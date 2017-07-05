@@ -56,7 +56,7 @@ void ObjectStatePublisher::publish(
         ri::publish_marker(states[i].pose,
                            ori_.mesh_uri(i),
                            object_marker_publisher_,
-                           0,
+                           i,
                            object_color_red_ / 255.,
                            object_color_green_ / 255.,
                            object_color_blue_ / 255.);
