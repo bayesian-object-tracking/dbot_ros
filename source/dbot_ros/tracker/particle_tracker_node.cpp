@@ -223,13 +223,16 @@ int main(int argc, char** argv)
     /* ------------------------------ */
     /* - Initialize interactively   - */
     /* ------------------------------ */
+    bool use_cached_poses = false;
+    nh.getParam("use_cached_poses", use_cached_poses);
     opi::InteractiveMarkerInitializer object_initializer(
         camera_data->frame_id(),
         ori.package(),
         ori.directory(),
         ori.meshes(),
         {},
-        true);
+        true,
+        use_cached_poses);
     if (!object_initializer.wait_for_object_poses())
     {
         ROS_INFO("Setting object poses was interrupted.");
@@ -244,6 +247,7 @@ int main(int argc, char** argv)
     {
         initial_poses[0].component(i++) = ri::to_pose_velocity_vector(ros_pose);
     }
+
 
     tracker->initialize(initial_poses);
 
