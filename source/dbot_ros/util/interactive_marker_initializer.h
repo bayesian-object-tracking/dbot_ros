@@ -24,6 +24,7 @@
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseArray.h>
 #include <interactive_markers/interactive_marker_server.h>
+#include <memory>
 #include <mutex>
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
@@ -44,7 +45,8 @@ public:
                                  const std::string& object_directory,
                                  const std::vector<std::string>& object_names,
                                  const std::vector<geometry_msgs::Pose>& poses,
-                                 bool load_from_cache);
+                                 bool load_from_cache,
+                                 bool accept_cached_poses = false);
 
     /**
      *
@@ -90,8 +92,10 @@ public:
 
     /**
      * \brief Checks wheather all object poses have been aligned
+     * \param accept_cached_poses If set to true and cached poses where loaded,
+     *        this will return true.
      */
-    bool are_all_object_poses_set();
+    bool are_all_object_poses_set(bool accept_cached_poses = false);
 
     /**
      * \brief A call to this fucntion will block until all object poses have
@@ -174,6 +178,7 @@ protected:
     std::vector<bool> active_;
 
     bool load_from_cache_;
+    bool accept_cached_poses_;
 
     /**
      * \brief Poses container of all interactive markers
@@ -195,7 +200,7 @@ private:
     /**
      * \brief Interactive marker backend
      */
-    interactive_markers::InteractiveMarkerServer server_;
+    std::shared_ptr<interactive_markers::InteractiveMarkerServer> server_;
 
     /**
      * \brief Camera reference frame for the markers

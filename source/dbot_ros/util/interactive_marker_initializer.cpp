@@ -32,17 +32,39 @@ InteractiveMarkerInitializer::InteractiveMarkerInitializer(
     const std::string& object_directory,
     const std::vector<std::string>& object_names,
     const std::vector<geometry_msgs::Pose>& poses,
-    bool load_from_cache)
-    : server_("interactive_marker_initializer"),
+    bool load_from_cache,
+    bool accept_cached_poses)
+    : load_from_cache_(load_from_cache),
+      accept_cached_poses_(accept_cached_poses),
+      server_(std::make_shared<interactive_markers::InteractiveMarkerServer>(
+          "interactive_marker_initializer")),
       camera_frame_id_(camera_frame_id)
 {
-    set_objects(
-        object_package, object_directory, object_names, poses, load_from_cache);
+    if (load_from_cache_ && accept_cached_poses_)
+    {
+        ROS_INFO(
+            "Skipping interactive marker initializer. Using cached poses.");
+        poses_.resize(object_names.size());
+        for (size_t i = 0; i < object_names.size(); ++i)
+        {
+            std::string name = std::to_string(i);
+            load_pose_from_cache(name, poses_[i]);
+        }
+    }
+    else
+    {
+        set_objects(object_package,
+                    object_directory,
+                    object_names,
+                    poses,
+                    load_from_cache);
+    }
 }
 
 InteractiveMarkerInitializer::InteractiveMarkerInitializer(
     const std::string& camera_frame_id)
-    : server_("interactive_marker_initializer"),
+    : server_(std::make_shared<interactive_markers::InteractiveMarkerServer>(
+          "interactive_marker_initializer")),
       camera_frame_id_(camera_frame_id)
 {
 }
@@ -71,10 +93,9 @@ void InteractiveMarkerInitializer::set_objects(
     bool load_from_cache,
     bool make_active)
 {
-    poses_           = poses;
-    load_from_cache_ = load_from_cache;
+    poses_ = poses;
 
-    server_.clear();
+    server_->clear();
     poses_.resize(object_names.size());
 
     // activate all markers
@@ -84,12 +105,13 @@ void InteractiveMarkerInitializer::set_objects(
         active_[i] = make_active;
     }
 
-    // of poses provided they have to match the number of objects
+    // If poses provided they have to match the number of objects
     if (poses.size() > 0 && object_names.size() != poses.size())
     {
         ROS_ERROR("#object names != #poses");
         exit(1);
     }
+
 
     for (size_t i = 0; i < object_names.size(); i++)
     {
@@ -116,16 +138,17 @@ void InteractiveMarkerInitializer::set_objects(
         switch_marker(int_marker, make_active);
 
         // add the interactive marker to our collection &
-        // tell the server to call process_feedback() when feedback arrives for
+        // tell the server to call process_feedback() when feedback arrives
+        // for
         // it
-        server_.insert(
+        server_->insert(
             int_marker,
             boost::bind(
                 &InteractiveMarkerInitializer::process_feedback, this, _1));
     }
 
     // 'commit' changes and send to all clients
-    server_.applyChanges();
+    server_->applyChanges();
 }
 
 void InteractiveMarkerInitializer::poses_update_callback(Callback callback)
@@ -138,8 +161,14 @@ void InteractiveMarkerInitializer::delete_poses_update_callback()
     poses_update_callback_ = Callback();
 }
 
-bool InteractiveMarkerInitializer::are_all_object_poses_set()
+bool InteractiveMarkerInitializer::are_all_object_poses_set(
+    bool accept_cached_poses)
 {
+    if (accept_cached_poses && load_from_cache_)
+    {
+        return true;
+    }
+
     for (bool still_active : active_)
     {
         if (still_active) return false;
@@ -151,10 +180,11 @@ bool InteractiveMarkerInitializer::are_all_object_poses_set()
 bool InteractiveMarkerInitializer::wait_for_object_poses()
 {
     ROS_INFO(
-        "Please use rviz to align and initialize the object poses under the "
+        "Please use rviz to align and initialize the object poses under "
+        "the "
         "topic.");
     ROS_INFO("Waiting for all interactive object poses to be set ...");
-    while (!are_all_object_poses_set())
+    while (!are_all_object_poses_set(accept_cached_poses_))
     {
         if (!ros::ok()) return false;
 
@@ -193,9 +223,13 @@ void InteractiveMarkerInitializer::create_interactive_marker(
     int_marker.scale           = 0.2;
     // position interactive marker by default 1 m in font
     // of camera in viewing condition
-    int_marker.pose.position.x = 0.0;
-    int_marker.pose.position.y = 0.0;
-    int_marker.pose.position.z = 1.0;
+    int_marker.pose.position.x    = 0.0;
+    int_marker.pose.position.y    = 0.0;
+    int_marker.pose.position.z    = 1.0;
+    int_marker.pose.orientation.w = 1;
+    int_marker.pose.orientation.x = 0;
+    int_marker.pose.orientation.y = 0;
+    int_marker.pose.orientation.z = 0;
 
     // load pose from cache if available
     if (load_from_cache_)
@@ -228,6 +262,10 @@ void InteractiveMarkerInitializer::add_object_controller(
     object_marker.color.g       = 0.5;
     object_marker.color.b       = 0.5;
     object_marker.color.a       = 1.0;
+    object_marker.pose.orientation.w = 1;
+    object_marker.pose.orientation.x = 0;
+    object_marker.pose.orientation.y = 0;
+    object_marker.pose.orientation.z = 0;
 
     // create a non-interactive control which contains the object
     visualization_msgs::InteractiveMarkerControl object_control;
@@ -235,6 +273,7 @@ void InteractiveMarkerInitializer::add_object_controller(
         visualization_msgs::InteractiveMarkerControl::BUTTON;
     object_control.name           = "button_control";
     object_control.always_visible = true;
+    object_control.orientation.w  = 1;
     object_control.markers.push_back(object_marker);
 
     // add the control to the interactive marker
@@ -295,7 +334,8 @@ void InteractiveMarkerInitializer::process_feedback(
 
     ROS_INFO("Marker Frame %s", feedback->header.frame_id.c_str());
 
-    // if the feedback from the marker is in a different than the desired frame
+    // if the feedback from the marker is in a different than the desired
+    // frame
     // convert it using a transform listener
     if (feedback->header.frame_id.compare(camera_frame_id_) != 0)
     {
@@ -321,7 +361,7 @@ void InteractiveMarkerInitializer::process_feedback(
     }
 
     visualization_msgs::InteractiveMarker int_marker;
-    server_.get(feedback->marker_name, int_marker);
+    server_->get(feedback->marker_name, int_marker);
     if (feedback->event_type ==
         visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK)
     {
@@ -343,9 +383,20 @@ void InteractiveMarkerInitializer::process_feedback(
         }
 
         // update marker
+
         int_marker.header.frame_id = feedback->header.frame_id;
-        server_.insert(int_marker);
-        server_.applyChanges();
+
+        int_marker.controls.front().orientation.w = 1;
+        int_marker.pose.orientation.w             = 1;
+        int_marker.pose.orientation.x             = 0;
+        int_marker.pose.orientation.y             = 0;
+        int_marker.pose.orientation.z             = 0;
+
+        // apply no changes this will cause rviz to crash (with ogre 1.9)
+        // server_->insert(int_marker);
+        // server_->applyChanges();
+        // same happens when destroying the marker server
+        // server_.reset();
     }
 }
 
@@ -380,6 +431,7 @@ void InteractiveMarkerInitializer::load_pose_from_cache(
         ROS_INFO("Loading interactive marker pose %s from ",
                  cache_file.c_str());
 
+
         pose_tmp_file >> pose.position.x;
         pose_tmp_file >> pose.position.y;
         pose_tmp_file >> pose.position.z;
@@ -389,6 +441,18 @@ void InteractiveMarkerInitializer::load_pose_from_cache(
         pose_tmp_file >> pose.orientation.z;
         pose_tmp_file.close();
     }
+    else
+    {
+        ROS_WARN_STREAM("No cached pose for object " << object_name);
+    }
+
+    double length = std::sqrt(
+        std::pow(pose.orientation.w, 2) + std::pow(pose.orientation.x, 2) +
+        std::pow(pose.orientation.y, 2) + std::pow(pose.orientation.z, 2));
+    pose.orientation.w /= length;
+    pose.orientation.x /= length;
+    pose.orientation.y /= length;
+    pose.orientation.z /= length;
 }
 
 void InteractiveMarkerInitializer::cache_pose(
