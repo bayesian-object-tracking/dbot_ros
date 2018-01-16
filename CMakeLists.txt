@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.8.3)
 project(dbot_ros)
 
 ############################
-# Options                  #
-############################
-
-############################
 # Flags                    #
 ############################
 # Enable c++11 GCC 4.6 or greater required
@@ -54,12 +50,13 @@ set(PROJECT_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_MODULE_PATH ${PROJECT_MODULE_PATH})
 
 find_package(Boost REQUIRED)
-find_package(Eigen REQUIRED)
-find_package(OpenCV REQUIRED)
-
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${Eigen_INCLUDE_DIRS})
-include_directories(${OpenCV_INCLUDE_DIRS})
+
+find_package(Eigen3 3.2 EXACT REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+# find_package(OpenCV REQUIRED)
+# include_directories(${OpenCV_INCLUDE_DIRS})
 
 ###################################
 ## catkin specific configuration ##
@@ -82,9 +79,7 @@ catkin_package(
     dbot
     dbot_ros_msgs
     interactive_markers
-  DEPENDS
-    OpenCV
-    eigen)
+    )
 
 ###########
 ## Build ##
@@ -116,7 +111,7 @@ add_dependencies(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES})
+  )
 
 add_executable(particle_tracker
   source/${PROJECT_NAME}/tracker/particle_tracker_node.cpp)
@@ -125,7 +120,6 @@ add_dependencies(particle_tracker
 target_link_libraries(particle_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
 
@@ -136,7 +130,6 @@ add_dependencies(gaussian_tracker
 target_link_libraries(gaussian_tracker
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
 
@@ -147,7 +140,6 @@ add_dependencies(object_tracker_service
 target_link_libraries(object_tracker_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
 
@@ -158,7 +150,6 @@ add_dependencies(object_tracker_controller_service
 target_link_libraries(object_tracker_controller_service
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
-  ${OpenCV_LIBS}
   ${PCL_LIBRARIES}
   yaml-cpp)
 
@@ -168,5 +159,6 @@ add_executable(
 target_link_libraries(
   interactive_markers_initializer_node
   ${PROJECT_NAME}
-  ${catkin_LIBRARIES})
+  ${catkin_LIBRARIES}
+  )
 
