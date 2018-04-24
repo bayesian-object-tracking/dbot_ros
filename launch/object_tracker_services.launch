@@ -12,5 +12,9 @@
     <arg name="camera_config" value="$(arg camera_config)"/>
   </include>
 
-  <include file="$(find dbot_ros)/launch/object_tracker_controller_service.launch" />
+  <include file="$(find dbot_ros)/launch/object_tracker_controller_service.launch">
+    <arg name="camera_config" value="$(arg camera_config)"/>
+  </include>
+
+
 </launch>
