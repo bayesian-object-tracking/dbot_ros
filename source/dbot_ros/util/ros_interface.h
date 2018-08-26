@@ -136,8 +136,20 @@ template <typename Scalar>
 Eigen::Matrix<Scalar, -1, -1> to_eigen_matrix(
     const sensor_msgs::Image& ros_image, const size_t& n_downsampling = 1)
 {
-    cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
+  cv::Mat cv_image;
+  // Kinect1/XTION use encoding 32FC1 and meters
+  if(ros_image.encoding.compare("32FC1")==0)
+    cv_image = cv_bridge::toCvCopy(ros_image)->image;
+  else
+    // Kinect2 uses encoding 16UC1 and millimeters and therefore has to be converted to 32FC1
+    // TODO: Assumption that all depth sensors in encoding different from 32FC1 are in millimeters
+    cv_bridge::toCvCopy(ros_image, ros_image.encoding)->image.convertTo(cv_image, CV_32F, 0.001);
 
+  //  cv_bridge::toCvCopy(ros_image, sensor_msgs::image_encodings::TYPE_16UC1)->image.convertTo(cv_image, CV_32F, 0.001);
+  //cv_bridge::toCvCopy(ros_image, ros_image.encoding)->image.convertTo(cv_image, CV_32F, 0.001);
+  //  cv_bridge::toCvCopy(ros_image, ros_image.encoding)->image.convertTo(cv_image, CV_32F);
+
+  
     size_t n_rows = cv_image.rows / n_downsampling;
     size_t n_cols = cv_image.cols / n_downsampling;
     Eigen::Matrix<Scalar, -1, -1> eigen_image(n_rows, n_cols);
@@ -153,8 +165,15 @@ template <typename Scalar>
 Eigen::Matrix<Scalar, -1, 1> to_eigen_vector(
     const sensor_msgs::Image& ros_image, const size_t& n_downsampling = 1)
 {
-    cv::Mat cv_image = cv_bridge::toCvCopy(ros_image)->image;
-
+  cv::Mat cv_image;
+  // Kinect1/XTION use encoding 32FC1 and meters
+  if(ros_image.encoding.compare("32FC1")==0)
+    cv_image = cv_bridge::toCvCopy(ros_image)->image;
+  else
+    // Kinect2 uses encoding 16UC1 and millimeters and therefore has to be converted to 32FC1
+    // TODO: Assumption that all depth sensors in encoding different from 32FC1 are in millimeters
+    cv_bridge::toCvCopy(ros_image, ros_image.encoding)->image.convertTo(cv_image, CV_32F, 0.001);
+  
     size_t n_rows = cv_image.rows / n_downsampling;
     size_t n_cols = cv_image.cols / n_downsampling;
 
