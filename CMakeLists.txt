@@ -97,9 +97,11 @@ set(dbot_ros_SOURCES
     source/${PROJECT_NAME}/object_tracker_ros.cpp
     source/${PROJECT_NAME}/object_tracker_publisher.cpp 
     source/${PROJECT_NAME}/util/ros_camera_data_provider.cpp
-    source/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
     source/${PROJECT_NAME}/util/ros_interface.cpp
-    source/${PROJECT_NAME}/util/tracking_dataset.cpp
+    # we do not build the following two sources for now, because we 
+    # have compilation issues and we don't need this functionality currently
+    # source/${PROJECT_NAME}/util/data_set_camera_data_provider.cpp
+    # source/${PROJECT_NAME}/util/tracking_dataset.cpp
     source/${PROJECT_NAME}/util/interactive_marker_initializer.cpp)
 
 add_library(${PROJECT_NAME}
