@@ -73,6 +73,7 @@ catkin_package(
     sensor_msgs
     std_msgs
     geometry_msgs
+    cv_bridge
     message_filters
     image_transport
     fl
