@@ -90,10 +90,6 @@ include_directories(${dbot_ros_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 set(dbot_ros_SOURCE_DIR source/${PROJECT_NAME})
 
-file(GLOB_RECURSE dbot_ros_HEADERS
-    ${dbot_SOURCE_DIR}/*.hpp
-    ${dbot_SOURCE_DIR}/*.h)
-
 set(dbot_ros_SOURCES
     source/${PROJECT_NAME}/object_tracker_ros.cpp
     source/${PROJECT_NAME}/object_tracker_publisher.cpp 
@@ -106,7 +102,6 @@ set(dbot_ros_SOURCES
     source/${PROJECT_NAME}/util/interactive_marker_initializer.cpp)
 
 add_library(${PROJECT_NAME}
-  ${dbot_ros_HEADERS}
   ${dbot_ros_SOURCES})
 
 add_dependencies(${PROJECT_NAME}
